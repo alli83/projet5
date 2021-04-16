@@ -1,1 +1,6 @@
 
+vendor/
+var/
+.php_cs.cache
+composer.json
+composer.lock

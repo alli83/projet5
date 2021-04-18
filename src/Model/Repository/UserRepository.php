@@ -59,7 +59,7 @@ final class UserRepository implements EntityRepositoryInterface
 
     public function create(object $user): bool
     {
-        // TO DO handle error 
+        // TO DO handle error
         $req = $this->pdo->prepare('INSERT INTO user (pseudo, email, password) VALUES(:pseudo, :email, :password)');
 
         $req->bindValue("email", $user->getEmail());

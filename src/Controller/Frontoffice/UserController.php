@@ -49,10 +49,14 @@ final class UserController
 
                 if ($auth->register()) {
                     $user = $this->userRepository->findOneBy(['email' => $params['email']]);
-
-                    $message = new Mailer();
-                    $message->sendMessage("frontoffice/mail/validateRegistration.html.twig", $user, $params['email']);
-                    $this->session->addFlashes('success', 'Votre inscription a bien été prise en compte. Vous allez recevoir un lien de validation');
+                    if ($user !== null) {
+                        $message = new Mailer();
+                        $message->sendMessage("frontoffice/mail/validateRegistration.html.twig", $user, $params['email']);
+                        $this->session->addFlashes('success', 'Votre inscription a bien été prise en compte. Vous allez recevoir un lien de validation');
+                    }
+                    else {
+                        $this->session->addFlashes('error', 'une erreur s\'est produite');
+                    }
                 } else {
                     $this->session->addFlashes('error', 'une erreur s\'est produite');
                 }

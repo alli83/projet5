@@ -1,0 +1,92 @@
+{% extends "/frontoffice/base.html.twig" %}
+
+{% block title %}- Accueil{% endblock %}
+{% block content %}
+<div class="jumbotron p-3 p-md-5 text-white text-center rounded bg-dark">
+  <div class="col-md-12 px-0">
+    <h1 class="display-4 font-italic ">Un bon titre</h1>
+    <p class="lead my-3">Une petite phrase d'accroche</p>
+  </div>
+</div>
+
+<div class="row mt-5">
+  <div class="col-lg-12">
+    <img class="rounded-circle center"
+      src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="
+      alt="Generic placeholder image" width="140" height="140">
+    <div class="col-lg-8 center text-center">
+      <h2>Heading</h2>
+      <p>Donec sed odio dui. Etiam porta sem malesuada magna mollis euismod. Nullam id dolor id nibh ultricies vehicula
+        ut id elit. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Praesent commodo cursus magna.</p>
+      <p><a class="btn btn-secondary" href="index.php?action=download&file=moncv.pdf" role="button">mon cv</a></p>
+    </div>
+    <div class="text-center pb-3">
+      <a href="https://twitter.com/share" class="btn btn-social btn-github">
+        <i class="fa fa-github pe-3 socialShare"></i> Suivez moi sur Github</i></a>
+      <a href="https://twitter.com/share" class="btn btn-social btn-linkedin">
+        <i class="fa fa-linkedin pe-3 socialShare"></i> ou sur linkedIn</i></a>
+      <a href="https://twitter.com/share" class="btn btn-social btn-twitter">
+        <i class="fa fa-twitter"></i> ou sur Twitter</i></a>
+
+    </div>
+  </div>
+</div>
+</div>
+</div>
+<div class="container text-center">
+  <h5>Une question ... n'hésitez pas à me contacter </h5>
+</div>
+<div class="container my-5">
+  <div class="row justify-content-md-center">
+    <div class="col-md-6 p-4 rounded justify-content-center filmPage">
+      <form method="POST" action="/">
+        <div class="form-check d-flex justify-content-center mb-4">
+
+          <label class="form-check-label" for="form2Example4">
+            Je souhaite:
+          </label>
+        </div>
+
+        <select class="form-select" aria-label="Default select example" name="reason">
+          <option selected>Obtenir des renseignements</option>
+          <option>M'inscrire</option>
+          <option>Avoir un devis</option>
+          <option>Autres</option>
+        </select>
+
+
+        <h4 class="text-center my-4">Vos coordonnées</h4>
+        <div class="col mb-2">
+          <div class="form-outline">
+            <label class="form-label" for="form3Example1">Votre prénom</label>
+            <input type="text" id="form3Example1" class="form-control" name="name" required/>
+          </div>
+        </div>
+        <div class="col mb-2">
+          <div class="">
+            <label class="form-label" for="form3Example2">Votre nom</label>
+            <input type="text" id="form3Example2" class="form-control" name="lastName" required/>
+          </div>
+        </div>
+        <div class="mb-4">
+          <label class="form-label" for="form3Example3">Votre email</label>
+          <input type="email" id="form3Example3" class="form-control" name="email" required/>
+        </div>
+        <div class="form-group mb-3">
+          <label for="exampleFormControlTextarea2">Votre message</label>
+          <textarea class="form-control rounded-0" id="exampleFormControlTextarea2" name="message" rows="3" required></textarea>
+        </div>
+        <div class="form-check d-flex justify-content-center mb-4">
+          <input class="form-check-input me-2" type="checkbox" value="" id="form2Example9" name="check" checked required/>
+          <label class="form-check-label" for="form2Example9">
+            J'accepte les conditions......
+          </label>
+        </div>
+        <div class="text-center">
+          <button type="submit" class="btn btn-primary btn-block mb-4 orangeButton">Envoyer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

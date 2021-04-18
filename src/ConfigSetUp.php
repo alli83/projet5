@@ -2,29 +2,29 @@
 
 namespace App;
 
-class Config
+class ConfigSetUp
 {
     private static array $settingsConfig;
     private static ?object $instance;
 
     public function __construct()
     {
-        Config::$settingsConfig = require('config/config.php');
+        ConfigSetUp::$settingsConfig = require('config/config.php');
     }
 
     public static function getSettingsDb(): array
     {
-        if (empty(Config::$settingsConfig)) {
-            Config::$instance = new Config();
+        if (empty(ConfigSetUp::$settingsConfig)) {
+            ConfigSetUp::$instance = new ConfigSetUp();
         }
-        return Config::$settingsConfig["database"];
+        return ConfigSetUp::$settingsConfig["database"];
     }
 
     public static function getSettingsMailer(): array
     {
-        if (empty(Config::$settingsConfig)) {
-            Config::$instance = new Config();
+        if (empty(ConfigSetUp::$settingsConfig)) {
+            ConfigSetUp::$instance = new ConfigSetUp();
         }
-        return Config::$settingsConfig["emailTransport"];
+        return ConfigSetUp::$settingsConfig["emailTransport"];
     }
 }

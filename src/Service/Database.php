@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use App\Config;
+use App\ConfigSetUp;
 use PDO;
 
 final class Database
@@ -13,7 +13,7 @@ final class Database
 
     public function __construct()
     {
-        $this->settings = Config::getSettingsDb();
+        $this->settings = ConfigSetUp::getSettingsDb();
     }
 
     public function connectToDb(): PDO

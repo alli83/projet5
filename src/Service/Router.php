@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace  App\Service;
 
+use App\Controller\Frontoffice\HomeController;
 use App\Controller\Frontoffice\PostController;
 use App\Controller\Frontoffice\UserController;
 use App\Model\Repository\PostRepository;
@@ -32,11 +33,24 @@ final class Router
 
     public function run(): Response
     {
-        $action = $this->request->query()->has('action') ? $this->request->query()->get('action') : 'posts';
+        $action = $this->request->query()->has('action') ? $this->request->query()->get('action') : 'accueil';
+        $method = $this->request->getMethod() === "POST" ? $this->request->getMethod() : '';
 
+        // *** @Route http://localhost:8000/***
+        if ($action === 'accueil' && empty($method)) {
+            var_dump("la");
+            $controller = new HomeController($this->view, $this->session);
 
-        // *** @Route http://localhost:8000/?action=posts ***
-        if ($action === 'posts') {
+            return $controller->getHomePage();
+
+            // *** @Route http://localhost:8000/contact***
+        } elseif ($action === 'accueil' && !empty($method)) {
+            $controller = new HomeController($this->view, $this->session);
+
+            return $controller->contactDev($this->request);
+
+            // *** @Route http://localhost:8000/?action=posts ***
+        } elseif ($action === 'posts') {
             try {
                 $postRepo = new PostRepository($this->database);
             } catch (\Exception $e) {

@@ -53,8 +53,7 @@ final class UserController
                         $message = new Mailer();
                         $message->sendMessage("frontoffice/mail/validateRegistration.html.twig", $user, $params['email']);
                         $this->session->addFlashes('success', 'Votre inscription a bien été prise en compte. Vous allez recevoir un lien de validation');
-                    }
-                    else {
+                    } else {
                         $this->session->addFlashes('error', 'une erreur s\'est produite');
                     }
                 } else {

@@ -13,12 +13,22 @@ final class Comment
     private string $text;
     private int $idPost;
 
-    public function __construct(int $id, string $pseudo, string $text, int $idPost)
+    public function __construct(?array $datas = [])
     {
-        $this->id = $id;
-        $this->pseudo = $pseudo;
-        $this->text = $text;
-        $this->idPost = $idPost;
+        if (!empty($datas)) {
+            $this->hydrate($datas);
+        }
+    }
+
+    public function hydrate(array $datas): void
+    {
+        foreach ($datas as $key => $value) {
+            $method = 'set' . ucfirst($key);
+
+            if (method_exists($this, $method)) {
+                $this->$method($value);
+            }
+        }
     }
 
     public function getId(): int

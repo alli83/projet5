@@ -12,11 +12,23 @@ final class Post
     private string $title;
     private string $text;
 
-    public function __construct(int $id, string $title, string $text)
+
+    public function __construct(?array $datas = [])
     {
-        $this->id = $id;
-        $this->title = $title;
-        $this->text = $text;
+        if (!empty($datas)) {
+            $this->hydrate($datas);
+        }
+    }
+
+    public function hydrate(array $datas): void
+    {
+        foreach ($datas as $key => $value) {
+            $method = 'set' . ucfirst($key);
+
+            if (method_exists($this, $method)) {
+                $this->$method($value);
+            }
+        }
     }
 
     public function getId(): int

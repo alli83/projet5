@@ -13,12 +13,22 @@ final class User
     private string $pseudo;
     private string $password;
 
-    public function __construct(int $id, string $pseudo, string $email, string $password)
+    public function __construct(?array $datas = [])
     {
-        $this->id = $id;
-        $this->pseudo = $pseudo;
-        $this->email = $email;
-        $this->password = $password;
+        if (!empty($datas)) {
+            $this->hydrate($datas);
+        }
+    }
+
+    public function hydrate(array $datas): void
+    {
+        foreach ($datas as $key => $value) {
+            $method = 'set' . ucfirst($key);
+
+            if (method_exists($this, $method)) {
+                $this->$method($value);
+            }
+        }
     }
 
     public function getId(): int

@@ -51,13 +51,12 @@ final class Router
         } elseif ($action === 'post' && $this->request->query()->has('id')) {
             try {
                 $postRepo = new PostRepository($this->database);
+                $commentRepo = new CommentRepository($this->database);
             } catch (\Exception $e) {
                 $redir = new Errors($e, $e->getCode());
                 return $redir->handleErrors();
             }
             $controller = new PostController($postRepo, $this->view);
-
-            $commentRepo = new CommentRepository($this->database);
 
             return $controller->displayOneAction((int) $this->request->query()->get('id'), $commentRepo);
 

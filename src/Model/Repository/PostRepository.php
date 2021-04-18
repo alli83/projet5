@@ -35,12 +35,16 @@ final class PostRepository implements EntityRepositoryInterface
         $req = $this->pdo->prepare('select * from post where id=:id');
         $req->setFetchMode(\PDO::FETCH_CLASS, 'App\\Model\\Entity\\Post', [$criteria]);
         foreach ($criteria as $key => $param) {
+            if (!is_int($param)) {
+                // TO DO ERROR
+            }
             $req->bindValue($key, $param);
         }
+        // TO DO ERROR
         $req->execute();
         $datas = $req->fetch();
 
-        return $datas == false ? null : $datas;
+        return $datas === false ? null : $datas;
     }
 
     public function findBy(array $criteria, array $orderBy = null, int $limit = null, int $offset = null): ?array
@@ -55,7 +59,7 @@ final class PostRepository implements EntityRepositoryInterface
         $req->execute();
         $datas = $req->fetchAll(\PDO::FETCH_CLASS, 'App\\Model\\Entity\\Post');
 
-        return $datas;
+        return $datas === false ? null : $datas;;
     }
 
     public function create(object $post): bool

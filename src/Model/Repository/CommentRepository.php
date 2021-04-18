@@ -40,18 +40,15 @@ final class CommentRepository implements EntityRepositoryInterface
         $req = $this->pdo->prepare('select * from comment where idPost=:idPost AND status = "validated"');
         $req->setFetchMode(\PDO::FETCH_CLASS, 'App\\Model\\Entity\\Comment', [$criteria]);
         foreach ($criteria as $key => $param) {
+            if (!is_int($param)) {
+                // TO DO ERROR
+            }
             $req->bindValue($key, $param);
         }
-        if ($req->execute()) {
-            $datas = $req->FetchAll();
-
-            if ($datas === []) {
-                return null;
-            }
-            return $datas;
-        } else {
-            return null;
-        }
+        // TO DO ERROR
+        $req->execute();
+        $datas = $req->FetchAll();
+        return  $datas === false ? null : $datas;;
     }
 
     public function findAll(): ?array

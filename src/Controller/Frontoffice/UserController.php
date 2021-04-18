@@ -10,6 +10,7 @@ use App\Service\Http\Response;
 use App\Service\Http\Session\Session;
 use App\Model\Repository\UserRepository;
 use App\Service\Utils\Auth;
+use App\Service\Utils\Mailer;
 
 final class UserController
 {
@@ -35,6 +36,31 @@ final class UserController
             $this->session->addFlashes('error', 'Mauvais identifiants');
         }
         return new Response($this->view->render(['template' => 'login', 'data' => []]));
+    }
+
+
+    public function signupAction(Request $request): Response
+    {
+        if ($request->getMethod() === 'POST') {
+            $params = $request->request()->all();
+
+            if (isset($params['email']) && isset($params['password']) && isset($params['pseudo'])) {
+                $auth = new Auth($params, $this->userRepository, $this->session);
+
+                if ($auth->register()) {
+                    $user = $this->userRepository->findOneBy(['email' => $params['email']]);
+
+                    $message = new Mailer();
+                    $message->sendMessage("frontoffice/mail/validateRegistration.html.twig", $user, $params['email']);
+                    $this->session->addFlashes('success', 'Votre inscription a bien été prise en compte. Vous allez recevoir un lien de validation');
+                } else {
+                    $this->session->addFlashes('error', 'une erreur s\'est produite');
+                }
+            } else {
+                $this->session->addFlashes('error', 'une erreur s\'est produite');
+            }
+        }
+        return new Response($this->view->render(['template' => 'signup', 'data' => []]));
     }
 
     public function logoutAction(): Response

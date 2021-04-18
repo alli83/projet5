@@ -72,6 +72,18 @@ final class Router
 
             return $controller->loginAction($this->request);
 
+            // *** @Route http://localhost:8000/?action=signup ***
+        } elseif ($action === 'signup') {
+            try {
+                $userRepo = new UserRepository($this->database);
+            } catch (\Exception $e) {
+                $redir = new Errors($e, $e->getCode());
+                return $redir->handleErrors();
+            }
+            $controller = new UserController($userRepo, $this->view, $this->session);
+
+            return $controller->signupAction($this->request);
+
             // *** @Route http://localhost:8000/?action=logout ***
         } elseif ($action === 'logout') {
             try {

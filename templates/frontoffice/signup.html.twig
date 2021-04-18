@@ -1,0 +1,35 @@
+{% extends "/frontoffice/base.html.twig" %}
+
+
+{% block title %}Inscription{% endblock %}
+
+
+{% block content %}
+
+<div class="container justify-content-center ">
+    <div class="row text-center justify-content-center">
+        <h2>Formulaire d'inscription</h2>
+
+        <div class="col col-lg-4">
+            <form method="POST">
+                <div class="mb-4">
+                    <label class="form-label" for="pseudo">Votre pseudo</label>
+                    <input type="text" id="pseudo" class="form-control" name="pseudo" required />
+                </div>
+                <div class="mb-4">
+                    <label class="form-label" for="email">Votre email</label>
+                    <input type="email" id="email" class="form-control" name="email" required>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label" for="password">Votre mot de passe</label>
+                    <input type="password" id="password" class="form-control" name="password" required />
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary btn-block mb-4 orangeButton">Se connecter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

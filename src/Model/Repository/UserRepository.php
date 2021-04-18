@@ -36,6 +36,7 @@ final class UserRepository implements EntityRepositoryInterface
         $req = $this->pdo->prepare('select * from user where email=:email');
         $req->setFetchMode(\PDO::FETCH_CLASS, 'App\\Model\\Entity\\User', [$criteria]);
         foreach ($criteria as $key => $param) {
+            $param = htmlspecialchars($param);
             $req->bindValue($key, $param);
         }
         $req->execute();
@@ -58,7 +59,14 @@ final class UserRepository implements EntityRepositoryInterface
 
     public function create(object $user): bool
     {
-        return false;
+        // TO DO handle error 
+        $req = $this->pdo->prepare('INSERT INTO user (pseudo, email, password) VALUES(:pseudo, :email, :password)');
+
+        $req->bindValue("email", $user->getEmail());
+        $req->bindValue("pseudo", $user->getPseudo());
+        $req->bindValue("password", $user->getPassword());
+
+        return $req->execute();
     }
 
     public function update(object $user): bool

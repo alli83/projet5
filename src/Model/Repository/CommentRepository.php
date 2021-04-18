@@ -48,7 +48,7 @@ final class CommentRepository implements EntityRepositoryInterface
         // TO DO ERROR
         $req->execute();
         $datas = $req->FetchAll();
-        return  $datas === false ? null : $datas;;
+        return  $datas === false ? null : $datas;
     }
 
     public function findAll(): ?array

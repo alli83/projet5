@@ -9,28 +9,13 @@ use App\Service\Http\Request;
 use App\Service\Http\Response;
 use App\Service\Http\Session\Session;
 use App\Model\Repository\UserRepository;
+use App\Service\Utils\Auth;
 
 final class UserController
 {
     private UserRepository $userRepository;
     private View $view;
     private Session $session;
-
-    private function isValidLoginForm(?array $infoUser): bool
-    {
-        if ($infoUser === null) {
-            return false;
-        }
-
-        $user = $this->userRepository->findOneBy(['email' => $infoUser['email']]);
-        if ($user === null || $infoUser['password'] !== $user->getPassword()) {
-            return false;
-        }
-
-        $this->session->set('user', $user);
-
-        return true;
-    }
 
     public function __construct(UserRepository $userRepository, View $view, Session $session)
     {
@@ -42,8 +27,10 @@ final class UserController
     public function loginAction(Request $request): Response
     {
         if ($request->getMethod() === 'POST') {
-            if ($this->isValidLoginForm($request->request()->all())) {
-                return new Response('<h1>Utilisateur connecté</h1><h2>faire une redirection vers la page d\'accueil</h2><a href="index.php?action=posts">Liste des posts</a><br>', 200);
+            $auth = new Auth($request->request()->all(), $this->userRepository, $this->session);
+            if ($auth->isValidLoginForm()) {
+                $this->session->addFlashes('success', 'Vous êtes connecté');
+                return new Response("", 304, ["location" =>  "index.php?action=posts"]);
             }
             $this->session->addFlashes('error', 'Mauvais identifiants');
         }

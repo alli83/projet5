@@ -9,6 +9,7 @@ use App\Controller\Frontoffice\UserController;
 use App\Model\Repository\PostRepository;
 use App\Model\Repository\CommentRepository;
 use App\Model\Repository\UserRepository;
+use App\Service\ErrorsHandlers\Errors;
 use App\Service\Http\Request;
 use App\Service\Http\Response;
 use App\Service\Http\Session\Session;
@@ -36,14 +37,24 @@ final class Router
 
         // *** @Route http://localhost:8000/?action=posts ***
         if ($action === 'posts') {
-            $postRepo = new PostRepository($this->database);
+            try {
+                $postRepo = new PostRepository($this->database);
+            } catch (\Exception $e) {
+                $redir = new Errors($e, $e->getCode());
+                return $redir->handleErrors();
+            }
             $controller = new PostController($postRepo, $this->view);
 
             return $controller->displayAllAction();
 
             // *** @Route http://localhost:8000/?action=post&id=5 ***
         } elseif ($action === 'post' && $this->request->query()->has('id')) {
-            $postRepo = new PostRepository($this->database);
+            try {
+                $postRepo = new PostRepository($this->database);
+            } catch (\Exception $e) {
+                $redir = new Errors($e, $e->getCode());
+                return $redir->handleErrors();
+            }
             $controller = new PostController($postRepo, $this->view);
 
             $commentRepo = new CommentRepository($this->database);
@@ -52,14 +63,24 @@ final class Router
 
             // *** @Route http://localhost:8000/?action=login ***
         } elseif ($action === 'login') {
-            $userRepo = new UserRepository($this->database);
+            try {
+                $userRepo = new UserRepository($this->database);
+            } catch (\Exception $e) {
+                $redir = new Errors($e, $e->getCode());
+                return $redir->handleErrors();
+            }
             $controller = new UserController($userRepo, $this->view, $this->session);
 
             return $controller->loginAction($this->request);
 
             // *** @Route http://localhost:8000/?action=logout ***
         } elseif ($action === 'logout') {
-            $userRepo = new UserRepository($this->database);
+            try {
+                $userRepo = new UserRepository($this->database);
+            } catch (\Exception $e) {
+                $redir = new Errors($e, $e->getCode());
+                return $redir->handleErrors();
+            }
             $controller = new UserController($userRepo, $this->view, $this->session);
 
             return $controller->logoutAction();

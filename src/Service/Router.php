@@ -38,7 +38,6 @@ final class Router
 
         // *** @Route http://localhost:8000/***
         if ($action === 'accueil' && empty($method)) {
-            var_dump("la");
             $controller = new HomeController($this->view, $this->session);
 
             return $controller->getHomePage();
@@ -48,6 +47,12 @@ final class Router
             $controller = new HomeController($this->view, $this->session);
 
             return $controller->contactDev($this->request);
+
+            // *** @Route http://localhost:8000/?action=get&file=moncv***
+        } elseif ($action === 'download' && $this->request->query()->has('file')) {
+            $controller = new HomeController($this->view, $this->session);
+
+            return $controller->getCv((string) $this->request->query()->get('file'));
 
             // *** @Route http://localhost:8000/?action=posts ***
         } elseif ($action === 'posts') {

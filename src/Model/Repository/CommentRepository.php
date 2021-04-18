@@ -7,14 +7,22 @@ namespace App\Model\Repository;
 use App\Service\Database;
 use App\Model\Entity\Comment;
 use App\Model\Repository\Interfaces\EntityRepositoryInterface;
+use PDO;
 
 final class CommentRepository implements EntityRepositoryInterface
 {
     private Database $database;
+    private PDO $pdo;
 
     public function __construct(Database $database)
     {
         $this->database = $database;
+        $this->pdo = $this->getDatabase()->connectToDb();
+    }
+
+    public function getDatabase(): Database
+    {
+        return $this->database;
     }
 
     public function find(int $id): ?Comment
@@ -29,19 +37,21 @@ final class CommentRepository implements EntityRepositoryInterface
 
     public function findBy(array $criteria, array $orderBy = null, int $limit = null, int $offset = null): ?array
     {
-        $this->database->prepare('select * from comment where idPost=:idPost');
-        $data = $this->database->execute($criteria);
+        $req = $this->pdo->prepare('select * from comment where idPost=:idPost AND status = "validated"');
+        $req->setFetchMode(\PDO::FETCH_CLASS, 'App\\Model\\Entity\\Comment', [$criteria]);
+        foreach ($criteria as $key => $param) {
+            $req->bindValue($key, $param);
+        }
+        if ($req->execute()) {
+            $datas = $req->FetchAll();
 
-        if ($data === null) {
+            if ($datas === []) {
+                return null;
+            }
+            return $datas;
+        } else {
             return null;
         }
-
-        $comments = [];
-        foreach ($data as $comment) {
-            $comments[] = new Comment((int)$comment['id'], $comment['pseudo'], $comment['text'], (int)$comment['idPost']);
-        }
-
-        return $comments;
     }
 
     public function findAll(): ?array

@@ -7,14 +7,22 @@ namespace App\Model\Repository;
 use App\Model\Entity\Post;
 use App\Service\Database;
 use App\Model\Repository\Interfaces\EntityRepositoryInterface;
+use PDO;
 
 final class PostRepository implements EntityRepositoryInterface
 {
     private Database $database;
+    private PDO $pdo;
 
     public function __construct(Database $database)
     {
         $this->database = $database;
+        $this->pdo = $this->getDatabase()->connectToDb();
+    }
+
+    public function getDatabase(): Database
+    {
+        return $this->database;
     }
 
     public function find(int $id): ?Post
@@ -24,10 +32,15 @@ final class PostRepository implements EntityRepositoryInterface
 
     public function findOneBy(array $criteria, array $orderBy = null): ?Post
     {
-        $this->database->prepare('select * from post where id=:id');
-        $data = $this->database->execute($criteria);
+        $req = $this->pdo->prepare('select * from post where id=:id');
+        $req->setFetchMode(\PDO::FETCH_CLASS, 'App\\Model\\Entity\\Post', [$criteria]);
+        foreach ($criteria as $key => $param) {
+            $req->bindValue($key, $param);
+        }
+        $req->execute();
+        $datas = $req->fetch();
 
-        return $data === null ? $data : new Post($data['id'], $data['title'], $data['text']);
+        return $datas == false ? null : $datas;
     }
 
     public function findBy(array $criteria, array $orderBy = null, int $limit = null, int $offset = null): ?array
@@ -37,19 +50,15 @@ final class PostRepository implements EntityRepositoryInterface
 
     public function findAll(): ?array
     {
-        $this->database->prepare('select * from post');
-        $data = $this->database->execute();
+        $req = $this->pdo->prepare('select * from post');
 
-        if ($data === null) {
+        $req->execute();
+        $datas = $req->fetchAll(\PDO::FETCH_CLASS, 'App\\Model\\Entity\\Post');
+
+        if ($datas === []) {
             return null;
         }
-
-        $posts = [];
-        foreach ($data as $post) {
-            $posts[] = new Post((int)$post['id'], $post['title'], $post['text']);
-        }
-
-        return $posts;
+        return $datas;
     }
 
     public function create(object $post): bool

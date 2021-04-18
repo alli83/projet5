@@ -10,13 +10,13 @@ use Twig\Loader\FilesystemLoader;
 
 final class Errors
 {
-    private object $e;
+    private object $except;
     private int $code;
     private Environment $twig;
 
-    public function __construct(object $e, int $code)
+    public function __construct(object $except, int $code)
     {
-        $this->e = $e;
+        $this->except = $except;
         $this->code = $code;
         $loader = new FilesystemLoader('../templates');
         $this->twig = new Environment($loader);

@@ -55,9 +55,6 @@ final class PostRepository implements EntityRepositoryInterface
         $req->execute();
         $datas = $req->fetchAll(\PDO::FETCH_CLASS, 'App\\Model\\Entity\\Post');
 
-        if ($datas === []) {
-            return null;
-        }
         return $datas;
     }
 

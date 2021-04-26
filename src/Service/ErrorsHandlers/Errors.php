@@ -10,13 +10,11 @@ use Twig\Loader\FilesystemLoader;
 
 final class Errors
 {
-    private object $except;
     private int $code;
     private Environment $twig;
 
-    public function __construct(object $except, int $code)
+    public function __construct(int $code)
     {
-        $this->except = $except;
         $this->code = $code;
         $loader = new FilesystemLoader('../templates');
         $this->twig = new Environment($loader);
@@ -32,6 +30,25 @@ final class Errors
                         []
                     ),
                     500,
+                    ['Content-Type' => 'text/html; charset=utf-8']
+                );
+            case 404:
+                return new Response(
+                    $this->twig->render(
+                        "frontoffice/error/error_404.html.twig",
+                        []
+                    ),
+                    404,
+                    ['Content-Type' => 'text/html; charset=utf-8']
+                );
+            case 23000:
+                return 
+                new Response(
+                    $this->twig->render(
+                        "frontoffice/signup.html.twig",
+                        []
+                    ),
+                    403,
                     ['Content-Type' => 'text/html; charset=utf-8']
                 );
             default:

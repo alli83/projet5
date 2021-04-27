@@ -4,27 +4,27 @@ namespace App;
 
 class ConfigSetUp
 {
-    private static array $settingsConfig;
-    private static ?object $instance;
+    private array $settingsConfig;
+    private ?object $instance;
 
     public function __construct()
     {
-        ConfigSetUp::$settingsConfig = require('config/config.php');
+        $this->settingsConfig = require('config/config.php');
     }
 
-    public static function getSettingsDb(): array
+    public function getSettingsDb(): array
     {
-        if (empty(ConfigSetUp::$settingsConfig)) {
-            ConfigSetUp::$instance = new ConfigSetUp();
+        if (empty($this->settingsConfig)) {
+            $this->instance = new ConfigSetUp();
         }
-        return ConfigSetUp::$settingsConfig["database"];
+        return $this->settingsConfig["database"];
     }
 
-    public static function getSettingsMailer(): array
+    public function getSettingsMailer(): array
     {
-        if (empty(ConfigSetUp::$settingsConfig)) {
-            ConfigSetUp::$instance = new ConfigSetUp();
+        if (empty($this->settingsConfig)) {
+            $this->instance = new ConfigSetUp();
         }
-        return ConfigSetUp::$settingsConfig["emailTransport"];
+        return $this->settingsConfig["emailTransport"];
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Service\Utils;
 
 use Twig\Environment;
+use App\Config;
 use App\ConfigSetUp;
 use Twig\Loader\FilesystemLoader;
 use App\Model\Entity\User;
@@ -17,15 +18,17 @@ class Mailer
 
     public function __construct()
     {
-        $this->settings = ConfigSetUp::getSettingsMailer();
+        $this->settings = (new ConfigSetUp())->getSettingsMailer();
         $loader = new FilesystemLoader('../templates');
         $this->twig = new Environment($loader);
     }
+
 
     public function getSettings(): array
     {
         return $this->settings;
     }
+
 
 
     public function sendMessage(string $template, User $data, string $dest): bool

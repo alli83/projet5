@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Config;
 use App\ConfigSetUp;
 use PDO;
+use PHP_CodeSniffer\Config as PHP_CodeSnifferConfig;
 
 final class Database
 {
@@ -13,9 +15,8 @@ final class Database
 
     public function __construct()
     {
-        $this->settings = ConfigSetUp::getSettingsDb();
+        $this->settings = (new ConfigSetUp())->getSettingsDb();
     }
-
     public function connectToDb(): PDO
     {
         $dbparams = $this->getSettings();

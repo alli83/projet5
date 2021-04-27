@@ -1,0 +1,16 @@
+<?php
+
+return array(
+    'database' => array(
+        "db_user" => "xxxx",
+        "db_pass" => "xxxxx",
+        "db_host" => "xxxx",
+        "db_name" => "xxx"
+    ),
+    'emailTransport' => array(
+        "smtp" => "xxxxx",
+        "smtp_port" => 1025,
+        "from" => "xxxxx",
+        "sender" => "xxxxx"
+    )
+);

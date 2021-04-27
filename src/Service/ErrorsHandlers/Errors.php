@@ -42,7 +42,7 @@ final class Errors
                     ['Content-Type' => 'text/html; charset=utf-8']
                 );
             case 23000:
-                return 
+                return
                 new Response(
                     $this->twig->render(
                         "frontoffice/signup.html.twig",

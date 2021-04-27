@@ -12,6 +12,7 @@ final class User
     private string $email;
     private string $pseudo;
     private string $password;
+    private string $role;
 
     public function __construct(?array $datas = [])
     {
@@ -34,6 +35,12 @@ final class User
     public function getId(): int
     {
         return $this->id;
+    }
+
+    public function setId(int $id): self
+    {
+        $this->id = $id;
+        return $this;
     }
 
     public function getPseudo(): string
@@ -66,6 +73,16 @@ final class User
     public function setPassword(string $password): self
     {
         $this->password = $password;
+        return $this;
+    }
+    public function getRole(): string
+    {
+        return $this->role;
+    }
+
+    public function setRole(string $role): self
+    {
+        $this->role = $role;
         return $this;
     }
 }

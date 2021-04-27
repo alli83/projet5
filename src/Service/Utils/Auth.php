@@ -10,18 +10,18 @@ use App\Service\Http\Session\Session;
 
 class Auth
 {
-    private ?array $datas;
+    private array $datas;
     private UserRepository $userRepo;
     private Session $session;
 
-    public function __construct(?array $datas, UserRepository $userRepo, Session $session)
+    public function __construct(array $datas, UserRepository $userRepo, Session $session)
     {
         $this->datas = $datas;
         $this->userRepo = $userRepo;
         $this->session = $session;
     }
 
-    public function getDatas(): ?array
+    public function getDatas(): array
     {
         return $this->datas;
     }
@@ -29,13 +29,10 @@ class Auth
     public function isValidLoginForm(): bool
     {
         $infoUser = $this->getDatas();
-        if ($infoUser == null) {
+        if ($infoUser == [] || $infoUser["email"] === "" || $infoUser["password"] === "") {
             return false;
         }
 
-        if ($infoUser["email"] === "" || $infoUser["password"] === "") {
-            return false;
-        }
         $email = htmlspecialchars($infoUser['email']);
         $password = htmlspecialchars($infoUser['password']);
 
@@ -45,7 +42,9 @@ class Auth
             if (!password_verify($password, $user->getPassword())) {
                 return false;
             }
-            $this->session->set('user', $user); // remove password
+            $this->session->set('pseudo', $user->getPseudo());
+            $this->session->set('role', $user->getRole());
+            $this->session->set('email', $user->getEmail());
             return true;
         } else {
             return false;
@@ -56,8 +55,8 @@ class Auth
     {
         $userDatas = $this->getDatas();
         $password = "";
-        if (array_key_exists("password", $userDatas)) {
-            $password = password_hash($userDatas['password'], PASSWORD_DEFAULT); // to change if more security is needed 12
+        if (array_key_exists("password", $userDatas) && $userDatas["password"] !== "") {
+            $password = password_hash($userDatas['password'], PASSWORD_DEFAULT);
         } else {
             return false;
         }
@@ -65,7 +64,6 @@ class Auth
             $params = ['email', 'password', 'pseudo'];
             $values = [htmlspecialchars($userDatas['email']), $password, htmlspecialchars($userDatas['pseudo'])];
             $param = array_combine($params, $values);
-
             $object = new User($param);
 
             return $this->userRepo->create($object);

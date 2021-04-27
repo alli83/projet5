@@ -2,15 +2,51 @@
 
 {% block title %}Tous les posts{% endblock %}
 
-{% block content %} 
-    <h2>Tous les posts</h2>
-    {% for post in posts %}
-        <article>
-            <h2>title = {{ post.title }}</h2>
-            <p>text = {{ post.text}}</p>
-            <p>id = {{ post.id}}</p>
-            <a href="index.php?action=post&id={{post.id}}">Lire le post</a>
-            <hr>
-        </article>
-    {% endfor %}
+{% block content %}
+<div class="container">
+
+    <!--Section: Content-->
+    <div class="text-center">
+        <h4 class="mb-5"><strong>Les derniers posts</strong></h4>
+        {% if posts %}
+        <div class="row">
+            {% for post in posts %}
+
+            <div class="col-lg-4 col-sm-11 mb-4">
+                <div class="card">
+                    <div class="bg-image hover-overlay ripple" data-mdb-ripple-color="light">
+                        <img src="https://mdbootstrap.com/img/new/standard/nature/184.jpg" class="img-fluid" />
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ post.title }}</h5>
+                        <div class="mb-1 text-muted">
+                            <p>Le {{ post.Creation_date}} par {{post.pseudo}}</p>
+                        </div>
+                        <p class="card-text">
+                            {{ post.stand_first}}
+                        </p>
+                        <a href="/post-{{ post.id}}" class="btn btn-dark">Lire le post</a>
+                    </div>
+                </div>
+            </div>
+
+            {% endfor %}
+        </div>
+        <nav class="my-4" aria-label="...">
+            <ul class="pagination pagination-circle justify-content-center">
+                {% if (page > 0) %}
+                <li class="page-item">
+                    <a class="page-link" href="/posts/{{page-1}}">Précédent</a>
+                </li>
+                {% endif %}
+                {% if posts|length == 3 %}
+                <li class="page-item">
+                    <a class="page-link" href="/posts/{{ page+1}}">Suivant</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}

@@ -1,0 +1,68 @@
+{% extends "/frontoffice/base.html.twig" %}
+
+{% block title %}List des membres{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <h2 class="text-center">liste des membres</h2>
+
+  {% if members %}
+  {% for member in members %}
+  <div class="container mt-5">
+    <ul class="list-group">
+      <li class="list-group-item list-group-item-primary fs-5">
+        <span class=" d-inline-block px-md-2 col-sm-9 col-lg-12">{{member.pseudo}}
+          <p class="mb-1 text-muted">Role: {{member.role }} - Crée le {{member.created_date}} - dernière mise à jour le:
+            {{member.last_update}}</p>
+        </span>
+        <form action="/member-{{member.id}}/edit" method="post">
+          <div class="row mt-2">
+            <div class="col-md-7">
+              <select class="form-select" name="role">
+                <option value="" selected>Modifier le role</option>
+                <option value="user">Utilisateur</option>
+                <option value="admin">Administrateur</option>
+              </select>
+            </div>
+            <div class="col">
+              <button type="submit" class="btn btn-dark btn-block mb-4">mettre à jour les
+                droits</button>
+            </div>
+          </div>
+        </form>
+
+
+        <a class="btn btn-secondary text-white" role="button" href="/member-{{member.id}}/delete">supprimer</a>
+  </div>
+  </li>
+  </ul>
+</div>
+
+{% endfor %}
+
+<nav class="my-4">
+  <ul class="pagination pagination-circle justify-content-center">
+    {% if (page > 0) %}
+    <li class="page-item">
+      <a class="page-link" href="/admin/members/{{ page-1 }}">Précédent</a>
+    </li>
+    {%endif%}
+    {% if members|length == 3 %}
+    <li class="page-item">
+      <a class="page-link" href="/admin/members/{{page+1}}">Suivant</a>
+    </li>
+    {% endif %}
+  </ul>
+</nav>
+</div>
+{% else %}
+<nav class="my-4">
+  <ul class="pagination pagination-circle justify-content-center">
+    <li class="page-item">
+      <a class="page-link" href="/admin/members">Retour</a>
+    </li>
+  </ul>
+</nav>
+{% endif %}
+{% endblock %}

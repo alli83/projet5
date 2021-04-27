@@ -4,67 +4,114 @@ declare(strict_types=1);
 
 namespace  App\Service;
 
-use App\Controller\Frontoffice\PostController;
-use App\Controller\Frontoffice\UserController;
-use App\Model\Repository\PostRepository;
-use App\Model\Repository\CommentRepository;
-use App\Model\Repository\UserRepository;
+use App\Service\ErrorsHandlers\Errors;
 use App\Service\Http\Request;
 use App\Service\Http\Response;
-use App\Service\Http\Session\Session;
-use App\View\View;
+use Exception;
 
 final class Router
 {
-    private Database $database;
-    private View $view;
-    private Request $request;
-    private Session $session;
 
-    public function __construct(Request $request)
+    private Container $container;
+    private Request $request;
+    private array $routes = [];
+
+    public function __construct(Request $request, Container $container)
     {
-        $this->database = new Database();
-        $this->session = new Session();
-        $this->view = new View($this->session);
         $this->request = $request;
+        $this->container = $container;
+    }
+
+    public function addRoutes(Route $route): void
+    {
+        if (!in_array($route, $this->routes)) {
+            $this->routes[] = $route;
+        }
+    }
+
+    public function getRoute(string $url): ?Route
+    {
+        foreach ($this->routes as $route) {
+            $comp = $route->match($url);
+            if ($comp !== false) {
+                return $route;
+            }
+        }
+        return null;
+    }
+    public function getRoutes(): array
+    {
+        return $this->routes;
+    }
+
+    public function getRoads(): Response
+    {
+        $xml = new \DOMDocument();
+        $xml->load('../src/config/routes.xml');
+        $tagroutes = $xml->getElementsByTagName('route');
+
+        foreach ($tagroutes as $tagroute) {
+            $url = $tagroute->getAttribute('url');
+            $module = $tagroute->getAttribute('module');
+            $action = $tagroute->getAttribute('action');
+            $accessory = $tagroute->getAttribute('accessory');
+
+            if ($tagroute->hasAttribute('varnames')) {
+                $varsnames = explode(',', $tagroute->getAttribute('varnames'));
+            } else {
+                $varsnames = null;
+            }
+            $this->addRoutes($this->container->getRoutes($url, $module, $action, $accessory, $varsnames));
+        }
+        try {
+            $goodRoad = $this->getRoute($_SERVER['REQUEST_URI']);
+
+            if ($goodRoad == null) {
+                $error = new Errors(404);
+                return $error->handleErrors();
+            } else {
+                $module = $goodRoad->getModule();
+                $method = $goodRoad->getAction();
+                $accessory = $goodRoad->getAccessory();
+
+                $varsvalues = $goodRoad->getVarsValues();
+                $varsnames = $goodRoad->getVarsNames();
+
+                $goodCont = $this->container->callGoodController($module);
+
+                if ($goodRoad->hasVarsName()) {
+                    $goodRoad->setParams($varsnames, $varsvalues);
+                    $get = $goodRoad->getParams();
+
+                    if ($accessory !== "") {
+                        $accessory = $this->container->setRepositoryClass(($accessory));
+
+                        return $this->request->getMethod() === "POST" ?
+                            $goodCont->$method($get, $accessory, $this->request->request()) :
+                            $goodCont->$method($get, $accessory, null);
+                    } else {
+                        return $this->request->getMethod() === "POST" ?
+                            $goodCont->$method($get, $this->request->request()) :
+                            $goodCont->$method($get, null);
+                    }
+                }
+                if ($accessory !== "") {
+                    $accessory = $this->container->setRepositoryClass(($accessory));
+                    return $this->request->getMethod() === "POST" ?
+                        $goodCont->$method($accessory, $this->request->request()) : $goodCont->$method($accessory, null);
+                } else {
+                    return $this->request->getMethod() === "POST" ?
+                        $goodCont->$method($this->request->request()) : $goodCont->$method(null);
+                }
+            }
+        } catch (Exception $e) {
+            $error = new Errors(500);
+            return $error->handleErrors();
+        }
     }
 
     public function run(): Response
     {
-        $action = $this->request->query()->has('action') ? $this->request->query()->get('action') : 'posts';
-
-
-        // *** @Route http://localhost:8000/?action=posts ***
-        if ($action === 'posts') {
-            $postRepo = new PostRepository($this->database);
-            $controller = new PostController($postRepo, $this->view);
-
-            return $controller->displayAllAction();
-
-            // *** @Route http://localhost:8000/?action=post&id=5 ***
-        } elseif ($action === 'post' && $this->request->query()->has('id')) {
-            $postRepo = new PostRepository($this->database);
-            $controller = new PostController($postRepo, $this->view);
-
-            $commentRepo = new CommentRepository($this->database);
-
-            return $controller->displayOneAction((int) $this->request->query()->get('id'), $commentRepo);
-
-            // *** @Route http://localhost:8000/?action=login ***
-        } elseif ($action === 'login') {
-            $userRepo = new UserRepository($this->database);
-            $controller = new UserController($userRepo, $this->view, $this->session);
-
-            return $controller->loginAction($this->request);
-
-            // *** @Route http://localhost:8000/?action=logout ***
-        } elseif ($action === 'logout') {
-            $userRepo = new UserRepository($this->database);
-            $controller = new UserController($userRepo, $this->view, $this->session);
-
-            return $controller->logoutAction();
-        } else {
-            return new Response("Error 404 - cette page n'existe pas<br><a href='index.php?action=posts'>Aller Ici</a>", 404);
-        }
+        return $this->getRoads();
     }
 }

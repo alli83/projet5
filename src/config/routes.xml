@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding = "utf-8" ?>
+
+<routes>
+    <route url="/" module= "home"  action="getHomePage"/>
+    <route url="/posts" module= "post"  action="displayAllAction"/>
+    <route url="/posts/([0-9]*)" module= "post"  action="displayAllAction" varnames="page"/>
+    <route url="/post-([0-9]*)" module= "post"  action="displayOneAction"  varnames="id" accessory="comment"/>
+    <route url="/login" module= "user" action="loginAction" />
+    <route url="/signup" module= "user"  action="signupAction" />
+    <route url="/logout" module= "user"  action="logoutAction" />
+    <route url="/contact" module= "home"  action="contactDev" />
+    <route url="/download-([a-z@Z-a]*)" module= "home"  action="getCv" varnames="file"/>
+    <route url="/validate" module= "comment"  action="createComment"  accessory="user"/>
+    
+    <!-- ADMIN -->
+    <route url="/admin/posts" module= "adminpost"  action="displayAllPosts"/>
+    <route url="/admin/posts/([0-9]*)" module= "adminpost"  action="displayAllPosts" varnames="page"/>
+    <route url="/post/create" module= "adminpost"  action="createNewPost"/>
+    <route url="/post/create-confirm" module= "adminpost"  action="createNewPostSave"/>
+    <route url="/post-([0-9]*)/delete" module= "adminpost"  action="deleteOnePost" varnames="id"/>
+    <route url="/post-([0-9]*)/edit" module= "adminpost"  action="editOnePost" varnames="id"/>
+    <route url="/post-([0-9]*)/edit-confirm" module= "adminpost"  action="editOnePostSave" varnames="id"/>
+
+    <route url="/admin/comments" module= "admincomment"  action="displayAllComments"/>
+    <route url="/admin/comments/([0-9]*)" module= "admincomment"  action="displayAllComments" varnames="page"/>
+    <route url="/comment-([0-9]*)/delete" module= "admincomment"  action="deleteOneComment" varnames="id"/>
+    <route url="/comment-([0-9]*)/validate" module= "admincomment"  action="validateOneComment" varnames="id"/>
+
+    <route url="/admin/members" module= "adminmember"  action="displayAllMembers"/>
+     <route url="/admin/members/([0-9]*)" module= "adminmember"  action="displayAllMembers" varnames="page"/>
+    <route url="/member-([0-9]*)/edit" module= "adminmember" action="editOneMember" varnames="id"/>
+    <route url="/member-([0-9]*)/delete" module= "adminmember"  action="deleteOneMember" varnames="id"/>
+</routes>

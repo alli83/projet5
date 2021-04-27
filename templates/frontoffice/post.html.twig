@@ -2,22 +2,61 @@
 
 {% block title %}post.title{% endblock %}
 
-{% block content %} 
-    <article>
-        <h2>{{ post.title }}</h2>
-        <p>{{ post.text }}</p>
-    </article>
+{% block content %}
 
-    <section>
-        <h3>Commentaires</h3>
-        {% if comments %}
-            {% for comment in comments %}
-                <p>id =  {{ comment.id }}<br>
-                pseudo = {{ comment.pseudo }}<br>
-                text = {{ comment.text }}</p>
-            {% endfor %}
-        {% else %}
-            <h4>Aucun commentaires</h4>
-        {% endif %}
-    </section>
-{% endblock %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 blog-main">
+            <!-- /.blog-post -->
+
+            <div class="blog-post">
+                <h2 class="blog-post-title">{{ post.title }}</h2>
+                <p class="blog-post-meta mb-1 text-muted">Par {{ post.pseudo}}</p>
+                <p class="blog-post-meta mb-1 text-muted">créé le {{ post.Creation_date}}</p>
+                <p>{{ post.text }}</p>
+                <p> TO DO !!!! + 1 image maybe "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+                    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
+                    exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+                    reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
+                    occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+                </p>
+                <p class="blog-post-meta mb-1 text-muted">modifié dernièrement le {{ post.lastUpdate}}</p>
+            </div>
+
+            <section>
+                <h3>Commentaires</h3>
+                {% if session %}
+                <div class="col col-lg-4">
+                    <form action="/validate" method="post" id="searchForm">
+                        <div class="form-group mb-4">
+                            <label for="pseudo">Votre nom d'utilisateur:</label>
+                            <input type="text" id="pseudo" name="pseudo" required>
+                        </div>
+                        <div class="form-group mb-4">
+                            <label for="text">Votre message:</label>
+                            <textarea type="textarea" id="message" name="text" rows="4" required></textarea>>
+                        </div>
+                        <input hidden type="number" id="post" name="post" value={{post.id}}>
+                        <div>
+                            <button type="submit" id="submit"
+                                class="btn btn-primary btn-block mb-4 orangeButton">Envoyer</button>
+                        </div>
+                    </form>
+                    <div id="result"></div>
+                    {% endif %}
+                </div>
+
+
+                {% if comments %}
+                {% for comment in comments %}
+                <p class="mb-1 text-muted">Commentaire de {{ comment.pseudo }} - posté le {{ comment.created_date}}</p>
+                <br>
+                <p>{{ comment.text }}</p>
+                <hr>
+                {% endfor %}
+                {% else %}
+                <h4 class="alert alert-warning">Il n'y a pas encore de commentaires pour cet article</h4>
+                {% endif %}
+            </section>
+        </div>
+        {% endblock %}

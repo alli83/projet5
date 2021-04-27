@@ -4,50 +4,75 @@ declare(strict_types=1);
 
 namespace  App\Controller\Frontoffice;
 
+use App\Controller\ControllerInterface\ControllerInterface;
 use App\View\View;
 use App\Service\Http\Response;
 use App\Model\Repository\PostRepository;
 use App\Model\Repository\CommentRepository;
+use App\Service\Http\Session\Session;
+use App\Service\Utils\Validity;
 
-final class PostController
+final class PostController implements ControllerInterface
 {
     private PostRepository $postRepository;
     private View $view;
+    private Session $session;
 
-    public function __construct(PostRepository $postRepository, View $view)
+    public function __construct(PostRepository $postRepository, View $view, Session $session)
     {
         $this->postRepository = $postRepository;
         $this->view = $view;
+        $this->session = $session;
     }
 
-    public function displayOneAction(int $id, CommentRepository $commentRepository): Response
+    public function displayOneAction(array $params, CommentRepository $commentRepository): Response
     {
-        $post = $this->postRepository->findOneBy(['id' => $id]);
-        $comments = $commentRepository->findBy(['idPost' => $id]);
-        $response = new Response('<h1>faire une redirection vers la page d\'erreur, ce post n\'existe pas</h1><a href="index.php?action=posts">Liste des posts</a><br>', 404);
+        if ($params["id"]) {
+            $params['id'] = intval($params['id']);
+        }
+        $validityTools = new Validity();
+        $params = $validityTools->validityVariables($params);
+
+        $post = $this->postRepository->findOneBy(['id' => $params['id']]);
+
+        $allIds = $this->postRepository->findAllIds();
+
+        $comments = $commentRepository->findBy(['idPost' => $params['id']], ['order' => "asc"]);
 
         if ($post !== null) {
-            $response = new Response($this->view->render(
+            return new Response($this->view->render(
                 [
                     'template' => 'post',
                     'data' => [
                         'post' => $post,
+                        'ids' => $allIds,
                         'comments' => $comments,
                     ],
                 ],
             ));
+        } elseif ($post === null) {
+            $this->session->addFlashes('danger', 'le post demandé n\'est pas disponible');
         }
-
-        return $response;
+        $this->session->addFlashes('danger', 'Une erreur est survenue');
+        return $this->displayAllAction();
     }
 
-    public function displayAllAction(): Response
+    public function displayAllAction(?array $params = []): Response
     {
-        $posts = $this->postRepository->findAll();
+        if ($params === null || ($params && $params["page"] === null)) {
+            $offset = 0;
+        } else {
+            $offset = intval($params["page"]) * 3;
+        }
+
+        $posts = $this->postRepository->findAll(3, $offset);
 
         return new Response($this->view->render([
             'template' => 'posts',
-            'data' => ['posts' => $posts],
+            'data' => [
+                'posts' => $posts,
+                'page' => $params === null ? 0 : intval($params["page"])
+            ]
         ]));
     }
 }

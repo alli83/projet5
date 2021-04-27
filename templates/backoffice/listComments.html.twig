@@ -1,0 +1,60 @@
+{% extends "/frontoffice/base.html.twig" %}
+
+{% block title %}List des commentaires{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <h2 class="text-center">liste des commentaires</h2>
+
+  {% if comments %}
+  {% for comment in comments %}
+
+
+  <div class="container mt-5">
+    <ul class="list-group">
+      <li class="list-group-item list-group-item-info fs-5">
+        <span class=" d-inline-block px-md-2 col-sm-9 col-lg-12">
+          <p class="mb-1 text-muted">Commentaire crée le {{comment.created_date}} - par {{comment.pseudo }} - dernière
+            mise à jour le:
+            {{comment.last_update}}</p>
+          <p>{{comment.text}}</p>
+        </span>
+        <span class="d-inline-block col-md-7">
+          {% if comment.status is same as("created") %}
+          <a class="btn btn-dark text-white me-2" href="/comment-{{comment.id}}/validate" role="button">valider</a>
+          {% endif %}
+          <a class="btn btn-secondary text-white" role="button" href="/comment-{{comment.id}}/delete">supprimer</a>
+        </span>
+      </li>
+    </ul>
+  </div>
+
+  {% endfor %}
+
+
+  <nav class="my-4">
+    <ul class="pagination pagination-circle justify-content-center">
+      {% if (page > 0) %}
+      <li class="page-item">
+        <a class="page-link" href="/admin/comments/{{ page-1}}">Précédent</a>
+      </li>
+      {%endif%}
+      {% if comments|length == 3 %}
+      <li class="page-item">
+        <a class="page-link" href="/admin/comments/{{page+1}}">Suivant</a>
+      </li>
+      {% endif %}
+    </ul>
+  </nav>
+</div>
+{% else %}
+<nav class="my-4">
+  <ul class="pagination pagination-circle justify-content-center">
+    <li class="page-item">
+      <a class="page-link" href="/admin/comments">Retour</a>
+    </li>
+  </ul>
+</nav>
+{% endif %}
+{% endblock %}

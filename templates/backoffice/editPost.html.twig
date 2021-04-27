@@ -1,0 +1,43 @@
+{% extends "/frontoffice/base.html.twig" %}
+
+{% block title %}Modification d'un post{% endblock %}
+
+{% block content %}
+
+<div class="container">
+  <form action="{{url}}" method="POST">
+    <div class="form-group">
+      <label for="title">Titre du post</label>
+      <input type="text" class="form-control" id="title" name="title" value="{{post.title | default('')}}" />
+    </div>
+    <div class="form-group">
+      <label for="standFirst">Chapo</label>
+      <input type="text" class="form-control" id="standFirst" name="standFirst"
+        value="{{post.stand_first | default('')}}">
+    </div>
+    <div class="form-group">
+      <label for="exampleFormControlSelect1">publier:</label>
+      <select class="form-control" id="exampleFormControlSelect1">
+        <option>oui</option>
+        <option>non</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="image">Charger une image</label>
+      <input type="file" class="form-control-file" name="file_attached" id="image">
+    </div>
+    <div class="form-group">
+      <label for="text">Contenu</label>
+      <textarea class="form-control" id="text" name="text" rows="15">
+            {{post.text | default('')}}
+          </textarea>
+    </div>
+    <div class="text-center">
+      <button type="submit" class="btn btn-primary btn-block mb-4 orangeButton">Modifier</button>
+    </div>
+  </form>
+</div>
+
+
+{% endblock %}

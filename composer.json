@@ -1,0 +1,16 @@
+{
+    "require": {
+        "twig/twig": "^3.0",
+        "swiftmailer/swiftmailer": "^6.0"
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^0.12.82",
+        "squizlabs/php_codesniffer": "*",
+        "filp/whoops": "^2.11"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    }
+}

@@ -43,14 +43,14 @@ final class Errors
                 );
             case 23000:
                 return
-                new Response(
-                    $this->twig->render(
-                        "frontoffice/signup.html.twig",
-                        []
-                    ),
-                    403,
-                    ['Content-Type' => 'text/html; charset=utf-8']
-                );
+                    new Response(
+                        $this->twig->render(
+                            "frontoffice/signup.html.twig",
+                            []
+                        ),
+                        403,
+                        ['Content-Type' => 'text/html; charset=utf-8']
+                    );
             default:
                 return new Response(
                     $this->twig->render(

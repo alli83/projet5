@@ -6,13 +6,23 @@ namespace App\Service\Http;
 
 class ParametersBag
 {
+    /**
+     * @var string[] $parameters
+     */
     protected array $parameters;
 
+
+    /**
+     * @param string[] $parameters
+     */
     function __construct(array &$parameters)
     {
         $this->parameters = &$parameters;
     }
 
+    /**
+     * @return string[]
+     */
     public function all(): ?array
     {
         return $this->parameters;

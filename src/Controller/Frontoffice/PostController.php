@@ -67,10 +67,12 @@ final class PostController implements ControllerInterface
 
         $posts = $this->postRepository->findAll(3, $offset);
 
-         return new Response($this->view->render([
-             'template' => 'posts',
-             'data' => ['posts' => $posts,
-             'page' => $params === null ? 0 : intval($params["page"])]
-         ]));
+        return new Response($this->view->render([
+            'template' => 'posts',
+            'data' => [
+                'posts' => $posts,
+                'page' => $params === null ? 0 : intval($params["page"])
+            ]
+        ]));
     }
 }

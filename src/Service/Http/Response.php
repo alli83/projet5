@@ -37,7 +37,7 @@ final class Response
     }
 
 
-  /**
+    /**
      * @return string[]
      */
     public function getHeaders(): array

@@ -80,7 +80,7 @@ final class PostRepository implements EntityRepositoryInterface
     {
         $query = 'select 
         post.id, post.title, post.stand_first, post.text, post.creation_date, post.last_update, pseudo
-        from post INNER JOIN user ON post.userId = user.id' ;
+        from post INNER JOIN user ON post.userId = user.id';
         $query = $query . " LIMIT 3";
         if ($offset !== null) {
             $query = $query . " OFFSET $offset";
@@ -98,11 +98,12 @@ final class PostRepository implements EntityRepositoryInterface
         $text = $post->getText();
         $userId = $post->getUserId();
 
-        $valuesToBind = [":title" => $title,
-        ":stand_first" => $standFirst,
-        ":text" => $text,
-        ":userId" => $userId]
-        ;
+        $valuesToBind = [
+            ":title" => $title,
+            ":stand_first" => $standFirst,
+            ":text" => $text,
+            ":userId" => $userId
+        ];
 
         $req = $this->pdo->prepare("INSERT INTO post (title,stand_first,text,userId,last_update) 
         VALUES ( :title, :stand_first, :text, :userId, now())");
@@ -118,9 +119,11 @@ final class PostRepository implements EntityRepositoryInterface
         $title = $post->getTitle();
         $standFirst = $post->getstandFirst();
         $text = $post->getText();
-        $valuesToBind = [":title" => $title,
-                        ":stand_first" => $standFirst,
-                        ":text" => $text];
+        $valuesToBind = [
+            ":title" => $title,
+            ":stand_first" => $standFirst,
+            ":text" => $text
+        ];
 
         $req = $this->pdo->prepare("UPDATE post SET title = :title, stand_first = :stand_first,
         text = :text, last_update = now() WHERE id = ${id}");

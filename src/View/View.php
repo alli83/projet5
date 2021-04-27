@@ -17,7 +17,8 @@ final class View
     {
         $loader = new FilesystemLoader('../templates');
         $this->twig = new Environment($loader, [
-            'debug' => true]);
+            'debug' => true
+        ]);
         $this->twig->addExtension(new \Twig\Extension\DebugExtension());
         $this->session = $session;
     }

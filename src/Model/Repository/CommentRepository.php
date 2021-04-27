@@ -76,7 +76,7 @@ final class CommentRepository implements EntityRepositoryInterface
         $query = 'select 
         comment.id, comment.status, comment.text, comment.created_date, comment.last_update, user.pseudo, post.title
         from comment INNER JOIN user ON comment.idUser = user.id 
-        INNER JOIN post ON comment.idPost = post.id WHERE comment.status = "created" OR comment.status = "validated"' ;
+        INNER JOIN post ON comment.idPost = post.id WHERE comment.status = "created" OR comment.status = "validated"';
 
         $query = $query . " LIMIT 3";
         if ($offset !== null) {

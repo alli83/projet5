@@ -46,8 +46,10 @@ class AdminPostController implements ControllerInterface
 
             return new Response($this->view->render([
                 'template' => 'listPosts',
-                'data' => ['posts' => $posts,
-                'page' => $params === null ? 0 : intval($params["page"])],
+                'data' => [
+                    'posts' => $posts,
+                    'page' => $params === null ? 0 : intval($params["page"])
+                ],
                 'env' => 'backoffice'
             ]));
         }

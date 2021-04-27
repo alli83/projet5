@@ -70,24 +70,24 @@
             setTimeout(function () {
                 $('#flash').remove();
             }, 2000);
-     
 
-        $("#password1").on("submit", function () {
-  if ($(this).val() != $("#password2").val()) {
-    $("#password2").removeClass("valid").addClass("invalid");
-  } else {
-    $("#password2").removeClass("invalid").addClass("valid");
-  }
-});
 
-$("#password2").on("submit", function () {
-  if ($("#password1").val() != $(this).val()) {
-    $(this).removeClass("valid").addClass("invalid");
-  } else {
-    $(this).removeClass("invalid").addClass("valid");
-  }
-});
-})
+            $("#password1").on("submit", function () {
+                if ($(this).val() != $("#password2").val()) {
+                    $("#password2").removeClass("valid").addClass("invalid");
+                } else {
+                    $("#password2").removeClass("invalid").addClass("valid");
+                }
+            });
+
+            $("#password2").on("submit", function () {
+                if ($("#password1").val() != $(this).val()) {
+                    $(this).removeClass("valid").addClass("invalid");
+                } else {
+                    $(this).removeClass("invalid").addClass("valid");
+                }
+            });
+        })
     </script>
 
     <footer class="theme">
@@ -125,7 +125,7 @@ $("#password2").on("submit", function () {
                 </li>
                 <li>
                     <a href="https://twitter.com/share" class="btn btn-social btn-linkedin whiteText"">
-                        <i class="fa fa-linkedin"></i>LinkedIn</a>
+                        <i class=" fa fa-linkedin"></i>LinkedIn</a>
                 </li>
 
             </ul>

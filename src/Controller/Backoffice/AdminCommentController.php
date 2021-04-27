@@ -45,8 +45,10 @@ class AdminCommentController implements ControllerInterface
 
             return new Response($this->view->render([
                 'template' => 'listComments',
-                'data' => ['comments' => $comments,
-                'page' => $params === null ? 0 : intval($params["page"])],
+                'data' => [
+                    'comments' => $comments,
+                    'page' => $params === null ? 0 : intval($params["page"])
+                ],
                 'env' => 'backoffice'
             ]));
         }

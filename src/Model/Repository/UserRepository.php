@@ -66,7 +66,7 @@ final class UserRepository implements EntityRepositoryInterface
     {
         $query = 'select 
         id, pseudo, role,  Created_date, last_update, pseudo
-        from user WHERE role= "user" OR role= "admin"' ;
+        from user WHERE role= "user" OR role= "admin"';
         $query = $query . " LIMIT 3";
         if ($offset !== null) {
             $query = $query . " OFFSET $offset";
@@ -80,19 +80,17 @@ final class UserRepository implements EntityRepositoryInterface
     public function create(object $user): bool
     {
         $req = $this->pdo->prepare('INSERT INTO user (pseudo, email, password) VALUES(:pseudo, :email, :password)');
-    
-            $req->bindValue("email", $user->getEmail());
-            $req->bindValue("pseudo", $user->getPseudo());
-            $req->bindValue("password", $user->getPassword());
+
+        $req->bindValue("email", $user->getEmail());
+        $req->bindValue("pseudo", $user->getPseudo());
+        $req->bindValue("password", $user->getPassword());
         try {
             return $req->execute();
-        }
-        catch  (\Exception $e) {
+        } catch (\Exception $e) {
             $error = new Errors(intval($e->getCode()));
             $error->handleErrors();
             return false;
         }
-        
     }
 
     public function update(object $user): bool

@@ -10,12 +10,13 @@
   {% if comments %}
   {% for comment in comments %}
 
- 
+
   <div class="container mt-5">
     <ul class="list-group">
       <li class="list-group-item list-group-item-info fs-5">
         <span class=" d-inline-block px-md-2 col-sm-9 col-lg-12">
-          <p class="mb-1 text-muted">Commentaire crée le {{comment.created_date}}  - par {{comment.pseudo }} -  dernière mise à jour le:
+          <p class="mb-1 text-muted">Commentaire crée le {{comment.created_date}} - par {{comment.pseudo }} - dernière
+            mise à jour le:
             {{comment.last_update}}</p>
           <p>{{comment.text}}</p>
         </span>

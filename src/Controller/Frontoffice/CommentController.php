@@ -38,7 +38,7 @@ final class CommentController implements ControllerInterface
             if ($user !== null) {
                 $post = intval($request->get("post"));
                 $params = ['pseudo', 'text', 'idPost', 'idUser'];
-                $values = [$request->get("pseudo"),$request->get("text"),$post, $user->getId()];
+                $values = [$request->get("pseudo"), $request->get("text"), $post, $user->getId()];
                 $param = array_combine($params, $values);
 
                 $validityTools = new Validity();
@@ -52,10 +52,10 @@ final class CommentController implements ControllerInterface
                     $validate = $message->sendMessage("frontoffice/mail/validateComment.html.twig", $user, $user->getEmail());
 
                     $validate === true ? $this->session->addFlashes('success', 'Une confirmation vous a été envoyée par mail') :
-                                        $this->session->addFlashes('warning', 'Une erreur s\'est produite au niveau de l\'envoi de la confirmation par mail');
+                        $this->session->addFlashes('warning', 'Une erreur s\'est produite au niveau de l\'envoi de la confirmation par mail');
                 }
                 $result === true ? $this->session->addFlashes('success', 'Votre commentaire a été envoyé pour validation') :
-                                   $this->session->addFlashes('error', 'Une erreur est survenue');
+                    $this->session->addFlashes('error', 'Une erreur est survenue');
 
                 return new Response("", 304, ["location" =>  "/post-${post}"]);
             } else {

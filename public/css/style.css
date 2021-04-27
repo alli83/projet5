@@ -1,3 +1,35 @@
+html {
+    height: 100%;
+}
+
+body {
+    height: 100%;
+    background: linear-gradient(90deg, rgba(158,159,163,1) 0%, rgba(224,224,228,1) 19%, rgba(248,249,251,1) 52%, rgba(209,212,217,1) 89%, rgba(184,186,189,1) 100%, rgba(153,154,156,1) 100%);
+}
+
+.theme {
+    background: linear-gradient(90deg, rgba(54,6,11,1) 4%, rgba(65,3,10,1) 17%, rgba(94,9,18,1) 50%, rgba(64,12,18,1) 97%, rgba(54,3,9,1) 100%);
+}
+
+.whiteText {
+    color:white;
+}
+
 .danger {
     color: red;
 }
+
+.center {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+}
+
+.footer {
+  margin: 0;
+  width: 100%;
+}
+
+
+
+

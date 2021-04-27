@@ -17,8 +17,9 @@ class File
 
     public function downloadFile(): bool
     {
-        $fileToSearch = $this->getFileName();
-        if (file_exists(ROOT_DIR . "/src/utils/" . $fileToSearch)) {
+        $fileToSearch = $this->getFileName() . ".pdf";
+
+        if (file_exists(ROOT_DIR . "/src/Service/Utils/" . $fileToSearch)) {
             header('Content-Description: File Transfer');
             header('Content-Type: application/octet-stream');
             header('Content-Disposition: attachment; filename=' . $fileToSearch);
@@ -26,7 +27,7 @@ class File
             header('Cache-Control: must-revalidate');
             header('Pragma: public');
             header('Content-Length: ' . filesize(ROOT_DIR . "/src/utils/" . $fileToSearch));
-            $result = readfile(ROOT_DIR . "/src/utils/" . $fileToSearch);
+            $result = readfile(ROOT_DIR . "/src/Service/Utils/" . $fileToSearch);
 
             if ($result !== false) {
                 return true;

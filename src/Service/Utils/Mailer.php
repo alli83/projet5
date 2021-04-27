@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Service\Utils;
 
 use Twig\Environment;
-use App\Config;
 use App\ConfigSetUp;
 use Twig\Loader\FilesystemLoader;
 use App\Model\Entity\User;
@@ -70,11 +69,13 @@ class Mailer
         $message->setBody(
             $this->twig->render(
                 $template,
-                ['reason' => $request["reason"],
-                'name' => $request["name"],
-                'lastName' => $request["lastName"],
-                'contactEmail' => $request["email"],
-                'message' => $request["message"]]
+                [
+                    'reason' => $request["reason"],
+                    'name' => $request["name"],
+                    'lastName' => $request["lastName"],
+                    'contactEmail' => $request["email"],
+                    'message' => $request["message"]
+                ]
             ),
             'text/html'
         );

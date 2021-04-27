@@ -51,7 +51,7 @@ final class CommentRepository implements EntityRepositoryInterface
         return  $datas === false ? null : $datas;
     }
 
-    public function findAll(): ?array
+    public function findAll(int $limit = null, int $offset = null, array $orderBy = null): ?array
     {
         return null;
     }

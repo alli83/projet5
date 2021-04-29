@@ -39,7 +39,7 @@ class AdminPostController implements ControllerInterface
             if ($params === null || ($params && $params["page"] === null)) {
                 $offset = 0;
             } else {
-                $offset = intval($params["page"]) * 3;
+                $offset = (int)$params["page"] * 3;
             }
 
             $posts = $this->postRepository->findAll(3, $offset);
@@ -48,7 +48,7 @@ class AdminPostController implements ControllerInterface
                 'template' => 'listPosts',
                 'data' => [
                     'posts' => $posts,
-                    'page' => $params === null ? 0 : intval($params["page"])
+                    'page' => $params === null ? 0 : (int)$params["page"]
                 ],
                 'env' => 'backoffice'
             ]));
@@ -64,7 +64,7 @@ class AdminPostController implements ControllerInterface
 
         $user = $auth->isAuth($this->session, $this->userRepository);
         if ($user !== null) {
-            $post = $this->postRepository->findOneBy(["id" => intval($params["id"])]);
+            $post = $this->postRepository->findOneBy(["id" => (int)$params["id"]]);
 
             if ($post !== null) {
                 return new Response($this->view->render([
@@ -164,7 +164,7 @@ class AdminPostController implements ControllerInterface
 
         $user = $auth->isAuth($this->session, $this->userRepository);
         if ($user !== null) {
-            $post = new Post(["id" => intval($params["id"])]);
+            $post = new Post(["id" => (int)$params["id"]]);
             $deletedPost = $this->postRepository->delete($post);
             if ($deletedPost) {
                 $this->session->addFlashes('success', "le post à bien été supprimé");

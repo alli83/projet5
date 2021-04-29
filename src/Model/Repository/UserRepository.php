@@ -38,7 +38,7 @@ final class UserRepository implements EntityRepositoryInterface
 
         $valuesToBind = [];
         foreach ($criteria as $key => $val) {
-            if (intval($val) === $val) {
+            if ((int)$val === $val) {
                 $valuesToBind[] = ['key' => ':' . $key, 'value' => $val, 'type' => \PDO::PARAM_INT];
                 $query .= "AND $key = :$key ";
             } else {
@@ -87,7 +87,7 @@ final class UserRepository implements EntityRepositoryInterface
         try {
             return $req->execute();
         } catch (\Exception $e) {
-            $error = new Errors(intval($e->getCode()));
+            $error = new Errors((int)$e->getCode());
             $error->handleErrors();
             return false;
         }

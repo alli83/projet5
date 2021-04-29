@@ -42,7 +42,7 @@ final class PostRepository implements EntityRepositoryInterface
 
         $valuesToBind = [];
         foreach ($criteria as $key => $val) {
-            if (intval($val) === $val) {
+            if ((int)$val === $val) {
                 $valuesToBind[] = ['key' => ':' . $key, 'value' => $val];
                 $query .= "AND post.$key = :$key ";
             } else {

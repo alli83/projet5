@@ -25,7 +25,7 @@ final class Post
     {
         foreach ($datas as $key => $value) {
             if ($key === "id") {
-                $value = intval($value);
+                $value = (int)$value;
             }
             $method = 'set' . ucfirst($key);
 

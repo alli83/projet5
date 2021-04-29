@@ -36,7 +36,7 @@ final class CommentController implements ControllerInterface
             $user = $auth->isAuth($this->session, $userRepository);
 
             if ($user !== null) {
-                $post = intval($request->get("post"));
+                $post = (int)$request->get("post");
                 $params = ['pseudo', 'text', 'idPost', 'idUser'];
                 $values = [$request->get("pseudo"), $request->get("text"), $post, $user->getId()];
                 $param = array_combine($params, $values);

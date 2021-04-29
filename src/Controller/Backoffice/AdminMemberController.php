@@ -36,7 +36,7 @@ class AdminMemberController implements ControllerInterface
             if ($params === null || ($params && $params["page"] === null)) {
                 $offset = 0;
             } else {
-                $offset = intval($params["page"]) * 3;
+                $offset = (int)$params["page"] * 3;
             }
 
             $users = $this->userRepository->findAll(3, $offset);
@@ -44,7 +44,7 @@ class AdminMemberController implements ControllerInterface
                 'template' => 'listUsers',
                 'data' => [
                     'members' => $users,
-                    'page' => $params === null ? 0 : intval($params["page"])
+                    'page' => $params === null ? 0 : (int)$params["page"]
                 ],
                 'env' => 'backoffice'
             ]));
@@ -71,7 +71,7 @@ class AdminMemberController implements ControllerInterface
 
             $user = $auth->isAuth($this->session, $this->userRepository);
             if ($user !== null) {
-                $params["id"] = intval($params["id"]);
+                $params["id"] = (int)$params["id"];
                 $user = new User($params);
                 if ($this->userRepository->update($user)) {
                     $this->session->addFlashes("success", "les droits de l'utilisateur ont bien été modifié");
@@ -93,7 +93,7 @@ class AdminMemberController implements ControllerInterface
 
         $user = $auth->isAuth($this->session, $this->userRepository);
         if ($user !== null) {
-            $user = new User(["id" => intval($params["id"])]);
+            $user = new User(["id" => (int)$params["id"]]);
             $deletedUser = $this->userRepository->delete($user);
             if ($deletedUser) {
                 $this->session->addFlashes('success', "l'utilisateur à bien été supprimé"); // envoyer un message!

@@ -38,7 +38,7 @@ class AdminCommentController implements ControllerInterface
             if ($params === null || ($params && $params["page"] === null)) {
                 $offset = 0;
             } else {
-                $offset = intval($params["page"]) * 3;
+                $offset = (int)$params["page"] * 3;
             }
 
             $comments = $this->commentRepository->findAll(3, $offset);
@@ -47,7 +47,7 @@ class AdminCommentController implements ControllerInterface
                 'template' => 'listComments',
                 'data' => [
                     'comments' => $comments,
-                    'page' => $params === null ? 0 : intval($params["page"])
+                    'page' => $params === null ? 0 : (int)$params["page"]
                 ],
                 'env' => 'backoffice'
             ]));
@@ -64,7 +64,7 @@ class AdminCommentController implements ControllerInterface
         $user = $auth->isAuth($this->session, $this->userRepository);
 
         if ($user !== null) {
-            $comment = new Comment(["id" => intval($params["id"])]);
+            $comment = new Comment(["id" => (int)$params["id"]]);
             $validatedComment = $this->commentRepository->validate($comment);
             if ($validatedComment) {
                 $this->session->addFlashes('success', "le commentaire à bien été validé"); // envoyer un message!
@@ -85,7 +85,7 @@ class AdminCommentController implements ControllerInterface
 
         $user = $auth->isAuth($this->session, $this->userRepository);
         if ($user !== null) {
-            $comment = new Comment(["id" => intval($params["id"])]);
+            $comment = new Comment(["id" => (int)$params["id"]]);
             $deletedComment = $this->commentRepository->delete($comment);
             if ($deletedComment) {
                 $this->session->addFlashes('success', "le commentaire à bien été supprimé"); // envoyer un message!

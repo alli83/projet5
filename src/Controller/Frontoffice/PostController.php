@@ -28,7 +28,7 @@ final class PostController implements ControllerInterface
     public function displayOneAction(array $params, CommentRepository $commentRepository): Response
     {
         if ($params["id"]) {
-            $params['id'] = intval($params['id']);
+            $params['id'] = (int)$params['id'];
         }
         $validityTools = new Validity();
         $params = $validityTools->validityVariables($params);
@@ -62,7 +62,7 @@ final class PostController implements ControllerInterface
         if ($params === null || ($params && $params["page"] === null)) {
             $offset = 0;
         } else {
-            $offset = intval($params["page"]) * 3;
+            $offset = (int)$params["page"] * 3;
         }
 
         $posts = $this->postRepository->findAll(3, $offset);
@@ -71,7 +71,7 @@ final class PostController implements ControllerInterface
             'template' => 'posts',
             'data' => [
                 'posts' => $posts,
-                'page' => $params === null ? 0 : intval($params["page"])
+                'page' => $params === null ? 0 : (int)$params["page"]
             ]
         ]));
     }

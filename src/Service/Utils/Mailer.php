@@ -34,7 +34,7 @@ class Mailer
     {
         $settings = $this->getSettings();
 
-        $transport = new \Swift_SmtpTransport($settings["smtp"], intval($settings["smtp_port"]));
+        $transport = new \Swift_SmtpTransport($settings["smtp"], (int)$settings["smtp_port"]);
         $mailer = new \Swift_Mailer($transport);
 
         $message = new \Swift_Message();
@@ -59,7 +59,7 @@ class Mailer
     public function sendMessageContact(string $template, array $request): bool
     {
         $settings = $this->getSettings();
-        $transport = new \Swift_SmtpTransport($settings["smtp"], intval($settings["smtp_port"]));
+        $transport = new \Swift_SmtpTransport($settings["smtp"], (int)$settings["smtp_port"]);
         $mailer = new \Swift_Mailer($transport);
 
         $message = new \Swift_Message();

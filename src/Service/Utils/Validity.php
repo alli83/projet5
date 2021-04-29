@@ -12,8 +12,8 @@ class Validity
         $newparams = [];
         foreach ($params as $key => $param) {
             if (is_int($param)) {
-                $params[$key] = htmlspecialchars(strval($param));
-                $params[$key] = intval($params[$key]);
+                $params[$key] = htmlspecialchars((string) $param);
+                $params[$key] = (int)$params[$key];
             } else {
                 $params[$key] = htmlspecialchars($param);
             }

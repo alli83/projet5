@@ -54,17 +54,13 @@ final class CommentController implements ControllerInterface
                     $validate === true ? $this->session->addFlashes('success', 'Une confirmation vous a été envoyée par mail') :
                         $this->session->addFlashes('warning', 'Une erreur s\'est produite au niveau de l\'envoi de la confirmation par mail');
                 }
-                $result === true ? $this->session->addFlashes('success', 'Votre commentaire a été envoyé pour validation') :
+                else {
                     $this->session->addFlashes('error', 'Une erreur est survenue');
-
+                }
                 return new Response("", 304, ["location" =>  "/post-${post}"]);
-            } else {
-                $error = new Errors(404);
-                return $error->handleErrors();
             }
-        } else {
-            $error = new Errors(404);
-            return $error->handleErrors();
         }
+        $error = new Errors(404);
+        return $error->handleErrors();
     }
 }

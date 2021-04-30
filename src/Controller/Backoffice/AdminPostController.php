@@ -75,9 +75,8 @@ class AdminPostController implements ControllerInterface
                     ],
                     'env' => "backoffice"
                 ]));
-            } else {
-                $this->session->addFlashes('danger', "Une erreur est survenue");
             }
+            $this->session->addFlashes('danger', "Une erreur est survenue");
         }
         return new Response("", 304, ["location" =>  "/"]);
     }

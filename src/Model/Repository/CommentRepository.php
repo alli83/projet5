@@ -51,10 +51,10 @@ final class CommentRepository implements EntityRepositoryInterface
         $valuesToBind = [];
         foreach ($criteria as $key => $val) {
             if ((int)$val === $val) {
-                $valuesToBind[] = ['key' => ':' . $key, 'value' => $val];
+                $valuesToBind[] = ['key' => ':' . $key, 'value' => $val, 'type' => \PDO::PARAM_INT];
                 $query .= "AND $key = :$key ";
             } else {
-                $valuesToBind[] = ['key' => ':' . $key, 'value' => $val];
+                $valuesToBind[] = ['key' => ':' . $key, 'value' => $val, 'type' => \PDO::PARAM_STR];
                 $query .= "AND $key = :$key ";
             }
         }
@@ -62,7 +62,7 @@ final class CommentRepository implements EntityRepositoryInterface
         $req = $this->pdo->prepare($query);
         $req->setFetchMode(\PDO::FETCH_ASSOC);
         foreach ($valuesToBind as $item) {
-            $req->bindValue($item['key'], $item['value']);
+            $req->bindValue($item['key'], $item['value'], $item['type']);
         }
 
         $req->execute();

@@ -31,9 +31,8 @@ class File
 
             if ($result !== false) {
                 return true;
-            } else {
-                return false;
             }
+            // return false;
         }
         return false;
     }

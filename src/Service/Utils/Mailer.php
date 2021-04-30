@@ -51,9 +51,8 @@ class Mailer
         $result = $mailer->send($message);
         if ($result === 1) {
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     public function sendMessageContact(string $template, array $request): bool
@@ -83,8 +82,7 @@ class Mailer
 
         if ($result === 1) {
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 }

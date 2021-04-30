@@ -50,9 +50,10 @@ final class PostController implements ControllerInterface
                     ],
                 ],
             ));
-        } elseif ($post === null) {
-            $this->session->addFlashes('danger', 'le post demandé n\'est pas disponible');
         }
+        // elseif ($post === null) {
+        // $this->session->addFlashes('danger', 'le post demandé n\'est pas disponible');
+        // } 
         $this->session->addFlashes('danger', 'Une erreur est survenue');
         return $this->displayAllAction();
     }

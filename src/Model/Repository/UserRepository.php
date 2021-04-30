@@ -76,7 +76,7 @@ final class UserRepository implements EntityRepositoryInterface
         $datas = $req->fetchAll(\PDO::FETCH_CLASS, User::class);
         return  $datas === false ? null : $datas;
     }
-
+    // add php doc
     public function create(object $user): bool
     {
         $req = $this->pdo->prepare('INSERT INTO user (pseudo, email, password) VALUES(:pseudo, :email, :password)');

@@ -70,23 +70,6 @@
             setTimeout(function () {
                 $('#flash').remove();
             }, 2000);
-
-
-            $("#password1").on("submit", function () {
-                if ($(this).val() != $("#password2").val()) {
-                    $("#password2").removeClass("valid").addClass("invalid");
-                } else {
-                    $("#password2").removeClass("invalid").addClass("valid");
-                }
-            });
-
-            $("#password2").on("submit", function () {
-                if ($("#password1").val() != $(this).val()) {
-                    $(this).removeClass("valid").addClass("invalid");
-                } else {
-                    $(this).removeClass("invalid").addClass("valid");
-                }
-            });
         })
     </script>
 

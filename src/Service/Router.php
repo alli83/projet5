@@ -56,54 +56,55 @@ final class Router
             $action = $tagroute->getAttribute('action');
             $accessory = $tagroute->getAttribute('accessory');
 
+            $varsnames = null;
+
             if ($tagroute->hasAttribute('varnames')) {
                 $varsnames = explode(',', $tagroute->getAttribute('varnames'));
-            } else {
-                $varsnames = null;
             }
+
             $this->addRoutes($this->container->getRoutes($url, $module, $action, $accessory, $varsnames));
         }
         try {
             $goodRoad = $this->getRoute($_SERVER['REQUEST_URI']);
 
-            if ($goodRoad == null) {
+            if ($goodRoad === null) {
                 $error = new Errors(404);
                 return $error->handleErrors();
-            } else {
-                $module = $goodRoad->getModule();
-                $method = $goodRoad->getAction();
-                $accessory = $goodRoad->getAccessory();
+            }
 
-                $varsvalues = $goodRoad->getVarsValues();
-                $varsnames = $goodRoad->getVarsNames();
+            $module = $goodRoad->getModule();
+            $method = $goodRoad->getAction();
+            $accessory = $goodRoad->getAccessory();
 
-                $goodCont = $this->container->callGoodController($module);
+            $varsvalues = $goodRoad->getVarsValues();
+            $varsnames = $goodRoad->getVarsNames();
 
-                if ($goodRoad->hasVarsName()) {
-                    $goodRoad->setParams($varsnames, $varsvalues);
-                    $get = $goodRoad->getParams();
+            $goodCont = $this->container->callGoodController($module);
 
-                    if ($accessory !== "") {
-                        $accessory = $this->container->setRepositoryClass(($accessory));
-
-                        return $this->request->getMethod() === "POST" ?
-                            $goodCont->$method($get, $accessory, $this->request->request()) :
-                            $goodCont->$method($get, $accessory, null);
-                    } else {
-                        return $this->request->getMethod() === "POST" ?
-                            $goodCont->$method($get, $this->request->request()) :
-                            $goodCont->$method($get, null);
-                    }
-                }
+            if ($goodRoad->hasVarsName()) {
+                $goodRoad->setParams($varsnames, $varsvalues);
+                $get = $goodRoad->getParams();
+                // refactorise switch?
                 if ($accessory !== "") {
                     $accessory = $this->container->setRepositoryClass(($accessory));
+
                     return $this->request->getMethod() === "POST" ?
-                        $goodCont->$method($accessory, $this->request->request()) : $goodCont->$method($accessory, null);
-                } else {
-                    return $this->request->getMethod() === "POST" ?
-                        $goodCont->$method($this->request->request()) : $goodCont->$method(null);
+                        $goodCont->$method($get, $accessory, $this->request->request()) :
+                        $goodCont->$method($get, $accessory, null);
                 }
+
+                return $this->request->getMethod() === "POST" ?
+                    $goodCont->$method($get, $this->request->request()) :
+                    $goodCont->$method($get, null);
             }
+            if ($accessory !== "") {
+                $accessory = $this->container->setRepositoryClass(($accessory));
+                return $this->request->getMethod() === "POST" ?
+                    $goodCont->$method($accessory, $this->request->request()) : $goodCont->$method($accessory, null);
+            }
+
+            return $this->request->getMethod() === "POST" ?
+                $goodCont->$method($this->request->request()) : $goodCont->$method(null);
         } catch (Exception $e) {
             $error = new Errors(500);
             return $error->handleErrors();

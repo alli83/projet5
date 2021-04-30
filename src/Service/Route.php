@@ -29,6 +29,8 @@ class Route
     public function match(string $url): bool
     {
         if (preg_match('#^' . $this->url . '$#', $url, $matches)) {
+
+            $this->setVarsValues([]);
             $vars = $this->hasVarsName();
             if ($vars) {
                 $varsvalues = [];
@@ -38,14 +40,10 @@ class Route
                     }
                 }
                 $this->setVarsValues($varsvalues);
-                return true;
-            } else {
-                $this->setVarsValues([]);
-                return true;
             }
-        } else {
-            return false;
+            return true;
         }
+        return false;
     }
 
     public function getUrl(): string

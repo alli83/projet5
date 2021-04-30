@@ -38,17 +38,14 @@ class Auth
 
         $user = $this->userRepo->findOneBy(['email' => $email]);
         if ($user !== null) {
-            password_verify($password, $user->getPassword());
-            if (!password_verify($password, $user->getPassword())) {
-                return false;
+            if (password_verify($password, $user->getPassword())) {
+                $this->session->set('pseudo', $user->getPseudo());
+                $this->session->set('role', $user->getRole());
+                $this->session->set('email', $user->getEmail());
+                return true;
             }
-            $this->session->set('pseudo', $user->getPseudo());
-            $this->session->set('role', $user->getRole());
-            $this->session->set('email', $user->getEmail());
-            return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     public function register(): bool
@@ -67,8 +64,7 @@ class Auth
             $object = new User($param);
 
             return $this->userRepo->create($object);
-        } else {
-            return false;
         }
+        return false;
     }
 }

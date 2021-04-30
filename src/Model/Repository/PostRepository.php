@@ -43,17 +43,17 @@ final class PostRepository implements EntityRepositoryInterface
         $valuesToBind = [];
         foreach ($criteria as $key => $val) {
             if ((int)$val === $val) {
-                $valuesToBind[] = ['key' => ':' . $key, 'value' => $val];
+                $valuesToBind[] = ['key' => ':' . $key, 'value' => $val, 'type' => \PDO::PARAM_INT];
                 $query .= "AND post.$key = :$key ";
             } else {
-                $valuesToBind[] = ['key' => ':' . $key, 'value' => $val];
+                $valuesToBind[] = ['key' => ':' . $key, 'value' => $val, 'type' => \PDO::PARAM_STR];
                 $query .= "AND post.$key = :$key ";
             }
         }
         $req = $this->pdo->prepare($query);
         $req->setFetchMode(\PDO::FETCH_CLASS, Post::class, [$criteria]);
         foreach ($valuesToBind as $item) {
-            $req->bindValue($item['key'], $item['value']);
+            $req->bindValue($item['key'], $item['value'], $item['type']);
         }
 
         $req->execute();

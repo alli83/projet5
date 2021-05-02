@@ -11,8 +11,12 @@ body {
   background: linear-gradient(90deg, rgba(54,6,11,1) 4%, rgba(65,3,10,1) 17%, rgba(94,9,18,1) 50%, rgba(64,12,18,1) 97%, rgba(54,3,9,1) 100%);
 }
 
+.themeAdmin {
+  background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(9,9,121,1) 35%, rgba(7,16,82,1) 100%);
+}
+
 .whiteText {
-  color: white;
+  color:white;
 }
 
 .danger {
@@ -30,6 +34,15 @@ body {
   width: 100%;
 }
 
+form .error {
+  color: #a51919;
+}
+
+.imagePost {
+  display: block;
+  margin: auto;
+  max-width: 35%;
+}
 
 
 

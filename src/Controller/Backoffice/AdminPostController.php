@@ -9,10 +9,11 @@ use App\Model\Entity\Post;
 use App\View\View;
 use App\Model\Repository\PostRepository;
 use App\Model\Repository\UserRepository;
+use App\Service\Http\ParametersBag;
 use App\Service\Http\Response;
 use App\Service\Http\Session\Session;
-use App\Service\Utils\Auth;
 use App\Service\Utils\Authentification;
+use App\Service\Utils\File;
 use App\Service\Utils\Validity;
 
 class AdminPostController implements ControllerInterface
@@ -34,11 +35,14 @@ class AdminPostController implements ControllerInterface
     public function displayAllPosts(?array $params = []): Response
     {
         $auth = new Authentification();
-        $user = $auth->isAuth($this->session, $this->userRepository);
-        if ($user !== null) {
+
+        if ($auth->isAdminAuth($this->session)) {
             if ($params === null || ($params && $params["page"] === null)) {
                 $offset = 0;
             } else {
+                $validity = new Validity();
+                $params = $validity->validityVariables($params);
+
                 $offset = (int)$params["page"] * 3;
             }
 
@@ -53,17 +57,17 @@ class AdminPostController implements ControllerInterface
                 'env' => 'backoffice'
             ]));
         }
-        return new Response("", 304, ["location" =>  "/"]);
+        return new Response("", 304, ["location" =>  "/login"]);
     }
 
     public function editOnePost(array $params): Response
     {
         $auth = new Authentification();
-        $validity = new Validity();
-        $params = $validity->validityVariables($params);
 
-        $user = $auth->isAuth($this->session, $this->userRepository);
-        if ($user !== null) {
+        if ($auth->isAdminAuth($this->session)) {
+            $validity = new Validity();
+            $params = $validity->validityVariables($params);
+
             $post = $this->postRepository->findOneBy(["id" => (int)$params["id"]]);
 
             if ($post !== null) {
@@ -78,40 +82,54 @@ class AdminPostController implements ControllerInterface
             }
             $this->session->addFlashes('danger', "Une erreur est survenue");
         }
-        return new Response("", 304, ["location" =>  "/"]);
+        return new Response("", 304, ["location" =>  "/login"]);
     }
 
-    public function editOnePostSave(array $params, ?object $request): Response
+    public function editOnePostSave(array $params, ?ParametersBag $request, ?ParametersBag $file): Response
     {
-
-        $param = $request->all();
-        foreach ($param as $key => $el) {
-            $params[$key] = $el;
-        }
-
         $auth = new Authentification();
-        $validity = new Validity();
-        $params = $validity->validityVariables($params);
+        $fileAttached = $file->get("file_attached");
 
-        $user = $auth->isAuth($this->session, $this->userRepository);
-        if ($user !== null) {
+        if ($auth->isAdminAuth($this->session)) {
+            if (!empty($fileAttached["tmp_name"])) {
+                if ($fileAttached["size"] > 150000) {
+                    $this->session->addFlashes("danger", "fichier trop lourd");
+                    return new Response("", 304, ["location" =>  "/admin/posts"]);
+                }
+                $file = new File($fileAttached["name"]);
+                $targetFile = $file->registerFile($fileAttached["tmp_name"]);
+
+                if ($targetFile === null) {
+                    $this->session->addFlashes("warning", "Cette image (par ce nom ) est déjà associée à un post");
+                    return new Response("", 304, ["location" =>  "/admin/posts"]);
+                }
+                $params["file_attached"] =  base64_encode(file_get_contents($targetFile));
+            }
+
+            $param = $request->all();
+            foreach ($param as $key => $el) {
+                $params[$key] = $el;
+            }
+
+            $validity = new Validity();
+            $params = $validity->validityVariables($params);
+
             $post = new Post($params);
+
+            $this->session->addFlashes("danger", "Une erreur s'est produite");
             if ($this->postRepository->update($post)) {
                 $this->session->addFlashes("success", "le post a bien été modifié et mis à jour");
-            } else {
-                $this->session->addFlashes("danger", "Une erreur s'est produite");
             }
             return new Response("", 304, ["location" =>  "/admin/posts"]);
         }
-        return new Response("", 304, ["location" =>  "/"]);
+        return new Response("", 304, ["location" =>  "/login"]);     
     }
 
     public function createNewPost(): Response
     {
         $auth = new Authentification();
 
-        $user = $auth->isAuth($this->session, $this->userRepository);
-        if ($user !== null) {
+        if ($auth->isAdminAuth($this->session)) {
             return new Response($this->view->render([
                 'template' => 'editPost',
                 'data' => [
@@ -120,58 +138,75 @@ class AdminPostController implements ControllerInterface
                 'env' => "backoffice"
             ]));
         }
-        return new Response("", 304, ["location" =>  "/"]);
+        return new Response("", 304, ["location" =>  "/login"]);
     }
 
-    public function createNewPostSave(object $request): Response
+    public function createNewPostSave(ParametersBag $request, ?ParametersBag $file): Response
     {
-
         $params = [];
-        $param = $request->all();
-        foreach ($param as $key => $el) {
-            $params[$key] = $el;
-        }
+        $fileAttached = $file->get("file_attached");
 
         $auth = new Authentification();
-        $validity = new Validity();
-        $params = $validity->validityVariables($params);
+        
+        if ($auth->isAdminAuth($this->session)) {
+            if (!empty($fileAttached["tmp_name"])) {
+                
+                if ($fileAttached["size"] > 150000) {
 
-        $user = $auth->isAuth($this->session, $this->userRepository);
-        if ($user !== null) {
+                    $this->session->addFlashes("danger", "fichier trop lourd");
+                    return new Response("", 304, ["location" =>  "/admin/posts"]);
+                }
+
+                $file = new File($fileAttached["name"], $fileAttached);
+                $targetFile = $file->registerFile($fileAttached["tmp_name"]);
+
+                if ($targetFile === null) {
+                    $this->session->addFlashes("warning", "Cette image (par ce nom ) est déjà associée à un post");
+                    return new Response("", 304, ["location" =>  "/admin/posts"]);
+                }
+                $params["file_attached"] =  base64_encode(file_get_contents($targetFile));
+            }
+
+            $param = $request->all();
+
+            foreach ($param as $key => $el) {
+                $params[$key] = $el;
+            }
+
+            $validity = new Validity();
+            $params = $validity->validityVariables($params);
+
             $user = $this->userRepository->findOneBy(["email" => $this->session->get("email")]);
             $userId = $user->getId();
 
             $params['userId'] = $userId;
-
             $post = new Post($params);
 
+            $this->session->addFlashes('danger', "Une erreur est survenue");
             if ($this->postRepository->create($post)) {
                 $this->session->addFlashes('success', "le post à bien été créé");
-            } else {
-                $this->session->addFlashes('danger', "Une erreur est survenue");
             }
             return new Response("", 304, ["location" =>  "/admin/posts"]);
         }
-        return new Response("", 304, ["location" =>  "/"]);
+        return new Response("", 304, ["location" =>  "/login"]);
     }
 
     public function deleteOnePost(array $params): Response
     {
         $auth = new Authentification();
-        $validity = new Validity();
-        $params = $validity->validityVariables($params);
 
-        $user = $auth->isAuth($this->session, $this->userRepository);
-        if ($user !== null) {
+        if ($auth->isAdminAuth($this->session)) {
+            $validity = new Validity();
+            $params = $validity->validityVariables($params);
+
             $post = new Post(["id" => (int)$params["id"]]);
-            $deletedPost = $this->postRepository->delete($post);
-            if ($deletedPost) {
+
+            $this->session->addFlashes('danger', "Une erreur est survenue");
+            if ($this->postRepository->delete($post)) {
                 $this->session->addFlashes('success', "le post à bien été supprimé");
-            } else {
-                $this->session->addFlashes('danger', "Une erreur est survenue");
             }
             return new Response("", 304, ["location" =>  "/admin/posts"]);
         }
-        return new Response("", 304, ["location" =>  "/"]);
+        return new Response("", 304, ["location" =>  "/login"]);
     }
 }

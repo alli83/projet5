@@ -65,7 +65,7 @@ final class Router
             $this->addRoutes($this->container->getRoutes($url, $module, $action, $accessory, $varsnames));
         }
         try {
-            $goodRoad = $this->getRoute($_SERVER['REQUEST_URI']);
+            $goodRoad = $this->getRoute($this->request->server()->get("REQUEST_URI"));
 
             if ($goodRoad === null) {
                 $error = new Errors(404);
@@ -81,32 +81,87 @@ final class Router
 
             $goodCont = $this->container->callGoodController($module);
 
-            if ($goodRoad->hasVarsName()) {
-                $goodRoad->setParams($varsnames, $varsvalues);
-                $get = $goodRoad->getParams();
-                // refactorise switch?
-                if ($accessory !== "") {
-                    $accessory = $this->container->setRepositoryClass(($accessory));
+            switch ($goodRoad->hasVarsName()) {
+                case true:
+                    $goodRoad->setParams($varsnames, $varsvalues);
+                    $get = $goodRoad->getParams();
+                    switch ($accessory) {
+                        case "":
+                            switch ($this->request->getMethod()) {
+                                case "POST":
+                                    switch ($this->request->files()->has("file_attached")) {
+                                        case true:
+                                            return $goodCont->$method($get, $this->request->request(), $this->request->files());
 
-                    return $this->request->getMethod() === "POST" ?
-                        $goodCont->$method($get, $accessory, $this->request->request()) :
-                        $goodCont->$method($get, $accessory, null);
-                }
+                                        default:
+                                            return $goodCont->$method($get, $this->request->request());
+                                    }
+                                default:
+                                    return $goodCont->$method($get, null);
+                            }
+                        default:
+                            $accessory = $this->container->setRepositoryClass(($accessory));
+                            switch ($this->request->getMethod()) {
+                                case "POST":
+                                    switch ($this->request->files()->has("file_attached")) {
+                                        case true:
+                                            return $goodCont->$method($get, $accessory, $this->request->request(), $this->request->files());
 
-                return $this->request->getMethod() === "POST" ?
-                    $goodCont->$method($get, $this->request->request()) :
-                    $goodCont->$method($get, null);
+                                        default:
+                                            return $goodCont->$method($get, $accessory, $this->request->request());
+                                    }
+                                default:
+                                    switch ($this->request->files()->has("file_attached")) {
+                                        case true:
+                                            return $goodCont->$method($get, $accessory, null, $this->request->files());
+
+                                        default:
+                                            return $goodCont->$method($get, $accessory, null);
+                                    }
+                            }
+                    }
+                default:
+                    switch ($accessory) {
+                        case "":
+                            switch ($this->request->getMethod()) {
+                                case "POST":
+                                    switch ($this->request->files()->has("file_attached")) {
+                                        case true:
+                                            return $goodCont->$method($this->request->request(), $this->request->files());
+                                        default:
+                                            return $goodCont->$method($this->request->request());
+                                    }
+                                default:
+                                    switch ($this->request->files()->has("file_attached")) {
+                                        case true:
+                                            return $goodCont->$method(null, $this->request->files());
+                                        default:
+                                            return $goodCont->$method(null);
+                                    }
+                            }
+                        default:
+                            $accessory = $this->container->setRepositoryClass(($accessory));
+                            switch ($this->request->getMethod()) {
+                                case "POST":
+                                    switch ($this->request->files()->has("file_attached")) {
+                                        case true:
+                                            return $goodCont->$method($accessory, $this->request->request(), $this->request->files());
+                                        default:
+                                            return $goodCont->$method($accessory, $this->request->request());
+                                    }
+                                default:
+                                    switch ($this->request->files()->has("file_attached")) {
+                                        case true:
+                                            return $goodCont->$method($accessory, null, $this->request->files());
+                                        default:
+                                            return $goodCont->$method($accessory, null);
+                                    }
+                            }
+                    }
             }
-            if ($accessory !== "") {
-                $accessory = $this->container->setRepositoryClass(($accessory));
-                return $this->request->getMethod() === "POST" ?
-                    $goodCont->$method($accessory, $this->request->request()) : $goodCont->$method($accessory, null);
-            }
-
-            return $this->request->getMethod() === "POST" ?
-                $goodCont->$method($this->request->request()) : $goodCont->$method(null);
         } catch (Exception $e) {
-            $error = new Errors(500);
+            var_dump($e);
+            $error = new Errors((int)($e->getCode()));
             return $error->handleErrors();
         }
     }

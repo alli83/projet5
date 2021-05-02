@@ -11,6 +11,7 @@ use App\Service\Http\Response;
 use App\Model\Repository\CommentRepository;
 use App\Model\Repository\UserRepository;
 use App\Service\ErrorsHandlers\Errors;
+use App\Service\Http\ParametersBag;
 use App\Service\Http\Session\Session;
 use App\Service\Utils\Authentification;
 use App\Service\Utils\Mailer;
@@ -29,37 +30,39 @@ final class CommentController implements ControllerInterface
         $this->session = $session;
     }
 
-    public function createComment(UserRepository $userRepository, ?object $request): Response
+    public function createComment(UserRepository $userRepository, ?ParametersBag $request): Response
     {
-        if ($request !== null && !empty($request->get("pseudo"))  && !empty($request->get("text"))  && !empty($request->get("post"))) {
-            $auth = new Authentification();
-            $user = $auth->isAuth($this->session, $userRepository);
+        $auth = new Authentification();
+        if ($auth->isAuth($this->session)) {
+            if ($request !== null && !empty($request->get("pseudo"))  && !empty($request->get("text")) && !empty($request->get("post"))) {
+                $user = $userRepository->findOneBy(["email" => $this->session->get("email")]);
+                if ($user) {
+                    $post = (int)$request->get("post");
+                    $params = ['pseudo', 'text', 'idPost', 'idUser'];
+                    $values = [$request->get("pseudo"), $request->get("text"), $post, $user->getId()];
+                    $param = array_combine($params, $values);
 
-            if ($user !== null) {
-                $post = (int)$request->get("post");
-                $params = ['pseudo', 'text', 'idPost', 'idUser'];
-                $values = [$request->get("pseudo"), $request->get("text"), $post, $user->getId()];
-                $param = array_combine($params, $values);
+                    $validityTools = new Validity();
+                    $param = $validityTools->validityVariables($param);
+                    $object = new Comment($param);
 
-                $validityTools = new Validity();
-                $param = $validityTools->validityVariables($param);
-
-                $object = new Comment($param);
-
-                $result = $this->commentRepository->create($object);
-                if ($result === true) {
-                    $message = new Mailer();
-                    $validate = $message->sendMessage("frontoffice/mail/validateComment.html.twig", $user, $user->getEmail());
-
-                    $validate === true ? $this->session->addFlashes('success', 'Une confirmation vous a été envoyée par mail') :
-                        $this->session->addFlashes('warning', 'Une erreur s\'est produite au niveau de l\'envoi de la confirmation par mail');
-                }
-                else {
                     $this->session->addFlashes('error', 'Une erreur est survenue');
+                    if ($this->commentRepository->create($object)) {
+                        $message = new Mailer("Votre commentaire");
+                        try {
+                            $validate = $message->sendMessage("frontoffice/mail/validateComment.html.twig", $user->getEmail(), ["pseudo" => $user->getPseudo()]);
+                        } catch (\Exception $e) {
+                            throw $e;
+                        }
+
+                        $validate === true ? $this->session->addFlashes('success', 'Merci pour votre commentaire, une confirmation va vous être envoyée par mail') :
+                            $this->session->addFlashes('warning', 'Une erreur s\'est produite au niveau de l\'envoi de la confirmation par mail');
+                    }
+                    return new Response("", 304, ["location" =>  "/post-${post}"]);
                 }
-                return new Response("", 304, ["location" =>  "/post-${post}"]);
             }
         }
+        // OR redirection?
         $error = new Errors(404);
         return $error->handleErrors();
     }

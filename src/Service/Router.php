@@ -160,7 +160,6 @@ final class Router
                     }
             }
         } catch (Exception $e) {
-            var_dump($e);
             $error = new Errors((int)($e->getCode()));
             return $error->handleErrors();
         }

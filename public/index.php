@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-require_once '../vendor/autoload.php';
-
 define('ROOT_DIR', dirname(__DIR__));
+
+require_once ROOT_DIR . '/vendor/autoload.php';
 
 use App\Service\Container;
 use App\Service\Router;

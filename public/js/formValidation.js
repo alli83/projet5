@@ -2,14 +2,14 @@
 $(document).ready(function () {
 
     setTimeout(function () {
-        $('#flash').remove();
+        $("#flash").remove();
     }, 10000);
 
     $.validator.addMethod("regexPass", function (value) {
-        return /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@%^&*-]).{10,}$/.test(value)
+        return /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@%^&*-]).{10,}$/.test(value);
     });
     $.validator.addMethod("regexPseudo", function (value) {
-        return /^\w{3,15}$/.test(value)
+        return /^\w{3,15}$/.test(value);
     });
 
 
@@ -20,14 +20,14 @@ $(document).ready(function () {
                 required: true,
                 minlength: 3,
                 regexPseudo: true,
-                normalizer: function (value) {
+                normalizer: (value) => {
                     return $.trim(value);
                 }
             },
             email: {
                 required: true,
                 email: true,
-                normalizer: function (value) {
+                normalizer: (value) => {
                     return $.trim(value);
                 }
             },
@@ -35,7 +35,7 @@ $(document).ready(function () {
                 required: true,
                 minlength: 8,
                 regexPass: true,
-                normalizer: function (value) {
+                normalizer: (value) => {
                     return $.trim(value);
                 }
             },
@@ -71,7 +71,7 @@ $(document).ready(function () {
             }
 
         },
-        submitHandler: function (form) {
+        submitHandler: (form) => {
             form.submit();
         }
     });
@@ -80,26 +80,26 @@ $(document).ready(function () {
         rules: {
             name: {
                 required: true,
-                normalizer: function (value) {
+                normalizer: (value) => {
                     return $.trim(value);
                 }
             },
             lastName: {
                 required: true,
-                normalizer: function (value) {
+                normalizer: (value) => {
                     return $.trim(value);
                 }
             },
             email: {
                 required: true,
                 email: true,
-                normalizer: function (value) {
+                normalizer: (value) => {
                     return $.trim(value);
                 }
             },
             message: {
                 required: true,
-                normalizer: function (value) {
+                normalizer: (value) => {
                     return $.trim(value);
                 }
             },
@@ -125,7 +125,7 @@ $(document).ready(function () {
                 required: "Vous devez accepter les conditions"
             }
         },
-        submitHandler: function (form) {
+        submitHandler: (form) => {
             form.submit();
         }
     });
@@ -136,13 +136,13 @@ $(document).ready(function () {
             pseudo: {
                 required: true,
                 regexPseudo: true,
-                normalizer: function (value) {
+                normalizer: (value) => {
                     return $.trim(value);
                 }
             },
             text: {
                 required: true,
-                normalizer: function (value) {
+                normalizer: (value) => {
                     return $.trim(value);
                 }
             }
@@ -155,7 +155,7 @@ $(document).ready(function () {
                 required: "Votre commentaire"
             },
         },
-        submitHandler: function (form) {
+        submitHandler: (form) => {
             form.submit();
         }
     });

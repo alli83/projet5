@@ -9,7 +9,7 @@ class ConfigSetUp
 
     public function __construct()
     {
-        $this->settingsConfig = require('config/config.php');
+        $this->settingsConfig = require 'config/config.php';
     }
 
     public function getSettingsDb(): array

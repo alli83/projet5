@@ -16,7 +16,7 @@ body {
 }
 
 .whiteText {
-  color:white;
+  color :white;
 }
 
 .danger {
@@ -43,6 +43,3 @@ form .error {
   margin: auto;
   max-width: 35%;
 }
-
-
-

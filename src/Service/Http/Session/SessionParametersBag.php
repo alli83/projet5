@@ -8,6 +8,7 @@ use App\Service\Http\ParametersBag;
 
 final class SessionParametersBag extends ParametersBag
 {
+
     function __construct(array &$parameters)
     {
         parent::__construct($parameters);

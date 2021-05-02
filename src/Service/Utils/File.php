@@ -4,15 +4,38 @@ declare(strict_types=1);
 
 namespace App\Service\Utils;
 
-define('ROOT_DIR', dirname(__DIR__));
-
 class File
 {
     private string $fileName;
+    private string $targetDir = ROOT_DIR . "/src/doc/";
+    private string $targetFile;
+    private array $format = ["jpg", "jpeg", "png"];
 
     public function __construct(string $fileName)
     {
         $this->fileName = $fileName;
+        $this->targetFile = $this->targetDir . basename($fileName);
+    }
+
+    public function getPathInfo(): string
+    {
+        return strtolower(pathinfo($this->targetFile, PATHINFO_EXTENSION));
+    }
+
+
+    public function getFileName(): string
+    {
+        return $this->fileName;
+    }
+
+    public function registerFile($file): ?string
+    {
+        if (!file_exists($this->targetFile) && in_array($this->getPathInfo(), $this->format)) {
+            $move = move_uploaded_file($file, $this->targetFile);
+            $result = $move === true ? $this->targetFile : null;
+            return $result;
+        }
+        return null;
     }
 
     public function downloadFile(): bool
@@ -32,13 +55,7 @@ class File
             if ($result !== false) {
                 return true;
             }
-            // return false;
         }
         return false;
-    }
-
-    public function getFileName(): string
-    {
-        return $this->fileName;
     }
 }

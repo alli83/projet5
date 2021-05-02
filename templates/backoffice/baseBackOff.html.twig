@@ -12,9 +12,10 @@
     <link type="text/css" href="/css/style.css" rel="stylesheet">
 
 </head>
+{% if session.role is same as("admin") or session.role is same as("superAdmin") %}
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark theme">
+    <nav class="navbar navbar-expand-lg navbar-dark themeAdmin">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">G.A</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll"
@@ -24,17 +25,28 @@
             <div class="collapse navbar-collapse" id="navbarScroll">
                 <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll" style="--bs-scroll-height: 100px;">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/">Accueil</a>
+                        <a class="nav-link active" aria-current="page" href="/">Espace Administrateur : Bonjour {{
+                            session.pseudo }}
+                            -
+                            </p></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/posts">Liste des posts</a>
+                        <a class="nav-link " aria-current="page" href="/admin/members">Les membres</a>
+                    </li>
+                    <li class="nav-item"></li>
+                    <a class="nav-link " aria-current="page" href="/admin/posts">Les posts</a>
+                    </li>
+                    <li class="nav-item"></li>
+                    <a class="nav-link " aria-current="page" href="/admin/comments">Les commentaires</a>
+                    </li>
+
+                    <li class="nav-item"></li>
+                    <a class="nav-link " aria-current="page" href="/posts">Revenir au site</a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
-
-    <!-- Page Header  TO DO JUMBOTRON-->
 
     <main class="mt-5">
         {% for type, message in flashes %}
@@ -43,7 +55,6 @@
 
         {% block content %} {% endblock %}
     </main>
-
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
         integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
@@ -55,52 +66,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.min.js"></script>
     <script type="text/javascript" src="/js/formValidation.js"></script>
 
-
-    <footer class="theme">
-        {% if session.pseudo %}
-        <p class="text-center fs-3 fw-lighter whiteText">
-            <strong> Bonjour {{ session.pseudo }}
-            </strong>
-        </p>
-        {% endif %}
-
+    <footer class="themeAdmin">
         <ul class="nav justify-content-center">
-            {% if session.role is same as("admin") or session.role is same as("superAdmin") %}
-            <li>
-                <a class="nav-link whiteText" aria-current="page" href="/admin/members">Espace administrateur</a>
-            </li>
-            {% endif %}
-            {% if session.pseudo %}
             <li>
                 <a class="nav-link whiteText" aria-current="page" href="/logout">Se déconnecter</a>
             </li>
-            {% else %}
-            <li class="nav-item">
-                <a class="nav-link whiteText" aria-current="page" href="/login">Se connecter</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link whiteText" aria-current="page" href="/signup">S'inscrire</a>
-            </li>
-            {% endif %}
-            <li class="nav-item">
-                <a class="nav-link whiteText" aria-current="page" href="/./mentionsLegales.html">Mentions légales</a>
-            </li>
         </ul>
         <div>
-            <ul class="nav justify-content-center">
-                <li>
-                    <a href="https://twitter.com/share" class="btn btn-social btn-github whiteText">
-                        <i class="fa fa-github"></i>Github</a>
-                </li>
-                <li>
-                    <a href="https://twitter.com/share" class="btn btn-social btn-twitter whiteText">
-                        <i class="fa fa-twitter"></i>Twitter</a>
-                </li>
-                <li>
-                    <a href="https://twitter.com/share" class="btn btn-social btn-linkedin whiteText"">
-                        <i class=" fa fa-linkedin"></i>LinkedIn</a>
-                </li>
-            </ul>
         </div>
         <div class="text-align whiteText">
             © 2020 Copyright:
@@ -108,5 +80,6 @@
         </div>
     </footer>
 </body>
+{% endif %}
 
 </html>

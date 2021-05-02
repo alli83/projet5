@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Model\Entity;
 
-use App\Model\Entity\Interfaces\EntityObjectInterface;
-
 final class Post
 {
     private int $id;
@@ -13,6 +11,7 @@ final class Post
     private string $text;
     private string $standFirst;
     private int $userId;
+    private ?string $file_attached = "";
 
     public function __construct(?array $datas = [])
     {
@@ -25,10 +24,9 @@ final class Post
     {
         foreach ($datas as $key => $value) {
             if ($key === "id") {
-                $value = (int)$value;
+                $value = (int)($value);
             }
             $method = 'set' . ucfirst($key);
-
             if (method_exists($this, $method)) {
                 $this->$method($value);
             }
@@ -85,6 +83,16 @@ final class Post
     public function setUserId(int $userId): self
     {
         $this->userId = $userId;
+        return $this;
+    }
+    public function getFile_attached(): ?string
+    {
+        return $this->file_attached;
+    }
+
+    public function setFile_attached(string $file): self
+    {
+        $this->file_attached = $file;
         return $this;
     }
 }

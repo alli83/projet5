@@ -52,15 +52,16 @@ final class CommentRepository implements EntityRepositoryInterface
         foreach ($criteria as $key => $val) {
             if ((int)$val === $val) {
                 $valuesToBind[] = ['key' => ':' . $key, 'value' => $val, 'type' => \PDO::PARAM_INT];
-                $query .= "AND $key = :$key ";
+                $query .= "AND comment.$key = :$key ";
             } else {
                 $valuesToBind[] = ['key' => ':' . $key, 'value' => $val, 'type' => \PDO::PARAM_STR];
-                $query .= "AND $key = :$key ";
+                $query .= "AND comment.$key = :$key ";
             }
         }
         $query = $query . $query2;
         $req = $this->pdo->prepare($query);
-        $req->setFetchMode(\PDO::FETCH_ASSOC);
+
+        $req->setFetchMode(\PDO::FETCH_CLASS, Comment::class, [$criteria]);
         foreach ($valuesToBind as $item) {
             $req->bindValue($item['key'], $item['value'], $item['type']);
         }
@@ -88,6 +89,9 @@ final class CommentRepository implements EntityRepositoryInterface
         return  $datas === false ? null : $datas;
     }
 
+    /**
+     * @param Comment $comment
+     */
     public function create(object $comment): bool
     {
         $req = $this->pdo->prepare('INSERT INTO comment (pseudo, text, idPost, idUser) VALUES(:pseudo, :text, :idPost, :idUser)');
@@ -100,6 +104,9 @@ final class CommentRepository implements EntityRepositoryInterface
         return $req->execute();
     }
 
+    /**
+     * @param Comment $comment
+     */
     public function validate(object $comment): bool
     {
         $id = $comment->getId();
@@ -110,11 +117,17 @@ final class CommentRepository implements EntityRepositoryInterface
         return false;
     }
 
+    /**
+     * @param Comment $comment
+     */
     public function update(object $comment): bool
     {
         return false;
     }
 
+    /**
+     * @param Comment $comment
+     */
     public function delete(object $comment): bool
     {
         $id = $comment->getId();

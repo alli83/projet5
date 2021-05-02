@@ -1,11 +1,12 @@
-{% extends "/frontoffice/base.html.twig" %}
+{% extends "/backoffice/baseBackOff.html.twig" %}
 
 {% block title %}Modification d'un post{% endblock %}
 
 {% block content %}
 
 <div class="container">
-  <form action="{{url}}" method="POST">
+
+  <form action="{{url}}" method="POST" enctype="multipart/form-data">
     <div class="form-group">
       <label for="title">Titre du post</label>
       <input type="text" class="form-control" id="title" name="title" value="{{post.title | default('')}}" />
@@ -15,13 +16,7 @@
       <input type="text" class="form-control" id="standFirst" name="standFirst"
         value="{{post.stand_first | default('')}}">
     </div>
-    <div class="form-group">
-      <label for="exampleFormControlSelect1">publier:</label>
-      <select class="form-control" id="exampleFormControlSelect1">
-        <option>oui</option>
-        <option>non</option>
-      </select>
-    </div>
+
 
     <div class="form-group">
       <label for="image">Charger une image</label>

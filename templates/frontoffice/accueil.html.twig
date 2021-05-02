@@ -9,7 +9,7 @@
       <img class="rounded-circle center" src="image/profile.png" alt="Generic placeholder image" width="140"
         height="180">
 
-      <h2>Allison Guilhem</h2>
+      <h2>G.A</h2>
       <p>Donec sed odio dui. Etiam porta sem malesuada magna mollis euismod. Nullam id dolor id nibh ultricies
         vehicula
         ut id elit. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Praesent commodo cursus magna.</p>
@@ -33,52 +33,48 @@
 
     <div class="row justify-content-md-center">
       <div class="col-md-6 p-4 rounded justify-content-center filmPage">
-        <form method="POST" action="/contact">
+        <form method="POST" action="/contact" id="contactForm">
           <div class="form-check d-flex justify-content-center mb-4">
-            <label class="form-check-label" for="form2Example4">
+            <label class="form-check-label" for="reason">
               Je souhaite:
             </label>
           </div>
 
-          <select class="form-select" aria-label="Default select example" name="reason">
+          <select class="form-select" aria-label="Default select example" name="reason" id="reason">
             <option selected>Obtenir des renseignements</option>
             <option>M'inscrire</option>
             <option>Avoir un devis</option>
             <option>Autres</option>
           </select>
-
-
           <h4 class="text-center my-4">Vos coordonnées</h4>
           <div class="col mb-2">
             <div class="form-outline">
-              <label class="form-label" for="form3Example1">Votre prénom</label>
-              <input type="text" id="form3Example1" class="form-control" name="name" required />
+              <label class="form-label" for="name">Votre prénom</label>
+              <input type="text" id="name" class="form-control" name="name" />
             </div>
           </div>
           <div class="col mb-2">
             <div class="">
-              <label class="form-label" for="form3Example2">Votre nom</label>
-              <input type="text" id="form3Example2" class="form-control" name="lastName" required />
+              <label class="form-label" for="lastName">Votre nom</label>
+              <input type="text" id="lastName" class="form-control" name="lastName" />
             </div>
           </div>
           <div class="mb-4">
-            <label class="form-label" for="form3Example3">Votre email</label>
-            <input type="email" id="form3Example3" class="form-control" name="email" required />
+            <label class="form-label" for="email">Votre email</label>
+            <input type="email" id="email" class="form-control" name="email" />
           </div>
           <div class="form-group mb-3">
-            <label for="exampleFormControlTextarea2">Votre message</label>
-            <textarea class="form-control rounded-0" id="exampleFormControlTextarea2" name="message" rows="3"
-              required></textarea>
+            <label for="message">Votre message</label>
+            <textarea class="form-control rounded-0" id="message" name="message" rows="3"></textarea>
           </div>
           <div class="form-check d-flex justify-content-center mb-4">
-            <input class="form-check-input me-2" type="checkbox" value="" id="form2Example9" name="check" checked
-              required />
-            <label class="form-check-label" for="form2Example9">
+            <input class="form-check-input me-2" type="checkbox" value="" id="check" name="check" />
+            <label class="form-check-label" for="check">
               J'accepte les conditions......
             </label>
           </div>
           <div class="text-center">
-            <button type="submit" class="btn btn-primary btn-block mb-4 orangeButton">Envoyer</button>
+            <button type="submit" class="btn btn-dark btn-block mb-4">Envoyer</button>
           </div>
         </form>
       </div>

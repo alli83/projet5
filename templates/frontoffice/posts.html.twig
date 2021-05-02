@@ -7,20 +7,26 @@
 
     <!--Section: Content-->
     <div class="text-center">
-        <h4 class="mb-5"><strong>Les derniers posts</strong></h4>
+        <h4 class="mb-5"><strong>Les Posts</strong></h4>
+
         {% if posts %}
+
         <div class="row">
             {% for post in posts %}
 
             <div class="col-lg-4 col-sm-11 mb-4">
                 <div class="card">
+                    {% if post.file_attached is empty %}
+                    <div></div>
+                    {% else %}
                     <div class="bg-image hover-overlay ripple" data-mdb-ripple-color="light">
-                        <img src="https://mdbootstrap.com/img/new/standard/nature/184.jpg" class="img-fluid" />
+                        <img src="data:image/jpeg;base64,{{post.file_attached}}" class="img-fluid" />
                     </div>
+                    {% endif %}
                     <div class="card-body">
                         <h5 class="card-title">{{ post.title }}</h5>
                         <div class="mb-1 text-muted">
-                            <p>Le {{ post.Creation_date}} par {{post.pseudo}}</p>
+                            <p>Le {{ post.creation_date}} par {{post.pseudo}}</p>
                         </div>
                         <p class="card-text">
                             {{ post.stand_first}}

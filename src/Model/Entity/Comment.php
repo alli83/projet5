@@ -18,7 +18,6 @@ final class Comment
 
     public function __construct(?array $datas = [])
     {
-
         if (!empty($datas)) {
             $this->hydrate($datas);
         }

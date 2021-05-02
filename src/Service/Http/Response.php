@@ -54,8 +54,6 @@ final class Response
 
     public function send(): void
     {
-        // TODO Il faut renvoyer aussi le status de la réponse
-
         $headers = $this->getHeaders();
         if ($this->has("location")) {
             $param = $this->get("location");

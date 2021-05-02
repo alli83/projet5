@@ -11,22 +11,27 @@
         <h2>Formulaire d'inscription</h2>
 
         <div class="col col-lg-4">
-            <form method="POST">
+            <form method="POST" action="/signup" id="registration-form">
                 <div class="mb-4">
                     <label class="form-label" for="pseudo">Votre pseudo</label>
-                    <input type="text" id="pseudo" class="form-control" name="pseudo" required />
+                    <input type="text" id="pseudo" class="form-control" name="pseudo" />
                 </div>
                 <div class="mb-4">
                     <label class="form-label" for="email">Votre email</label>
-                    <input type="email" id="email" class="form-control" name="email" required>
+                    <input type="email" id="email" class="form-control" name="email">
                 </div>
                 <div class="mb-4">
-                    <label class="form-label" for="password1">Votre mot de passe</label>
-                    <input type="password" id="password1" class="form-control" name="password"
-                        class="form-control validate" required />
+                    <label class="form-label" for="password">Votre mot de passe</label>
+                    <input type="password" id="password" class="form-control" name="password"
+                        class="form-control validate" />
+                </div>
+                <div class="mb-4">
+                    <label class="form-label" for="passwordConfirm">Confirmation du mot de passe</label>
+                    <input type="password" id="passwordConfirm" class="form-control" name="passwordConfirm"
+                        class="form-control validate" />
                 </div>
                 <div class="text-center">
-                    <button type="submit" class="btn btn-primary btn-block mb-4 orangeButton">Se connecter</button>
+                    <button type="submit" class="btn btn-dark btn-block mb-4 orangeButton">S'inscrire</button>
                 </div>
             </form>
         </div>

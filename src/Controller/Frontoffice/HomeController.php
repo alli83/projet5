@@ -6,6 +6,7 @@ namespace  App\Controller\Frontoffice;
 
 use App\Controller\ControllerInterface\ControllerInterface;
 use App\Service\ErrorsHandlers\Errors;
+use App\Service\Http\ParametersBag;
 use App\Service\Http\Response;
 use App\View\View;
 use App\Service\Http\Session\Session;
@@ -29,7 +30,7 @@ final class HomeController implements ControllerInterface
         return new Response($this->view->render(['template' => 'accueil']));
     }
 
-    public function contactDev(?object $request): Response
+    public function contactDev(?ParametersBag $request): Response
     {
         if ($request !== null) {
             $request = $request->all();
@@ -37,14 +38,15 @@ final class HomeController implements ControllerInterface
             $validityTools = new Validity();
             $request = $validityTools->validityVariables($request);
 
-            $message = new Mailer();
+            $message = new Mailer("un nouveau message");
             $contact = $message->sendMessageContact("frontoffice/mail/contactAdmin.html.twig", $request);
-            if ($contact === false) {
-                $this->session->addFlashes('danger', 'Nous sommes désolé mais votre message n\'a pas pu être envoyé');
-            } elseif ($contact === true) {
+            $this->session->addFlashes('danger', 'Nous sommes désolé mais votre message n\'a pas pu être envoyé');
+
+            if ($contact) {
                 $this->session->addFlashes('success', 'Votre message a bien été envoyé');
             }
         }
+        // to enhance
         return new Response($this->view->render(['template' => 'accueil', 'data' => []]));
     }
 

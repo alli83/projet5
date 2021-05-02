@@ -9,6 +9,7 @@ use App\View\View;
 use App\Service\Http\Response;
 use App\Service\Http\Session\Session;
 use App\Model\Repository\UserRepository;
+use App\Service\Http\ParametersBag;
 use App\Service\Utils\Auth;
 use App\Service\Utils\Mailer;
 
@@ -25,7 +26,7 @@ final class UserController implements ControllerInterface
         $this->session = $session;
     }
 
-    public function loginAction(?object $request): Response
+    public function loginAction(?ParametersBag $request): Response
     {
         if ($this->session->get("role")) {
             return new Response("", 304, ["location" =>  "/posts"]);
@@ -53,27 +54,34 @@ final class UserController implements ControllerInterface
         return new Response("", 304, ["location" =>  "/posts"]);
     }
 
-    public function signupAction(?object $request): Response
+    public function signupAction(?ParametersBag $request): Response
     {
+
+        if ($this->session->get("role")) {
+            return new Response("", 304, ["location" =>  "/posts"]);
+        }
         $template = ['template' => 'signup', 'data' => []];
+
         if ($request !== null) {
             $params = $request->all();
 
             if (isset($params['email']) && isset($params['password']) && isset($params['pseudo'])) {
                 $auth = new Auth($params, $this->userRepository, $this->session);
+
+                $this->session->addFlashes('danger', 'une erreur s\'est produite');
                 if ($auth->register()) {
                     $user = $this->userRepository->findOneBy(['email' => $params['email']]);
 
-                    $message = new Mailer();
+                    $message = new Mailer("création de compte");
+                    $message = $message->sendMessage(
+                        "frontoffice/mail/validateRegistration.html.twig",
+                        $params['email'],
+                        ["pseudo" => $user->getPseudo()]
+                    );
 
-                    $message->sendMessage("frontoffice/mail/validateRegistration.html.twig", $user, $params['email']);
                     $this->session->addFlashes('success', 'Votre inscription a bien été prise en compte. Vous pouvez désormais vous connecter');
                     $template = ['template' => 'login', 'data' => []];
-                } else {
-                    $this->session->addFlashes('danger', 'une erreur s\'est produite');
                 }
-            } else {
-                $this->session->addFlashes('danger', 'une erreur s\'est produite');
             }
         }
         return new Response($this->view->render($template));

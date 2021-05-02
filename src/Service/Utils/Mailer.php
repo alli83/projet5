@@ -7,30 +7,27 @@ namespace App\Service\Utils;
 use Twig\Environment;
 use App\ConfigSetUp;
 use Twig\Loader\FilesystemLoader;
-use App\Model\Entity\User;
 
 class Mailer
 {
-
     private Environment $twig;
     private array $settings;
+    private string $subject;
 
-    public function __construct()
+    public function __construct(string $subject = "un nouveau message")
     {
         $this->settings = (new ConfigSetUp())->getSettingsMailer();
         $loader = new FilesystemLoader('../templates');
         $this->twig = new Environment($loader);
+        $this->subject = $subject;
     }
-
 
     public function getSettings(): array
     {
         return $this->settings;
     }
 
-
-
-    public function sendMessage(string $template, User $data, string $dest): bool
+    public function sendMessage(string $template, string $dest, ?array $datasToInsert = []): bool
     {
         $settings = $this->getSettings();
 
@@ -39,12 +36,12 @@ class Mailer
 
         $message = new \Swift_Message();
         $message->setTo($dest);
-        $message->setSubject('Inscription validée');
+        $message->setSubject($this->subject);
         $message->setFrom([$settings["from"] => $settings["sender"]]);
         $message->setBody(
             $this->twig->render(
                 $template,
-                ['pseudo' => $data->getPseudo(), 'email' =>  $data->getEmail()]
+                $datasToInsert
             ),
             'text/html'
         );
@@ -63,7 +60,7 @@ class Mailer
 
         $message = new \Swift_Message();
         $message->setTo($request["email"]);
-        $message->setSubject('Un nouveau message');
+        $message->setSubject($this->subject);
         $message->setFrom([$settings["from"] => $settings["sender"]]);
         $message->setBody(
             $this->twig->render(

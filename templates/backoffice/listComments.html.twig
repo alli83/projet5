@@ -1,4 +1,4 @@
-{% extends "/frontoffice/base.html.twig" %}
+{% extends "/backoffice/baseBackOff.html.twig" %}
 
 {% block title %}List des commentaires{% endblock %}
 
@@ -9,7 +9,6 @@
 
   {% if comments %}
   {% for comment in comments %}
-
 
   <div class="container mt-5">
     <ul class="list-group">
@@ -22,16 +21,24 @@
         </span>
         <span class="d-inline-block col-md-7">
           {% if comment.status is same as("created") %}
-          <a class="btn btn-dark text-white me-2" href="/comment-{{comment.id}}/validate" role="button">valider</a>
+          <form method="POST" action="/comment-{{comment.id}}/validate">
+            <input hidden type="text" id="password" class="form-control" name="text" class="form-control validate"
+            value="{{comment.text}}"/>
+            <button class="btn btn-dark text-white me-2" type="submit">valider</button>
+          </form>
+         
           {% endif %}
-          <a class="btn btn-secondary text-white" role="button" href="/comment-{{comment.id}}/delete">supprimer</a>
+          <form method="POST" action="/comment-{{comment.id}}/delete" class="mt-2">
+            <input hidden type="text" id="password" class="form-control" name="text" class="form-control validate"
+            value="{{comment.text}}"/>
+            <button class="btn btn-secondary text-white" type="submit" >supprimer</button>
+          </form>
         </span>
       </li>
     </ul>
   </div>
 
   {% endfor %}
-
 
   <nav class="my-4">
     <ul class="pagination pagination-circle justify-content-center">

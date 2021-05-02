@@ -32,6 +32,9 @@ final class Session
         return $this->sessionParamBag->get($name);
     }
 
+    /**
+     * @return string[]
+     */
     public function toArray(): ?array
     {
         return $this->sessionParamBag->all();
@@ -47,6 +50,9 @@ final class Session
         $this->set('flashes', [$type => $message]);
     }
 
+    /**
+     * @return string[]
+     */
     public function getFlashes(): ?array
     {
         $flashes = $this->get('flashes');

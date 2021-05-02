@@ -42,6 +42,7 @@ class Container
                 return $this->getAdminMemberController();
         }
     }
+
     public function setRepositoryClass(string $name)
     {
         switch ($name) {

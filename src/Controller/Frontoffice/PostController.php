@@ -27,11 +27,12 @@ final class PostController implements ControllerInterface
 
     public function displayOneAction(array $params, CommentRepository $commentRepository): Response
     {
+        $validityTools = new Validity();
+        $params = $validityTools->validityVariables($params);
+
         if ($params["id"]) {
             $params['id'] = (int)$params['id'];
         }
-        $validityTools = new Validity();
-        $params = $validityTools->validityVariables($params);
 
         $post = $this->postRepository->findOneBy(['id' => $params['id']]);
 
@@ -51,9 +52,6 @@ final class PostController implements ControllerInterface
                 ],
             ));
         }
-        // elseif ($post === null) {
-        // $this->session->addFlashes('danger', 'le post demandé n\'est pas disponible');
-        // } 
         $this->session->addFlashes('danger', 'Une erreur est survenue');
         return $this->displayAllAction();
     }
@@ -63,17 +61,18 @@ final class PostController implements ControllerInterface
         if ($params === null || ($params && $params["page"] === null)) {
             $offset = 0;
         } else {
+            $validity = new Validity();
+            $params = $validity->validityVariables($params);
+
             $offset = (int)$params["page"] * 3;
         }
 
         $posts = $this->postRepository->findAll(3, $offset);
 
-        return new Response($this->view->render([
-            'template' => 'posts',
-            'data' => [
-                'posts' => $posts,
-                'page' => $params === null ? 0 : (int)$params["page"]
-            ]
-        ]));
+         return new Response($this->view->render([
+             'template' => 'posts',
+             'data' => ['posts' => $posts,
+             'page' => $params === null ? 0 : (int)$params["page"]]
+         ]));
     }
 }

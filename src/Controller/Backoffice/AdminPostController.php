@@ -114,6 +114,7 @@ class AdminPostController implements ControllerInterface
             $validity = new Validity();
             $params = $validity->validityVariables($params);
 
+            // all mandatory ? 
             $post = new Post($params);
 
             $this->session->addFlashes("danger", "Une erreur s'est produite");
@@ -180,6 +181,8 @@ class AdminPostController implements ControllerInterface
             $userId = $user->getId();
 
             $params['userId'] = $userId;
+
+                // all mandatory ? 
             $post = new Post($params);
 
             $this->session->addFlashes('danger', "Une erreur est survenue");

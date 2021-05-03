@@ -75,7 +75,8 @@ final class PostRepository implements EntityRepositoryInterface
     public function findAll(int $limit = null, int $offset = null, array $orderBy = null): ?array
     {
         $query = 'select 
-        post.id, post.title, post.stand_first, post.text, post.creation_date, post.last_update, post.file_attached, user.pseudo
+        post.id, post.title, post.stand_first, post.text, post.creation_date, post.last_update, post.file_attached, user.pseudo,
+        post.userId
         from post INNER JOIN user ON post.userId = user.id';
         $query = $query . " LIMIT 3";
         if ($offset !== null) {

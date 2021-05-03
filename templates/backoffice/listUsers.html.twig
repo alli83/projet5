@@ -9,6 +9,10 @@
 
   {% if members %}
   {% for member in members %}
+  {% if session.email is same as(member.email) %}
+  <div>
+  </div>
+  {% else %}
   <div class="container mt-5">
     <ul class="list-group">
       <li class="list-group-item list-group-item-primary fs-5">
@@ -31,37 +35,37 @@
             </div>
           </div>
         </form>
-
         <a class="btn btn-secondary text-white" role="button" href="/member-{{member.id}}/delete">supprimer</a>
+      </li>
+    </ul>
   </div>
-  </li>
-  </ul>
-</div>
 
-{% endfor %}
+  {% endif %}
+  {% endfor %}
 
-<nav class="my-4">
-  <ul class="pagination pagination-circle justify-content-center">
-    {% if (page > 0) %}
-    <li class="page-item">
-      <a class="page-link" href="/admin/members/{{ page-1 }}">Précédent</a>
-    </li>
-    {%endif%}
-    {% if members|length == 3 %}
-    <li class="page-item">
-      <a class="page-link" href="/admin/members/{{page+1}}">Suivant</a>
-    </li>
-    {% endif %}
-  </ul>
-</nav>
+  <nav class="my-4">
+    <ul class="pagination pagination-circle justify-content-center">
+      {% if (page > 0) %}
+      <li class="page-item">
+        <a class="page-link" href="/admin/members/{{ page-1 }}">Précédent</a>
+      </li>
+      {%endif%}
+      {% if members|length == 3 %}
+      <li class="page-item">
+        <a class="page-link" href="/admin/members/{{page+1}}">Suivant</a>
+      </li>
+      {% endif %}
+    </ul>
+  </nav>
+
+  {% else %}
+  <nav class="my-4">
+    <ul class="pagination pagination-circle justify-content-center">
+      <li class="page-item">
+        <a class="page-link" href="/admin/members">Retour</a>
+      </li>
+    </ul>
+  </nav>
 </div>
-{% else %}
-<nav class="my-4">
-  <ul class="pagination pagination-circle justify-content-center">
-    <li class="page-item">
-      <a class="page-link" href="/admin/members">Retour</a>
-    </li>
-  </ul>
-</nav>
 {% endif %}
 {% endblock %}

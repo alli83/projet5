@@ -94,7 +94,7 @@ final class UserRepository implements EntityRepositoryInterface
     public function findAll(int $limit = null, int $offset = null, array $orderBy = null): ?array
     {
         $query = 'select 
-        id, pseudo, role,  Created_date, last_update, pseudo
+        id, pseudo, role, email,  created_date, last_update, pseudo
         from user WHERE role= "user" OR role= "admin"';
         $query = $query . " LIMIT 3";
         if ($offset !== null) {

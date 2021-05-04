@@ -53,7 +53,7 @@ final class PostController implements ControllerInterface
             ));
         }
         $this->session->addFlashes('danger', 'Une erreur est survenue');
-        return $this->displayAllAction();
+        return $this->displayAllAction(["page" => null]);
     }
 
     public function displayAllAction(?array $params = []): Response

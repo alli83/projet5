@@ -100,6 +100,7 @@ class AdminCommentController implements ControllerInterface
         if ($auth->isAdminAuth($this->session)) {
             $param = $request->all();
 
+            // TO do check if null
             $params["text"] = $param["text"];
             $validity = new Validity();
             $params = $validity->validityVariables($params);
@@ -111,17 +112,17 @@ class AdminCommentController implements ControllerInterface
                 $user = $this->userRepository->findOneThroughComment(["id" => (int)$params["id"]]);
                 if ($user) {
                     $message = new Mailer("commentaire supprimé");
+                    $this->session->addFlashes('warning', "la confirmation n'a pas pu être envoyée par mail");
                     if (
-                        !$message->sendMessage(
+                        $message->sendMessage(
                             "frontoffice/mail/deletedComment.html.twig",
                             $user->getEmail(),
                             ["comment" => $comment->getText(), "pseudo" => $user->getPseudo()]
                         )
                     ) {
-                        $this->session->addFlashes('warning', "la confirmation n'a pas pu être envoyée par mail");
+                        $this->session->addFlashes('success', "le commentaire à bien été supprimé");
                     }
                 }
-                $this->session->addFlashes('success', "le commentaire à bien été supprimé");
             }
             return new Response("", 304, ["location" =>  "/admin/comments"]);
         }

@@ -35,6 +35,7 @@ final class HomeController implements ControllerInterface
         if ($request !== null) {
             $request = $request->all();
 
+            // TO DO check backend ? 
             $validityTools = new Validity();
             $request = $validityTools->validityVariables($request);
 

@@ -59,7 +59,7 @@ class Mailer
         $mailer = new \Swift_Mailer($transport);
 
         $message = new \Swift_Message();
-        $message->setTo($request["email"]);
+        $message->setTo($request["emailContact"]);
         $message->setSubject($this->subject);
         $message->setFrom([$settings["from"] => $settings["sender"]]);
         $message->setBody(
@@ -67,10 +67,10 @@ class Mailer
                 $template,
                 [
                     'reason' => $request["reason"],
-                    'name' => $request["name"],
-                    'lastName' => $request["lastName"],
-                    'contactEmail' => $request["email"],
-                    'message' => $request["message"]
+                    'name' => $request["nameContact"],
+                    'lastName' => $request["lastNameContact"],
+                    'contactEmail' => $request["emailContact"],
+                    'message' => $request["messageContact"]
                 ]
             ),
             'text/html'

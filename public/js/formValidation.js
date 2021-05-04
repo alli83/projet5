@@ -16,7 +16,7 @@ $(document).ready(function () {
     $("#registration-form").validate({
 
         rules: {
-            pseudo: {
+            pseudoSignup: {
                 required: true,
                 minlength: 3,
                 regexPseudo: true,
@@ -24,7 +24,7 @@ $(document).ready(function () {
                     return $.trim(value);
                 }
             },
-            email: {
+            emailSignup: {
                 required: true,
                 email: true,
                 normalizer: (value) => {
@@ -33,7 +33,7 @@ $(document).ready(function () {
             },
             password: {
                 required: true,
-                minlength: 8,
+                minlength: 10,
                 regexPass: true,
                 normalizer: (value) => {
                     return $.trim(value);
@@ -41,7 +41,7 @@ $(document).ready(function () {
             },
             passwordConfirm: {
                 required: true,
-                minlength: 8,
+                minlength: 10,
                 equalTo: "#password"
             },
             check: {
@@ -49,11 +49,11 @@ $(document).ready(function () {
             }
         },
         messages: {
-            pseudo: {
+            pseudoSignup: {
                 required: "Vous devez renseigner votre pseudo",
                 minlength: "Votre pseudo doit comporter au minimum 3 caractères"
             },
-            email: {
+            emailSignup: {
                 required: "Vous devez renseigner votre email",
                 email: "Le format de votre email est incorrect"
             },
@@ -78,26 +78,26 @@ $(document).ready(function () {
 
     $("#contactForm").validate({
         rules: {
-            name: {
+            nameContact: {
                 required: true,
                 normalizer: (value) => {
                     return $.trim(value);
                 }
             },
-            lastName: {
+            lastNameContact: {
                 required: true,
                 normalizer: (value) => {
                     return $.trim(value);
                 }
             },
-            email: {
+            emailContact: {
                 required: true,
                 email: true,
                 normalizer: (value) => {
                     return $.trim(value);
                 }
             },
-            message: {
+            messageContact: {
                 required: true,
                 normalizer: (value) => {
                     return $.trim(value);
@@ -111,14 +111,14 @@ $(document).ready(function () {
             name: {
                 required: "Vous devez renseigner votre prénom"
             },
-            lastName: {
+            lastNameContact: {
                 required: "Vous devez renseigner votre nom"
             },
-            email: {
+            emailContact: {
                 required: "Vous devez renseigner un email",
                 email: "L'email est invalide",
             },
-            message: {
+            messageContact: {
                 required: "Veuillez compléter ce champs"
             },
             check: {
@@ -133,14 +133,14 @@ $(document).ready(function () {
     $("#formComment").validate({
 
         rules: {
-            pseudo: {
+            pseudoComment: {
                 required: true,
                 regexPseudo: true,
                 normalizer: (value) => {
                     return $.trim(value);
                 }
             },
-            text: {
+            textComment: {
                 required: true,
                 normalizer: (value) => {
                     return $.trim(value);
@@ -148,11 +148,65 @@ $(document).ready(function () {
             }
         },
         messages: {
-            pseudo: {
+            pseudoComment: {
                 required: "Vous devez renseigner un pseudo"
             },
-            text: {
+            textComment: {
                 required: "Votre commentaire"
+            },
+        },
+        submitHandler: (form) => {
+            form.submit();
+        }
+    });
+    $("#newPass").validate({
+
+        rules: {
+            emailReset: {
+                required: true,
+                email: true,
+                normalizer: (value) => {
+                    return $.trim(value);
+                }
+            },
+        },
+        messages: {
+            emailReset: {
+                required: "Vous devez renseigner un email",
+                email: "L'email est invalide",
+            },
+        },
+        submitHandler: (form) => {
+            form.submit();
+        }
+    });
+
+    $("#confirmReset").validate({
+
+        rules: {
+            password2: {
+                required: true,
+                minlength: 10,
+                regexPass: true,
+                normalizer: (value) => {
+                    return $.trim(value);
+                }
+            },
+            passwordConfirm2: {
+                required: true,
+                minlength: 10,
+                equalTo: "#password2"
+            },
+        },
+        messages: {
+            password2: {
+                required: "Vous devez renseigner un mot de passe",
+                minlength: "Le mot de passe doit comporter au moins 10 caractères",
+                regexPass: "Votre mot de passe doit comporter 10 caractères, une majuscule, un chiffre et un caractère spécial #?!@%^&*-"
+            },
+            passwordConfirm2: {
+                required: "Vous devez confirmer votre mot de passe",
+                equalTo: "les mots de passe ne sont pas identiques"
             },
         },
         submitHandler: (form) => {

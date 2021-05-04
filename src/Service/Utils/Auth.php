@@ -29,12 +29,12 @@ class Auth
     public function isValidLoginForm(): bool
     {
         $infoUser = $this->getDatas();
-        if ($infoUser == [] || $infoUser["email"] === "" || $infoUser["password"] === "") {
+        if ($infoUser == [] || $infoUser["emailLogin"] === "" || $infoUser["passwordLogin"] === "") {
             return false;
         }
 
-        $email = htmlspecialchars($infoUser['email']);
-        $password = htmlspecialchars($infoUser['password']);
+        $email = htmlspecialchars($infoUser['emailLogin']);
+        $password = htmlspecialchars($infoUser['passwordLogin']);
 
         $user = $this->userRepo->findOneBy(['email' => $email]);
         if ($user !== null) {
@@ -53,11 +53,11 @@ class Auth
         $userDatas = $this->getDatas();
         $password = "";
 
-        if (!empty($userDatas['email']) && !empty($userDatas['pseudo'])) {
+        if (!empty($userDatas['emailSignup']) && !empty($userDatas['pseudoSignup'])) {
             $params = ['email', 'password', 'pseudo'];
 
-            if (filter_var($userDatas['email'], FILTER_VALIDATE_EMAIL)) {
-                $email = filter_var($userDatas['email'], FILTER_SANITIZE_EMAIL);
+            if (filter_var($userDatas['emailSignup'], FILTER_VALIDATE_EMAIL)) {
+                $email = filter_var($userDatas['emailSignup'], FILTER_SANITIZE_EMAIL);
 
                 if ($this->userRepo->findOneBy(["email" => $email])) {
                     $this->session->addFlashes(
@@ -66,7 +66,7 @@ class Auth
                     );
                     return false;
                 }
-                if (!preg_match('/^\w{3,15}$/', $userDatas['pseudo'])) {
+                if (!preg_match('/^\w{3,15}$/', $userDatas['pseudoSignup'])) {
                     $this->session->addFlashes(
                         "warning",
                         "Votre pseudo doit comporter entre 3 et 15 caractères (chiffres ou lettres"
@@ -80,7 +80,7 @@ class Auth
                     );
                     return false;
                 }
-                $pseudo = $userDatas["pseudo"];
+                $pseudo = $userDatas["pseudoSignup"];
 
                 if (array_key_exists("password", $userDatas) && $userDatas["password"] !== "") {
                     $password = password_hash($userDatas['password'], PASSWORD_DEFAULT);

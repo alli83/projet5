@@ -43,3 +43,7 @@ form .error {
   margin: auto;
   max-width: 35%;
 }
+
+#modalResetPass {
+  cursor: pointer;
+}

@@ -1,0 +1,29 @@
+{% extends "/frontoffice/base.html.twig" %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+
+<div class="container justify-content-center mb-4">
+  <div class="row text-center justify-content-center">
+    <h2>Réinitialisation de votre mot de passe</h2>
+    <div class="col col-lg-4">
+      <form method="POST" action= "/confirm-reset/{{id}}" id="confirmReset">
+        <div class="mb-4">
+          <label class="form-label" for="password2">Votre nouveau mot de passe</label>
+          <input type="password" id="password2" class="form-control" name="password2"  />
+        </div>
+        <div class="mb-4">
+            <label class="form-label" for="passwordConfirm2">Confirmation de votre nouveau mot de passe</label>
+            <input type="password" id="passwordConfirm2" class="form-control" name="passwordConfirm2"
+                class="form-control validate" />
+        </div>
+        <div class="text-center">
+          <button type="submit" class="btn btn-dark btn-block mb-4">Mettre à jour</button>
+        </div>
+      </form>
+  </div>
+  </div>
+</div>
+
+{% endblock %}

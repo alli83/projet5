@@ -53,22 +53,25 @@ final class UserController implements ControllerInterface
 
             if (isset($params['emailReset']) && !empty($params['emailReset'])) {
                 $validity = new Validity();
+
                 $email = $validity->validateEmail($params['emailReset']);
+                $this->session->addFlashes("warning", "Le format de votre email est invalide");
+                if ($email) {
+                    $user = $this->userRepository->findOneBy(["email" => $email]);
 
-                $user = $this->userRepository->findOneBy(["email" => $email]);
-
-                $this->session->addFlashes("warning", "Aucun compte ne correspond à cet email");
-                if ($user) {
-                    $message = new Mailer("Réinitialisation du mot de passe");
-                    $message = $message->sendMessage(
-                        "frontoffice/mail/reinitializePass.html.twig",
-                        $email,
-                        [
-                            "pseudo" => $user->getPseudo(),
-                            "id" => $user->getId()
-                        ]
-                    );
-                    $this->session->addFlashes("success", "Un email vous a été envoyé");
+                    $this->session->addFlashes("warning", "Aucun compte ne correspond à cet email");
+                    if ($user) {
+                        $message = new Mailer("Réinitialisation du mot de passe");
+                        $message = $message->sendMessage(
+                            "frontoffice/mail/reinitializePass.html.twig",
+                            $email,
+                            [
+                                "pseudo" => $user->getPseudo(),
+                                "id" => $user->getId()
+                            ]
+                        );
+                        $this->session->addFlashes("success", "Un email vous a été envoyé");
+                    }
                 }
             }
         }
@@ -79,7 +82,7 @@ final class UserController implements ControllerInterface
     {
         $validity = new Validity();
         $param = $validity->validityVariables(["id" => $param["id"]]);
-        
+
         if ($request !== null) {
             $params = $request->all();
 
@@ -124,24 +127,27 @@ final class UserController implements ControllerInterface
             $params = $request->all();
 
             if (isset($params['emailSignup']) && isset($params['password']) && isset($params['pseudoSignup'])) {
-                $auth = new Auth($params, $this->userRepository, $this->session);
+                $validity = new Validity();
+                $email = $validity->validateEmail($params['emailSignup']);
 
-                $this->session->addFlashes('danger', 'une erreur s\'est produite');
-                if ($auth->register()) {
-                    $validity = new Validity();
-                    $email = $validity->validateEmail($params['emailSignup']);
+                $this->session->addFlashes("warning", "Le format de votre email est invalide");
+                if ($email) {
+                    $auth = new Auth($params, $this->userRepository, $this->session);
 
-                    $user = $this->userRepository->findOneBy(['email' => $email]);
+                    $this->session->addFlashes('danger', 'une erreur s\'est produite');
+                    if ($auth->register()) {
+                        $user = $this->userRepository->findOneBy(['email' => $email]);
 
-                    $message = new Mailer("création de compte");
-                    $message = $message->sendMessage(
-                        "frontoffice/mail/validateRegistration.html.twig",
-                        $email,
-                        ["pseudo" => $user->getPseudo()]
-                    );
+                        $message = new Mailer("création de compte");
+                        $message = $message->sendMessage(
+                            "frontoffice/mail/validateRegistration.html.twig",
+                            $email,
+                            ["pseudo" => $user->getPseudo()]
+                        );
 
-                    $this->session->addFlashes('success', 'Votre inscription a bien été prise en compte. Vous pouvez désormais vous connecter');
-                    $template = ['template' => 'login', 'data' => []];
+                        $this->session->addFlashes('success', 'Votre inscription a bien été prise en compte. Vous pouvez désormais vous connecter');
+                        $template = ['template' => 'login', 'data' => []];
+                    }
                 }
             }
         }

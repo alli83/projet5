@@ -22,30 +22,27 @@ class Validity
         return $newparams;
     }
 
-    public function validateEmail(string $param): string
+    public function validateEmail(string $param): ?string
     {
         if (filter_var($param, FILTER_VALIDATE_EMAIL)) {
             $email = filter_var($param, FILTER_SANITIZE_EMAIL);
+            if ($email === false) {
+                return null;
+            }
             return $email;
         }
+        return null;
     }
 
     public function validatePassword(string $param, string $param2): ?string
     {
-        if (!preg_match('/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@%^&*-]).{8,}$/', $param)) {
-            $this->session->addFlashes(
-                "warning",
-                "Votre mot de passe doit comporter 8 caractères, au moins un chiffre et un caractère spécial #?!@%^&*-"
-            );
-            return null;
-        } else if ($param !== $param2) {
-            $this->session->addFlashes(
-                "warning",
-                "Les mots de passes ne sont pas identiques"
-            );
-            return null;
+        if (preg_match('/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@%^&*-]).{8,}$/', $param) && ($param === $param2)) {
+            $password = password_hash($param, PASSWORD_DEFAULT);
+            if ($password === false) {
+                return null;
+            }
+            return $password;
         }
-        $password = password_hash($param, PASSWORD_DEFAULT);
-        return $password;
+        return null;
     }
 }

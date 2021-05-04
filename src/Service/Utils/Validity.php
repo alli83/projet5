@@ -21,4 +21,28 @@ class Validity
         }
         return $newparams;
     }
+
+    public function validateEmail(string $param): ?string
+    {
+        if (filter_var($param, FILTER_VALIDATE_EMAIL)) {
+            $email = filter_var($param, FILTER_SANITIZE_EMAIL);
+            if ($email === false) {
+                return null;
+            }
+            return $email;
+        }
+        return null;
+    }
+
+    public function validatePassword(string $param, string $param2): ?string
+    {
+        if (preg_match('/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@%^&*-]).{8,}$/', $param) && ($param === $param2)) {
+            $password = password_hash($param, PASSWORD_DEFAULT);
+            if ($password === false) {
+                return null;
+            }
+            return $password;
+        }
+        return null;
+    }
 }

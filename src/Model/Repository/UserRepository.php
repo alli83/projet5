@@ -138,6 +138,21 @@ final class UserRepository implements EntityRepositoryInterface
         return $req->execute();
     }
 
+
+    public function updatePass(object $user): bool
+    {
+        $id = $user->getId();
+        $password = $user->getPassword();
+        $valuesToBind = [":password" => $password];
+
+        $req = $this->pdo->prepare("UPDATE user SET password = :password,
+         last_update = now() WHERE id = ${id}");
+        foreach ($valuesToBind as $key => $val) {
+            $req->bindValue($key, $val);
+        }
+        return $req->execute();
+    }
+
       /**
      * @param User $user
      */

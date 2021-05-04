@@ -114,7 +114,7 @@ class AdminPostController implements ControllerInterface
             $validity = new Validity();
             $params = $validity->validityVariables($params);
 
-            // all mandatory ? 
+            // all mandatory ?
             $post = new Post($params);
 
             $this->session->addFlashes("danger", "Une erreur s'est produite");
@@ -123,7 +123,7 @@ class AdminPostController implements ControllerInterface
             }
             return new Response("", 304, ["location" =>  "/admin/posts"]);
         }
-        return new Response("", 304, ["location" =>  "/login"]);     
+        return new Response("", 304, ["location" =>  "/login"]);
     }
 
     public function createNewPost(): Response
@@ -148,17 +148,15 @@ class AdminPostController implements ControllerInterface
         $fileAttached = $file->get("file_attached");
 
         $auth = new Authentification();
-        
+
         if ($auth->isAdminAuth($this->session)) {
             if (!empty($fileAttached["tmp_name"])) {
-                
                 if ($fileAttached["size"] > 150000) {
-
                     $this->session->addFlashes("danger", "fichier trop lourd");
                     return new Response("", 304, ["location" =>  "/admin/posts"]);
                 }
 
-                $file = new File($fileAttached["name"], $fileAttached);
+                $file = new File($fileAttached["name"]);
                 $targetFile = $file->registerFile($fileAttached["tmp_name"]);
 
                 if ($targetFile === null) {
@@ -177,12 +175,13 @@ class AdminPostController implements ControllerInterface
             $validity = new Validity();
             $params = $validity->validityVariables($params);
 
+            // to do if null
             $user = $this->userRepository->findOneBy(["email" => $this->session->get("email")]);
             $userId = $user->getId();
 
             $params['userId'] = $userId;
 
-                // all mandatory ? 
+            // all mandatory ?
             $post = new Post($params);
 
             $this->session->addFlashes('danger', "Une erreur est survenue");

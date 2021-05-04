@@ -34,12 +34,12 @@ final class CommentController implements ControllerInterface
     {
         $auth = new Authentification();
         if ($auth->isAuth($this->session)) {
-            if ($request !== null && !empty($request->get("pseudo"))  && !empty($request->get("text")) && !empty($request->get("post"))) {
+            if ($request !== null && !empty($request->get("pseudoComment"))  && !empty($request->get("textComment")) && !empty($request->get("post"))) {
                 $user = $userRepository->findOneBy(["email" => $this->session->get("email")]);
                 if ($user) {
                     $post = (int)$request->get("post");
                     $params = ['pseudo', 'text', 'idPost', 'idUser'];
-                    $values = [$request->get("pseudo"), $request->get("text"), $post, $user->getId()];
+                    $values = [$request->get("pseudoComment"), $request->get("textComment"), $post, $user->getId()];
                     $param = array_combine($params, $values);
 
                     $validityTools = new Validity();

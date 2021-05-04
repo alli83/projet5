@@ -4,25 +4,54 @@
 
 {% block content %}
 
-<div class="container justify-content-center">
+<div class="container justify-content-center mb-4">
   <div class="row text-center justify-content-center">
     <h2>Formulaire de connexion</h2>
-
     <div class="col col-lg-4">
-      <form method="POST">
+      <form method="POST" action="/login">
         <div class="mb-4">
-          <label class="form-label" for="email">Votre email</label>
-          <input type="email" id="email" name="email" class="form-control" value="{{email | default('')}}" required>
+          <label class="form-label" for="emailLogin">Votre email</label>
+          <input type="email" id="emailLogin" name="emailLogin" class="form-control" value="{{email | default('')}}" required>
         </div>
         <div class="mb-4">
-          <label class="form-label" for="password">Votre mot de passe</label>
-          <input type="password" id="password" class="form-control" name="password" required />
+          <label class="form-label" for="passwordLogin">Votre mot de passe</label>
+          <input type="password" id="passwordLogin" class="form-control" name="passwordLogin" required />
         </div>
         <div class="text-center">
-          <button type="submit" class="btn btn-primary btn-block mb-4 orangeButton">Se connecter</button>
+          <button type="submit" class="btn btn-dark btn-block mb-4">Se connecter</button>
         </div>
       </form>
+
+    <a  data-bs-toggle="modal" data-bs-target="#modalReset" id="modalResetPass">
+      J'ai oublié mon mot de passe
+    </a>
+    
+    <!-- Modal -->
+    <div class="modal fade" id="modalReset" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Réinitialisation du mot de passe</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form method="POST" action="/login/reset" id="newPass">
+              <div class="mb-4">
+                <label class="form-label" for="emailReset">Votre email</label>
+                <input type="email" id="emailReset" name="emailReset" class="form-control">
+              </div>
+              <div class="text-center">
+                <button type="submit" class="btn btn-dark btn-block mb-4">Réinitialiser</button>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">fermer</button>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
   </div>
 </div>
 

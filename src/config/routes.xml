@@ -6,6 +6,8 @@
     <route url="/posts/([0-9]*)" module= "post"  action="displayAllAction" varnames="page"/>
     <route url="/post-([0-9]*)" module= "post"  action="displayOneAction"  varnames="id" accessory="comment"/>
     <route url="/login" module= "user" action="loginAction" />
+    <route url="/login/reset" module= "user" action="resetLoginAction" />
+     <route url="/confirm-reset/([0-9]*)" module= "user" action="confirmResetAction" varnames="id" />
     <route url="/signup" module= "user"  action="signupAction" />
     <route url="/logout" module= "user"  action="logoutAction" />
     <route url="/contact" module= "home"  action="contactDev" />

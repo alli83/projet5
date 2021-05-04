@@ -64,6 +64,7 @@ class AdminCommentController implements ControllerInterface
         if ($auth->isAdminAuth($this->session)) {
             $param = $request->all();
 
+            // TO DO CHECK IF NULL 
             $params["text"] = $param["text"];
             $validity = new Validity();
             $params = $validity->validityVariables($params);
@@ -75,17 +76,17 @@ class AdminCommentController implements ControllerInterface
                 $user = $this->userRepository->findOneThroughComment(["id" => (int)$params["id"]]);
                 if ($user) {
                     $message = new Mailer("Commentaire validé");
+                    $this->session->addFlashes('warning', "la confirmation n'a pas pu être envoyée par mail");
                     if (
-                        !$message->sendMessage(
+                        $message->sendMessage(
                             "frontoffice/mail/publishedComment.html.twig",
                             $user->getEmail(),
                             ["comment" => $comment->getText(), "pseudo" => $user->getPseudo()]
                         )
                     ) {
-                        $this->session->addFlashes('warning', "la confirmation n'a pas pu être envoyée par mail");
+                        $this->session->addFlashes('success', "le commentaire est validé");
                     }
                 }
-                $this->session->addFlashes('success', "le commentaire est validé");
             }
             return new Response("", 304, ["location" =>  "/admin/comments"]);
         }

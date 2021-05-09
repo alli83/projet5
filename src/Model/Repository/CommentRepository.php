@@ -32,7 +32,29 @@ final class CommentRepository implements EntityRepositoryInterface
 
     public function findOneBy(array $criteria, array $orderBy = null): ?Comment
     {
-        return null;
+        $query = 'SELECT  user.pseudo, user.email FROM comment INNER JOIN user ON comment.userId = user.id 
+        WHERE 1 ';
+
+        $valuesToBind = [];
+        foreach ($criteria as $key => $val) {
+            if ((int)$val === $val) {
+                $valuesToBind[] = ['key' => ':' . $key, 'value' => $val, 'type' => \PDO::PARAM_INT];
+                $query .= "AND post.$key = :$key ";
+            } else {
+                $valuesToBind[] = ['key' => ':' . $key, 'value' => $val, 'type' => \PDO::PARAM_STR];
+                $query .= "AND post.$key = :$key ";
+            }
+        }
+        $req = $this->pdo->prepare($query);
+        $req->setFetchMode(\PDO::FETCH_CLASS, Comment::class, [$criteria]);
+        foreach ($valuesToBind as $item) {
+            $req->bindValue($item['key'], $item['value'], $item['type']);
+        }
+
+        $req->execute();
+        $data = $req->fetch();
+
+        return $data === false ? null : $data;
     }
 
 
@@ -79,7 +101,11 @@ final class CommentRepository implements EntityRepositoryInterface
         from comment INNER JOIN user ON comment.idUser = user.id 
         INNER JOIN post ON comment.idPost = post.id WHERE comment.status = "created" OR comment.status = "validated"';
 
-        $query = $query . " LIMIT 3";
+        if ($orderBy !== null && array_keys($orderBy)[0] === "order") {
+            $query = $query . " ORDER BY comment.created_date " . $orderBy['order'];
+        }
+
+        $query = $query . " LIMIT ${limit}";
         if ($offset !== null) {
             $query = $query . " OFFSET $offset";
         }
@@ -94,9 +120,8 @@ final class CommentRepository implements EntityRepositoryInterface
      */
     public function create(object $comment): bool
     {
-        $req = $this->pdo->prepare('INSERT INTO comment (pseudo, text, idPost, idUser) VALUES(:pseudo, :text, :idPost, :idUser)');
+        $req = $this->pdo->prepare('INSERT INTO comment (text, idPost, idUser) VALUES(:text, :idPost, :idUser)');
 
-        $req->bindValue("pseudo", $comment->getPseudo());
         $req->bindValue("text", $comment->getText());
         $req->bindValue("idPost", $comment->getIdPost());
         $req->bindValue("idUser", $comment->getIdUser());
@@ -107,21 +132,13 @@ final class CommentRepository implements EntityRepositoryInterface
     /**
      * @param Comment $comment
      */
-    public function validate(object $comment): bool
+    public function update(object $comment): bool
     {
         $id = $comment->getId();
         $req = $this->pdo->prepare("UPDATE comment SET status = 'validated', validation_date = now(), last_update = now() WHERE id = ${id}");
         if ($req->execute()) {
             return true;
         }
-        return false;
-    }
-
-    /**
-     * @param Comment $comment
-     */
-    public function update(object $comment): bool
-    {
         return false;
     }
 

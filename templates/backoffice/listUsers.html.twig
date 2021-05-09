@@ -4,25 +4,40 @@
 
 {% block content %}
 <div class="container">
+  {% set index = filter['order'] %}
+  {% set index2 = filter['counterOrder'] %}
 
   <h2 class="text-center">liste des membres</h2>
-
+  <p>Les membres sont actuellement classés du plus récent au plus ancien:</p>
+  <form method="post" action="/admin/members" class="mb-4">
+    <select class="form-select" name="order">
+        <option value="{{index}}">{{filter[index]}}</option>
+        <option value="{{index2}}">{{filter[index2]}}</option>
+      </select>
+    <button class="btn btn-dark text-white mt-4" type="submit">Rechercher</button>
+</form>
+<hr>
   {% if members %}
   {% for member in members %}
-  {% if session.email is same as(member.email) %}
-  <div>
-  </div>
-  {% else %}
   <div class="container mt-5">
     <ul class="list-group">
       <li class="list-group-item list-group-item-primary fs-5">
         <span class=" d-inline-block px-md-2 col-sm-9 col-lg-12">{{member.pseudo}}
-          <p class="mb-1 text-muted">Role: {{member.role }} - Crée le {{member.created_date}} - dernière mise à jour le:
-            {{member.last_update}}</p>
+          <p class="mb-1 text-muted">Role: {{member.role }} - Crée le {{member.created_date | date("d/m/Y")}} 
+            {% if member.created_date is same as(member.last_update) %}
+            {% else %}
+            - dernière mise à jour le:
+            {{member.last_update | date("d/m/Y H:i")}}
+            {% endif %}
+          </p>
         </span>
+        {% if member.role is same as('superAdmin')%}
+        {% elseif member.email is same as(session.email)%}
+        {% else %}
         <form action="/member-{{member.id}}/edit" method="post">
           <div class="row mt-2">
             <div class="col-md-7">
+              <input type="hidden" value="{{tokencsrf}}" name="tokencsrf"></input>
               <select class="form-select" name="role">
                 <option value="" selected>Modifier le role</option>
                 <option value="user">Utilisateur</option>
@@ -35,24 +50,33 @@
             </div>
           </div>
         </form>
+        {% endif %}
+        {% if member.role is same as('superAdmin')%}
+        {% else %}
         <a class="btn btn-secondary text-white" role="button" href="/member-{{member.id}}/delete">supprimer</a>
+        {% endif %}
       </li>
     </ul>
   </div>
 
-  {% endif %}
   {% endfor %}
 
   <nav class="my-4">
     <ul class="pagination pagination-circle justify-content-center">
       {% if (page > 0) %}
-      <li class="page-item">
-        <a class="page-link" href="/admin/members/{{ page-1 }}">Précédent</a>
-      </li>
+      <li class="page-item me-3">
+      <form method="post" action="/admin/members/{{ page-1 }}">
+        <input hidden value="{{index}}" name="order" />
+        <button class="btn btn-dark text-white mt-4" type="submit">Précédent</button>
+      </form>
+    </li>
       {%endif%}
-      {% if members|length == 3 %}
+      {% if members|length == 3 and end is same as(false) %}
       <li class="page-item">
-        <a class="page-link" href="/admin/members/{{page+1}}">Suivant</a>
+        <form method="post" action="/admin/members/{{page+1}}">
+          <input hidden value="{{index}}" name="order" />
+          <button class="btn btn-dark text-white mt-4" type="submit">Suivant</button>
+        </form>
       </li>
       {% endif %}
     </ul>

@@ -4,16 +4,33 @@
 
 {% block content %}
 <div class="container">
+  {% set index = filter['order'] %}
+  {% set index2 = filter['counterOrder'] %}
 
-  <h2 class="text-center">liste des posts</h2>
-  <a class="btn btn-success text-white me-2" href="/post/create" role="button">ajouter</a>
+  <h2 class="text-center fs-2">Liste des posts</h2>
+    <a class="btn btn-success text-white my-4 d-block" href="/post/create" role="button">Ajouter un nouveau post</a>
+    <p>Les posts sont actuellement classés du plus récent au plus ancien:</p>
+    <form method="post" action="/admin/posts" class="mb-4">
+      <select class="form-select" name="order">
+          <option value="{{index}}">{{filter[index]}}</option>
+          <option value="{{index2}}">{{filter[index2]}}</option>
+        </select>
+      <button class="btn btn-dark text-white mt-4" type="submit">Rechercher</button>
+  </form>
+  <hr>
   {% if posts %}
   {% for post in posts %}
   <div class="container mt-5">
     <ul class="list-group">
       <li class="list-group-item list-group-item-warning fs-5">
-        <span class=" d-inline-block px-md-2 col-sm-9 col-lg-12">{{post.title}}
-          <p class="mb-1 text-muted">Crée le {{post.creation_date}} - dernière mise à jour le: {{post.last_update}}</p>
+        <span class=" d-inline-block px-md-2 col-sm-9 col-lg-12 mb-4">{{post.title}}
+          <p class="mb-1 text-muted">Crée le {{post.creation_date | date("d/m/Y")}} 
+            {% if post.creation_date is same as(post.last_update) %}
+            {% else %}
+            - dernière mise à jour le: {{post.last_update | date("d/m/Y H:i")}}
+            {% endif %}
+            - par {{post.pseudo}}
+          </p>
         </span>
         <span class="d-inline-block col-md-7">
           <a class="btn btn-dark text-white me-2" href="/post-{{post.id}}" role="button">voir</a>
@@ -30,24 +47,26 @@
     <ul class="pagination pagination-circle justify-content-center">
       {% if (page > 0) %}
       <li class="page-item">
-        <a class="page-link" href="/admin/posts/{{ page-1}}">Précédent</a>
+        <form method="post" action="/admin/posts/{{ page-1}}">
+          <input hidden value="{{index}}" name="order" />
+          <button class="btn btn-dark text-white mt-4" type="submit">Précédent</button>
+        </form>
       </li>
       {%endif%}
-      {% if posts|length == 3 %}
+      {% if posts|length == 3 and end is same as(false) %}
       <li class="page-item">
-        <a class="page-link" href="/admin/posts/{{page+1}}">Suivant</a>
+        <form method="post" action="/admin/posts/{{page+1}}">
+          <input hidden value="{{index}}" name="order" />
+          <button class="btn btn-dark text-white mt-4" type="submit">Suivant</button>
+        </form>
       </li>
       {% endif %}
     </ul>
   </nav>
-</div>
 {% else %}
-<nav class="my-4">
-  <ul class="pagination pagination-circle justify-content-center">
-    <li class="page-item">
-      <a class="page-link" href="/admin/posts">Retour</a>
-    </li>
-  </ul>
-</nav>
+  <p class="fs-3 text-center mt-4">Vous n'avez pour l'instant créé aucun poste sur cette page </p>
+  <img class="center mb-4" src="https://cdn.pixabay.com/photo/2017/07/28/23/18/coming-soon-2550190_1280.jpg" alt="Generic placeholder image" width="900"
+        height="380">
 {% endif %}
+</div> 
 {% endblock %}

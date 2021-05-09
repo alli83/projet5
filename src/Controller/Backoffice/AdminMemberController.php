@@ -48,7 +48,7 @@ class AdminMemberController implements ControllerInterface
                     }
                     $users = array_slice($users, 0, 3);
                 }
-                // set security token 
+                // set security token
                 $tokencsrf = $this->serviceProvider->getTokenService()->setToken($this->session);
 
                 return new Response($this->view->render([

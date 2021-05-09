@@ -1,8 +1,10 @@
 vendor/
 var/
 .php_cs.cache
+.DS_store
 doc/
 
 #files
 
 config.php
+profile.jpeg

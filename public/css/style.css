@@ -47,3 +47,8 @@ form .error {
 #modalResetPass {
   cursor: pointer;
 }
+
+.linkStandard {
+  text-decoration: none;
+  color: darkred;
+}

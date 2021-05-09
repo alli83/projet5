@@ -4,17 +4,18 @@ declare(strict_types=1);
 
 namespace App\Model\Entity;
 
+use DateTime;
+
 final class Comment
 {
     private int $id;
-    private string $pseudo;
     private string $text;
     private int $idPost;
     private int $idUser;
     private string $status;
-    private string $CreatedDate;
-    private string $ValidationDate;
-    private string $SuppresionDate;
+    private DateTime $createdDate;
+    private DateTime $validationDate;
+    private DateTime $suppresionDate;
 
     public function __construct(?array $datas = [])
     {
@@ -40,17 +41,6 @@ final class Comment
     public function setId(int $id): self
     {
         $this->id = $id;
-        return $this;
-    }
-
-    public function getPseudo(): string
-    {
-        return $this->pseudo;
-    }
-
-    public function setPseudo(string $pseudo): self
-    {
-        $this->pseudo = $pseudo;
         return $this;
     }
 
@@ -96,33 +86,33 @@ final class Comment
         $this->status = $status;
         return $this;
     }
-    public function getCreatedDate(): string
+    public function getCreatedDate(): DateTime
     {
-        return $this->CreatedDate;
+        return $this->createdDate;
     }
-    public function setCreatedDate(string $CreatedDate): self
+    public function setCreatedDate(DateTime $createdDate): self
     {
-        $this->CreatedDate = $CreatedDate;
+        $this->createdDate = $createdDate;
         return $this;
     }
 
-    public function getValidationDate(): string
+    public function getValidationDate(): DateTime
     {
-        return $this->ValidationDate;
+        return $this->validationDate;
     }
-    public function setValidationDate(string $ValidationDate): self
+    public function setValidationDate(DateTime $validationDate): self
     {
-        $this->ValidationDate = $ValidationDate;
+        $this->validationDate = $validationDate;
         return $this;
     }
 
-    public function getSuppresionDate(): string
+    public function getSuppresionDate(): DateTime
     {
-        return $this->SuppresionDate;
+        return $this->suppresionDate;
     }
-    public function setSuppresionDate(string $SuppresionDate): self
+    public function setSuppresionDate(DateTime $suppresionDate): self
     {
-        $this->SuppresionDate = $SuppresionDate;
+        $this->suppresionDate = $suppresionDate;
         return $this;
     }
 }

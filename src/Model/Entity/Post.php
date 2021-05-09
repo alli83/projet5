@@ -9,7 +9,7 @@ final class Post
     private int $id;
     private string $title;
     private string $text;
-    private string $standFirst;
+    private string $stand_first;
     private int $userId;
     private ?string $file_attached = "";
 
@@ -26,7 +26,7 @@ final class Post
             if ($key === "id") {
                 $value = (int)($value);
             }
-            $method = 'set' . ucfirst($key);
+            $method = 'set' . ucfirst((string)$key);
             if (method_exists($this, $method)) {
                 $this->$method($value);
             }
@@ -65,14 +65,14 @@ final class Post
         $this->text = $text;
         return $this;
     }
-    public function getStandFirst(): string
+    public function getStand_first(): string
     {
-        return $this->standFirst;
+        return $this->stand_first;
     }
 
-    public function setStandFirst(string $standFirst): self
+    public function setStand_first(string $standFirst): self
     {
-        $this->standFirst = $standFirst;
+        $this->stand_first = $standFirst;
         return $this;
     }
     public function getUserId(): int

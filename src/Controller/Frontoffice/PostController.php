@@ -9,36 +9,33 @@ use App\View\View;
 use App\Service\Http\Response;
 use App\Model\Repository\PostRepository;
 use App\Model\Repository\CommentRepository;
+use App\Service\Http\ParametersBag;
 use App\Service\Http\Session\Session;
-use App\Service\Utils\Validity;
+use App\Service\Utils\ServiceProvider;
 
 final class PostController implements ControllerInterface
 {
     private PostRepository $postRepository;
     private View $view;
     private Session $session;
+    private ServiceProvider $serviceProvider;
 
-    public function __construct(PostRepository $postRepository, View $view, Session $session)
+    public function __construct(PostRepository $postRepository, View $view, Session $session, ServiceProvider $serviceProvider)
     {
         $this->postRepository = $postRepository;
         $this->view = $view;
         $this->session = $session;
+        $this->serviceProvider = $serviceProvider;
     }
 
     public function displayOneAction(array $params, CommentRepository $commentRepository): Response
     {
-        $validityTools = new Validity();
+        $validityTools =  $this->serviceProvider->getValidityService();
         $params = $validityTools->validityVariables($params);
 
-        if ($params["id"]) {
-            $params['id'] = (int)$params['id'];
-        }
+        $post = $this->postRepository->findOneBy(['id' => (int)$params['id']]);
 
-        $post = $this->postRepository->findOneBy(['id' => $params['id']]);
-
-        $allIds = $this->postRepository->findAllIds();
-
-        $comments = $commentRepository->findBy(['idPost' => $params['id']], ['order' => "asc"]);
+        $comments = $commentRepository->findBy(['idPost' => (int)$params['id']], ['order' => "asc"]);
 
         if ($post !== null) {
             return new Response($this->view->render(
@@ -46,33 +43,45 @@ final class PostController implements ControllerInterface
                     'template' => 'post',
                     'data' => [
                         'post' => $post,
-                        'ids' => $allIds,
                         'comments' => $comments,
                     ],
                 ],
             ));
         }
+        // or 404 error ?
         $this->session->addFlashes('danger', 'Une erreur est survenue');
-        return $this->displayAllAction(["page" => null]);
+        return new Response("", 302, ["location" =>  "/posts"]);
     }
 
-    public function displayAllAction(?array $params = []): Response
+    public function displayAllAction(?array $params = [], ?ParametersBag $request = null): Response
     {
-        if ($params === null || ($params && $params["page"] === null)) {
-            $offset = 0;
-        } else {
-            $validity = new Validity();
-            $params = $validity->validityVariables($params);
+        // set pagination
+        $offset = $this->serviceProvider->getPaginationService()->setOffset($params);
 
-            $offset = (int)$params["page"] * 3;
+        // set order and check if it's the last page
+        $order = ($request !== null && $request->get("order") !== null)  ? htmlspecialchars($request->get("order")) : "desc";
+        $order = $this->serviceProvider->getValidityService()->isInArray(["asc", "desc"], $order);
+
+        if ($order) {
+            $posts = $this->postRepository->findAll(4, $offset, ['order' => $order["order"]]);
+            $end = false;
+
+            if ($posts) {
+                if (!array_key_exists(3, $posts)) {
+                    $end = true;
+                }
+                $posts = array_slice($posts, 0, 3);
+            }
+
+            return new Response($this->view->render([
+                'template' => 'posts',
+                'data' => [
+                    'posts' => $posts,
+                    'page' => $params === null ? 0 : (int)$params["page"]
+                ],
+                "end" => $end
+            ]));
         }
-
-        $posts = $this->postRepository->findAll(3, $offset);
-
-         return new Response($this->view->render([
-             'template' => 'posts',
-             'data' => ['posts' => $posts,
-             'page' => $params === null ? 0 : (int)$params["page"]]
-         ]));
+        return new Response("", 304, ["location" =>  "/posts"]);
     }
 }

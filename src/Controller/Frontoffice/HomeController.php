@@ -10,19 +10,19 @@ use App\Service\Http\ParametersBag;
 use App\Service\Http\Response;
 use App\View\View;
 use App\Service\Http\Session\Session;
-use App\Service\Utils\File;
-use App\Service\Utils\Mailer;
-use App\Service\Utils\Validity;
+use App\Service\Utils\ServiceProvider;
 
 final class HomeController implements ControllerInterface
 {
     private View $view;
     private Session $session;
+    private ServiceProvider $serviceProvider;
 
-    public function __construct(View $view, Session $session)
+    public function __construct(View $view, Session $session, ServiceProvider $serviceProvider)
     {
         $this->view = $view;
         $this->session = $session;
+        $this->serviceProvider = $serviceProvider;
     }
 
     public function getHomePage(): Response
@@ -35,31 +35,33 @@ final class HomeController implements ControllerInterface
         if ($request !== null) {
             $request = $request->all();
 
-            // TO DO check backend ?
-            $validityTools = new Validity();
-            $request = $validityTools->validityVariables($request);
+            $validityTools = $this->serviceProvider->getValidityService();
+            $this->session->addFlashes("warning", "Merci d'entrer un email valide");
+            if ($validityTools->validateEmail($request["emailContact"]) !== null) {
+                $request = $validityTools->validityVariables($request);
 
-            $message = new Mailer("un nouveau message");
-            $contact = $message->sendMessageContact("frontoffice/mail/contactAdmin.html.twig", $request);
-            $this->session->addFlashes('danger', 'Nous sommes désolé mais votre message n\'a pas pu être envoyé');
-
-            if ($contact) {
-                $this->session->addFlashes('success', 'Votre message a bien été envoyé');
+                $this->serviceProvider->getInformUserService()
+                ->contactUserAdmin(
+                    $this->session,
+                    $request,
+                    "un nouveau message",
+                    "frontoffice/mail/contactAdmin.html.twig",
+                    "Votre message a bien été envoyé"
+                );
             }
         }
-        // to enhance
-        return new Response($this->view->render(['template' => 'accueil', 'data' => []]));
+        return new Response("", 302, ["location" =>  "/"]);
     }
 
     public function getCv(array $fileName): Response
     {
-        $fileToDownload = new File(htmlspecialchars($fileName["file"]));
-        $result = $fileToDownload->downloadFile();
+        $fileToDownload = $this->serviceProvider->getFileService();
+        $result = $fileToDownload->downloadFile(htmlspecialchars($fileName["file"]));
 
         if ($result === false) {
             $error = new Errors(404);
             return $error->handleErrors();
         }
-        return new Response("fichier téléchargé", 200);
+        return new Response($this->view->render(['template' => 'accueil', 'data' => []]));
     }
 }

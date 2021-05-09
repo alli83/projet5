@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Service\ErrorsHandlers;
 
 use App\Service\Http\Response;
+use App\Service\Http\Session\Session;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
@@ -23,13 +24,13 @@ final class Errors
     public function handleErrors(): Response
     {
         switch ($this->code) {
-            case 2002:
+            case 403:
                 return new Response(
                     $this->twig->render(
-                        "frontoffice/error/error_500.html.twig",
+                        "frontoffice/error/error_403.html.twig",
                         []
                     ),
-                    500,
+                    403,
                     ['Content-Type' => 'text/html; charset=utf-8']
                 );
             case 404:
@@ -41,16 +42,25 @@ final class Errors
                     404,
                     ['Content-Type' => 'text/html; charset=utf-8']
                 );
+            case 2002:
+                return new Response(
+                    $this->twig->render(
+                        "frontoffice/error/error_500.html.twig",
+                        []
+                    ),
+                    500,
+                    ['Content-Type' => 'text/html; charset=utf-8']
+                );
             case 23000:
-                return
-                    new Response(
-                        $this->twig->render(
-                            "frontoffice/signup.html.twig",
-                            []
-                        ),
-                        403,
-                        ['Content-Type' => 'text/html; charset=utf-8']
-                    );
+                (new Session())->addFlashes("warning", "Ce pseudo est déjà pris");
+                return new Response(
+                    $this->twig->render(
+                        "frontoffice/signup.html.twig",
+                        []
+                    ),
+                    403,
+                    ['Content-Type' => 'text/html; charset=utf-8']
+                );
             default:
                 return new Response(
                     $this->twig->render(

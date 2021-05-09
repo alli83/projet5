@@ -83,11 +83,14 @@ class Route
         $this->varsvalues = $values;
     }
 
-    public function setParams(array $varsnames, array $varsvalues): void
+    public function setParams(?array $varsnames, ?array $varsvalues): void
     {
-
-        foreach ($varsnames as $key => $varname) {
-            $this->params[$varname] = $varsvalues[$key];
+        if ($varsnames === null || $varsvalues === null || empty($varsvalues)) {
+            $this->params = null;
+        } else {
+            foreach ($varsnames as $key => $varname) {
+                $this->params[$varname] = $varsvalues[$key];
+            }
         }
     }
 }

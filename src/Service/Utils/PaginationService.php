@@ -10,10 +10,9 @@ class PaginationService
     {
         if (!isset($params) || ($params && !isset($params["page"]))) {
             return 0;
-        } else {
-            $validity = new ValidityService();
-            $params = $validity->validityVariables($params);
-            return (int)$params["page"] * 3;
         }
+        $validity = new ValidityService();
+        $params = $validity->validityVariables($params);
+        return (int)$params["page"] * 3;
     }
 }

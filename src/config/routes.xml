@@ -6,6 +6,7 @@
     <route url="/posts/([0-9]*)" module= "post"  action="displayAllAction" varnames="page"/>
     <route url="/post-([0-9]*)" module= "post"  action="displayOneAction"  varnames="id" accessory="comment"/>
     <route url="/login" module= "user" action="loginAction" />
+    <!-- add token  -->
     <route url="/login/reset" module= "user" action="resetLoginAction" />
      <route url="/confirm-reset/([0-9]*)" module= "user" action="confirmResetAction" varnames="id" />
     <route url="/signup" module= "user"  action="signupAction" />
@@ -18,9 +19,11 @@
     <route url="/admin/posts" module= "adminpost"  action="displayAllPosts"/>
     <route url="/admin/posts/([0-9]*)" module= "adminpost"  action="displayAllPosts" varnames="page"/>
     <route url="/post/create" module= "adminpost"  action="createNewPost"/>
-    <route url="/post/create-confirm" module= "adminpost"  action="createNewPostSave"/>
+    <!-- to do catch error here -->
+    <route url="/post/create-confirm" module= "adminpost"  action="createNewPostSave"/> 
     <route url="/post-([0-9]*)/delete" module= "adminpost"  action="deleteOnePost" varnames="id"/>
     <route url="/post-([0-9]*)/edit" module= "adminpost"  action="editOnePost" varnames="id"/>
+    <!-- to do catch error here -->
     <route url="/post-([0-9]*)/edit-confirm" module= "adminpost"  action="editOnePostSave" varnames="id"/>
 
     <route url="/admin/comments" module= "admincomment"  action="displayAllComments"/>

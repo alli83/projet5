@@ -2,15 +2,15 @@
 
 return array(
     'database' => array(
-        "db_user" => "xxxx",
-        "db_pass" => "xxxxx",
-        "db_host" => "xxxx",
-        "db_name" => "xxx"
+        "db_user" => "name",
+        "db_pass" => "password",
+        "db_host" => "127.0.0.1:0000",
+        "db_name" => "databasename"
     ),
     'emailTransport' => array(
-        "smtp" => "xxxxx",
+        "smtp" => "127.0.0.1:0000",
         "smtp_port" => 1025,
-        "from" => "xxxxx",
-        "sender" => "xxxxx"
+        "from" => "test@test.fr",
+        "sender" => "nom de l'expediteur"
     )
 );

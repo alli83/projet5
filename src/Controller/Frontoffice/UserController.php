@@ -59,6 +59,7 @@ final class UserController implements ControllerInterface
                 if ($email) {
                     $user = $this->userRepository->findOneBy(["email" => $email]);
 
+                    // TO DO ADD TOKEN IN THE LINK 
                     $this->session->addFlashes("warning", "Aucun compte ne correspond à cet email");
                     if ($user) {
                         $message = new Mailer("Réinitialisation du mot de passe");

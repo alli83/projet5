@@ -101,7 +101,6 @@ final class UserController implements ControllerInterface
         $user = $this->userRepository->findOneBy(["id" => (int)$param["id"]]);
         // check validity security token
         if ($user && $user->getToken() === $param["token"]) {
-            
             if ($request !== null) {
                 $params = $request->all();
                 $this->session->addFlashes("danger", "une erreur est survenue");
@@ -155,7 +154,7 @@ final class UserController implements ControllerInterface
                  $email = $validity->validateEmail($params['emailSignup']);
 
                  $this->session->addFlashes("warning", "Le format de votre email est invalide");
-                 if ($email) {
+                if ($email) {
                     $params['emailSignup'] = $email;
                     $auth = $this->serviceProvider->getAuthService();
 
@@ -176,7 +175,7 @@ final class UserController implements ControllerInterface
                         }
                         return new Response("", 304, ["location" =>  "/login"]);
                     }
-                 }
+                }
             }
         }
         return new Response($this->view->render(['template' => 'signup', 'data' => []]));

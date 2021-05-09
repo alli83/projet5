@@ -8,7 +8,14 @@
     <!--Section: Content-->
     <div class="text-center">
         <h4 class="mb-5"><strong>Les Posts</strong></h4>
-
+        <form method="post" action="/posts" class="mb-4">
+            <select class="form-select" name="order">
+                <option value="desc">Du plus récent au plus ancien</option>
+                <option value="asc">Du plus ancien au plus récent</option>
+              </select>
+            <button class="btn btn-dark text-white mt-4" type="submit">Rechercher</button>
+        </form>
+        <hr>
         {% if posts %}
 
         <div class="row">
@@ -20,13 +27,13 @@
                     <div></div>
                     {% else %}
                     <div class="bg-image hover-overlay ripple" data-mdb-ripple-color="light">
-                        <img src="data:image/jpeg;base64,{{post.file_attached}}" class="img-fluid" />
+                        <img src="data:image/jpeg;base64,{{post.file_attached}}" class="img-fluid" width="30%"/>
                     </div>
                     {% endif %}
                     <div class="card-body">
                         <h5 class="card-title">{{ post.title }}</h5>
                         <div class="mb-1 text-muted">
-                            <p>Le {{ post.creation_date}} par {{post.pseudo}}</p>
+                            <p>Le {{ post.creation_date | date("d/m/Y") }} par {{post.pseudo}}</p>
                         </div>
                         <p class="card-text">
                             {{ post.stand_first}}
@@ -52,6 +59,10 @@
                 {% endif %}
             </ul>
         </nav>
+      {% else %}
+        <h3 class="mb-4">Il y a actuellement aucun poste</h3>
+        <img class=" center mb-4" src="https://cdn.pixabay.com/photo/2017/07/28/23/18/coming-soon-2550190_1280.jpg" alt="Generic placeholder image" width="900"
+        height="380">
         {% endif %}
     </div>
 </div>

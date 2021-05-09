@@ -7,6 +7,7 @@ namespace App\Model\Repository;
 use App\Model\Entity\User;
 use App\Service\Database;
 use App\Model\Repository\Interfaces\EntityRepositoryInterface;
+use Exception;
 use PDO;
 
 final class UserRepository implements EntityRepositoryInterface
@@ -95,8 +96,15 @@ final class UserRepository implements EntityRepositoryInterface
     {
         $query = 'select 
         id, pseudo, role, email,  created_date, last_update, pseudo
-        from user WHERE role= "user" OR role= "admin"';
-        $query = $query . " LIMIT 3";
+        from user';
+
+        if ($orderBy !== null && array_keys($orderBy)[0] === "order") {
+            $query = $query . " ORDER BY user.created_date " . $orderBy['order'];
+        }
+
+        if ($limit !== null) {
+            $query = $query . " LIMIT ${limit}";
+        }
         if ($offset !== null) {
             $query = $query . " OFFSET $offset";
         }
@@ -116,11 +124,14 @@ final class UserRepository implements EntityRepositoryInterface
         $req->bindValue("email", $user->getEmail());
         $req->bindValue("pseudo", $user->getPseudo());
         $req->bindValue("password", $user->getPassword());
-
-        return $req->execute();
+        try {
+            return $req->execute();
+        } catch (Exception $e) {
+            return false;
+        }
     }
 
-      /**
+    /**
      * @param User $user
      */
 
@@ -128,32 +139,17 @@ final class UserRepository implements EntityRepositoryInterface
     {
         $id = $user->getId();
         $role = $user->getRole();
-        $valuesToBind = [":role" => $role];
-
-        $req = $this->pdo->prepare("UPDATE user SET role = :role,
-         last_update = now() WHERE id = ${id}");
-        foreach ($valuesToBind as $key => $val) {
-            $req->bindValue($key, $val);
-        }
-        return $req->execute();
-    }
-
-
-    public function updatePass(object $user): bool
-    {
-        $id = $user->getId();
         $password = $user->getPassword();
-        $valuesToBind = [":password" => $password];
+        $token = $user->getToken();
 
-        $req = $this->pdo->prepare("UPDATE user SET password = :password,
+        $req = $this->pdo->prepare("UPDATE user SET role = '${role}', token = '${token}', password = '${password}',
          last_update = now() WHERE id = ${id}");
-        foreach ($valuesToBind as $key => $val) {
-            $req->bindValue($key, $val);
-        }
+
         return $req->execute();
     }
 
-      /**
+
+    /**
      * @param User $user
      */
 

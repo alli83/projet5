@@ -7,8 +7,10 @@
 <div class="container justify-content-center mb-4">
   <div class="row text-center justify-content-center">
     <h2>Réinitialisation de votre mot de passe</h2>
-    <div class="col col-lg-4">
-      <form method="POST" action= "/confirm-reset/{{id}}" id="confirmReset">
+    <h4>Vous avez demandé à réinitialiser votre mot de passe. Une fois votre nouveau mot de passe renseigné, 
+      nous vous confirmerons par email la mise à jour de vos informations de connexion.</h4>
+    <div class="col col-lg-4 my-4">
+      <form method="POST" action= "/confirm-reset/{{token}}/{{id}}" id="confirmReset">
         <div class="mb-4">
           <label class="form-label" for="password2">Votre nouveau mot de passe</label>
           <input type="password" id="password2" class="form-control" name="password2"  />
@@ -19,7 +21,7 @@
                 class="form-control validate" />
         </div>
         <div class="text-center">
-          <button type="submit" class="btn btn-dark btn-block mb-4">Mettre à jour</button>
+          <button type="submit" class="btn btn-dark btn-block mb-4">Réinitialiser mon mot de passe</button>
         </div>
       </form>
   </div>

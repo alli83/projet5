@@ -8,49 +8,60 @@
     <div class="row">
         {% if post.file_attached is empty %}
         {% else %}
-        <div class="col-md-12">
-            <img src="data:image/jpeg;base64,{{post.file_attached}}" class="img-fluid imagePost" />
+        <div class="col-md-12 mb-3">
+            <img src="data:image/jpeg;base64,{{post.file_attached}}" class="img-fluid imagePost" width="20%" />
         </div>
         {% endif %}
-        <div class="text-center mb-3">
-            <!-- /.blog-post -->
-            <div>
-                <h2 class="blog-post-title text-center">{{ post.title }}</h2>
-                <p class="blog-post-meta mb-1 text-muted">Par {{ post.pseudo}}</p>
-                <p class="blog-post-meta mb-1 text-muted">créé le {{ post.creation_date}}</p>
-                <p>{{ post.text }}</p>
-                <p class="blog-post-meta mb-1 text-muted">modifié dernièrement le {{ post.last_update}}</p>
+        <div class="mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="blog-post-title text-center">{{ post.title }}</h2>
+                    <p class="blog-post-meta mb-1 text-muted">Par {{ post.pseudo}}</p>
+                    <p class="blog-post-meta mb-1 text-muted">Créé le {{ post.creation_date | date("d/m/Y")}}</p>
+                    <div class="card-text my-4">
+                        {{ post.text|nl2br }}
+                    </div>
+                    {% if post.creation_date is same as(post.last_update)%}
+                    {% else %}
+                    <p class="blog-post-meta mb-1 text-muted">modifié dernièrement le {{ post.last_update | date("d/m/Y
+                        H:i")}}</p>
+                    {% endif %}
+                </div>
             </div>
         </div>
         <hr>
         <div class="mb-3">
             <section>
                 <h3>Commentaires</h3>
-                {% if session %}
+                {% if session.pseudo %}
                 <div class="col col-lg-4">
                     <form action="/validate" method="post" id="formComment">
-                        <div class=" mb-4">
-                            <label class="form-label" for="pseudoComment">Votre nom d'utilisateur:</label>
-                            <input type="text" id="pseudoComment" name="pseudoComment"  class="form-control" >
+                        <div class="bg-dark text-white p-4 mb-3">
+                            <p>Vous pouvez écrire un commentaire sous le nom d'utilisateur : <span
+                                    class="fw-bolder">{{session.pseudo}}</span></p>
+                            <p>Une fois créé, votre commentaire sera mis en ligne dès qu'il aura été certifié par notre
+                                équipe</p>
                         </div>
                         <div class=" mb-4">
-                            <label class="form-label" for="textComment">Votre message:</label>
-                            <textarea type="textarea" id="textComment" name="textComment" rows="4"  class="form-control" ></textarea>
+                            <label class="form-label" for="textComment">Vous pouvez écrire votre message
+                                ci-dessous</label>
+                            <textarea type="textarea" id="textComment" name="textComment" rows="4"
+                                class="form-control"></textarea>
                         </div>
                         <input hidden type="number" id="post" name="post" value={{post.id}}>
                         <div>
-                            <button type="submit" id="submit"
-                                class="btn btn-dark btn-block mb-4">Envoyer</button>
+                            <button type="submit" id="submit" class="btn btn-dark btn-block mb-4">Envoyer</button>
                         </div>
                     </form>
                     <div id="result"></div>
-                  
+
                 </div>
                 {% endif %}
 
                 {% if comments %}
                 {% for comment in comments %}
-                <p class="mb-1 text-muted">Commentaire de {{ comment.pseudo }} - posté le {{ comment.created_date}}</p>
+                <p class="mb-1 text-muted">Commentaire de {{ comment.pseudo }} - posté le {{ comment.created_date |
+                    date("d/m/Y")}}</p>
                 <br>
                 <p>{{ comment.text }}</p>
                 <hr>
@@ -60,6 +71,6 @@
                 {% endif %}
             </section>
         </div>
-        </div>
+    </div>
 </div>
-        {% endblock %}
+{% endblock %}

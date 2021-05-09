@@ -23,7 +23,7 @@ class ParametersBag
     /**
      * @return string[]
      */
-    public function all(): ?array
+    public function all(): array
     {
         return $this->parameters;
     }

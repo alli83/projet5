@@ -63,26 +63,22 @@ final class PostRepository implements EntityRepositoryInterface
         return null;
     }
 
-    public function findAllIds(): ?array
-    {
-        $req = $this->pdo->prepare('select id from post');
-
-        $req->execute();
-        $datas = $req->fetchAll(\PDO::FETCH_COLUMN);
-        return  $datas === false ? null : $datas;
-    }
-
     public function findAll(int $limit = null, int $offset = null, array $orderBy = null): ?array
     {
+
         $query = 'select 
         post.id, post.title, post.stand_first, post.text, post.creation_date, post.last_update, post.file_attached, user.pseudo,
         post.userId
         from post INNER JOIN user ON post.userId = user.id';
-        $query = $query . " LIMIT 3";
+
+        if ($orderBy !== null && array_keys($orderBy)[0] === "order") {
+            $query = $query . " ORDER BY post.creation_date " . $orderBy['order'];
+        }
+
+        $query = $query . " LIMIT ${limit}";
         if ($offset !== null) {
             $query = $query . " OFFSET $offset";
         }
-
         $req = $this->pdo->prepare($query);
 
         $req->execute();
@@ -98,7 +94,7 @@ final class PostRepository implements EntityRepositoryInterface
     public function create(object $post): bool
     {
         $title = $post->getTitle();
-        $standFirst = $post->getstandFirst();
+        $standFirst = $post->getstand_first();
         $text = $post->getText();
         $userId = $post->getUserId();
         $file = $post->getFile_attached();
@@ -135,8 +131,9 @@ final class PostRepository implements EntityRepositoryInterface
     {
         $id = $post->getId();
         $title = $post->getTitle();
-        $standFirst = $post->getstandFirst();
+        $standFirst = $post->getStand_first();
         $text = $post->getText();
+        $userId = $post->getUserId();
         $file = $post->getFile_attached();
 
         $insert = "";
@@ -144,7 +141,8 @@ final class PostRepository implements EntityRepositoryInterface
         $valuesToBind = [
             ":title" => $title,
             ":stand_first" => $standFirst,
-            ":text" => $text
+            ":text" => $text,
+            ":userId" => $userId
         ];
         if ($file !== null) {
             $valuesToBind["file_attached"] = $file;
@@ -152,7 +150,7 @@ final class PostRepository implements EntityRepositoryInterface
         }
 
         $req = $this->pdo->prepare("UPDATE post SET title = :title, stand_first = :stand_first,
-        text = :text, last_update = now()${insert} WHERE id = ${id}");
+        text = :text, userId = :userId, last_update = now()${insert} WHERE id = ${id}");
 
         foreach ($valuesToBind as $key => $val) {
             $req->bindValue($key, $val);

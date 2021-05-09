@@ -54,13 +54,14 @@ final class Response
 
     public function send(): void
     {
-        $headers = $this->getHeaders();
         if ($this->has("location")) {
             $param = $this->get("location");
-            $goodHeader = "location:" . $param;
+
+            $goodHeader = "location: " . $param;
             header($goodHeader);
             exit();
         }
+        $headers = $this->getHeaders();
         foreach ($headers as $key => $header) {
             $this->setHeader($key, $header);
         }

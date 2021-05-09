@@ -13,17 +13,25 @@ use App\Controller\Frontoffice\HomeController;
 use App\Controller\Frontoffice\PostController;
 use App\Controller\Frontoffice\UserController;
 use App\Model\Repository\CommentRepository;
+use App\Model\Repository\Interfaces\EntityRepositoryInterface;
 use App\Model\Repository\PostRepository;
 use App\Model\Repository\UserRepository;
 use App\Service\Http\Session\Session;
+use App\Service\Utils\ServiceProvider;
 use App\View\View;
 
 class Container
 {
 
     private Session $session;
+    private ServiceProvider $serviceProvider;
 
-    public function callGoodController(string $name)
+    public function __construct(ServiceProvider $serviceProvider)
+    {
+        $this->serviceProvider = $serviceProvider;
+    }
+
+    public function callGoodController(string $name): ControllerInterface
     {
         switch ($name) {
             case "home":
@@ -40,17 +48,20 @@ class Container
                 return $this->getAdminCommentController();
             case "adminmember":
                 return $this->getAdminMemberController();
+            default:
+                return $this->getHomeController();
         }
     }
 
-    public function setRepositoryClass(string $name)
+    public function setRepositoryClass(string $name): ?EntityRepositoryInterface
     {
         switch ($name) {
             case "comment":
                 return $this->getCommentRepository();
-
             case "user":
                 return $this->getUserRepository();
+            default:
+                return null;
         }
     }
 
@@ -71,31 +82,31 @@ class Container
     }
     public function getHomeController(): ControllerInterface
     {
-        return new HomeController($this->getView(), $this->getSession());
+        return new HomeController($this->getView(), $this->getSession(), $this->serviceProvider);
     }
     public function getPostController(): ControllerInterface
     {
-        return new PostController($this->getPostRepository(), $this->getView(), $this->getSession());
+        return new PostController($this->getPostRepository(), $this->getView(), $this->getSession(), $this->serviceProvider);
     }
     public function getUserController(): ControllerInterface
     {
-        return new UserController($this->getUserRepository(), $this->getView(), $this->getSession());
+        return new UserController($this->getUserRepository(), $this->getView(), $this->getSession(), $this->serviceProvider);
     }
     public function getCommentController(): ControllerInterface
     {
-        return new CommentController($this->getCommentRepository(), $this->getView(), $this->getSession());
+        return new CommentController($this->getCommentRepository(), $this->getView(), $this->getSession(), $this->serviceProvider);
     }
     public function getAdminPostController(): ControllerInterface
     {
-        return new AdminPostController($this->getPostRepository(), $this->getUserRepository(), $this->getView(), $this->getSession());
+        return new AdminPostController($this->getPostRepository(), $this->getUserRepository(), $this->getView(), $this->getSession(), $this->serviceProvider);
     }
     public function getAdminCommentController(): ControllerInterface
     {
-        return new AdminCommentController($this->getCommentRepository(), $this->getUserRepository(), $this->getView(), $this->getSession());
+        return new AdminCommentController($this->getCommentRepository(), $this->getUserRepository(), $this->getView(), $this->getSession(), $this->serviceProvider);
     }
     public function getAdminMemberController(): ControllerInterface
     {
-        return new AdminMemberController($this->getUserRepository(), $this->getView(), $this->getSession());
+        return new AdminMemberController($this->getUserRepository(), $this->getView(), $this->getSession(), $this->serviceProvider);
     }
     public function getPostRepository(): PostRepository
     {

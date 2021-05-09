@@ -11,6 +11,7 @@ final class User
     private string $pseudo;
     private string $password;
     private string $role;
+    private ?string $token;
 
     public function __construct(?array $datas = [])
     {
@@ -73,6 +74,7 @@ final class User
         $this->password = $password;
         return $this;
     }
+
     public function getRole(): string
     {
         return $this->role;
@@ -81,6 +83,17 @@ final class User
     public function setRole(string $role): self
     {
         $this->role = $role;
+        return $this;
+    }
+
+    public function getToken(): ?string
+    {
+        return $this->token;
+    }
+
+    public function setToken(string $token): self
+    {
+        $this->token = $token;
         return $this;
     }
 }

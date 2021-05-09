@@ -13,57 +13,51 @@ use App\Model\Repository\UserRepository;
 use App\Service\ErrorsHandlers\Errors;
 use App\Service\Http\ParametersBag;
 use App\Service\Http\Session\Session;
-use App\Service\Utils\Authentification;
-use App\Service\Utils\Mailer;
-use App\Service\Utils\Validity;
+use App\Service\Utils\ServiceProvider;
 
 final class CommentController implements ControllerInterface
 {
     private CommentRepository $commentRepository;
     private View $view;
     private Session $session;
+    private ServiceProvider $serviceProvider;
 
-    public function __construct(CommentRepository $commentRepository, View $view, Session $session)
+    public function __construct(CommentRepository $commentRepository, View $view, Session $session, ServiceProvider $serviceProvider)
     {
         $this->commentRepository = $commentRepository;
         $this->view = $view;
         $this->session = $session;
+        $this->serviceProvider = $serviceProvider;
     }
 
-    public function createComment(UserRepository $userRepository, ?ParametersBag $request): Response
+    public function createComment(?UserRepository $userRepository = null, ?ParametersBag $request = null): Response
     {
-        $auth = new Authentification();
+        $auth = $this->serviceProvider->getAuthentificationService();
+        // check if auth
         if ($auth->isAuth($this->session)) {
-            if ($request !== null && !empty($request->get("pseudoComment"))  && !empty($request->get("textComment")) && !empty($request->get("post"))) {
+            $this->session->addFlashes('error', 'Une erreur est survenue');
+            if (isset($request) && !empty($request->get("textComment")) && !empty($request->get("post")) && isset($userRepository)) {
+                $post = (int)$request->get("post");
                 $user = $userRepository->findOneBy(["email" => $this->session->get("email")]);
+
                 if ($user) {
-                    $post = (int)$request->get("post");
-                    $params = ['pseudo', 'text', 'idPost', 'idUser'];
-                    $values = [$request->get("pseudoComment"), $request->get("textComment"), $post, $user->getId()];
+                    $params = ['text', 'idPost', 'idUser'];
+                    $values = [$request->get("textComment"), $post, $user->getId()];
                     $param = array_combine($params, $values);
 
-                    $validityTools = new Validity();
+                    $validityTools = $this->serviceProvider->getValidityService();
                     $param = $validityTools->validityVariables($param);
                     $object = new Comment($param);
 
-                    $this->session->addFlashes('error', 'Une erreur est survenue');
                     if ($this->commentRepository->create($object)) {
-                        $message = new Mailer("Votre commentaire");
-                        try {
-                            $validate = $message->sendMessage("frontoffice/mail/validateComment.html.twig", $user->getEmail(), ["pseudo" => $user->getPseudo()]);
-                        } catch (\Exception $e) {
-                            throw $e;
-                        }
-
-                        $validate === true ? $this->session->addFlashes('success', 'Merci pour votre commentaire, une confirmation va vous être envoyée par mail') :
-                            $this->session->addFlashes('warning', 'Une erreur s\'est produite au niveau de l\'envoi de la confirmation par mail');
+                        $this->session->addFlashes('success', 'Merci pour votre commentaire!  Dès qu\'il sera validé par notre équipe, il sera publié');
                     }
-                    return new Response("", 304, ["location" =>  "/post-${post}"]);
                 }
+                return new Response("", 304, ["location" =>  "/post-${post}"]);
             }
         }
-        // OR redirection?
-        $error = new Errors(404);
+        $auth->isNotAuth($this->session);
+        $error = new Errors(403);
         return $error->handleErrors();
     }
 }

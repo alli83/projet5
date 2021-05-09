@@ -9,12 +9,11 @@ use App\Model\Entity\Comment;
 use App\Model\Repository\CommentRepository;
 use App\View\View;
 use App\Model\Repository\UserRepository;
+use App\Service\ErrorsHandlers\Errors;
 use App\Service\Http\ParametersBag;
 use App\Service\Http\Response;
 use App\Service\Http\Session\Session;
-use App\Service\Utils\Authentification;
-use App\Service\Utils\Mailer;
-use App\Service\Utils\Validity;
+use App\Service\Utils\ServiceProvider;
 
 class AdminCommentController implements ControllerInterface
 {
@@ -22,110 +21,149 @@ class AdminCommentController implements ControllerInterface
     private UserRepository $userRepository;
     private View $view;
     private Session $session;
+    private ServiceProvider $serviceProvider;
 
-    public function __construct(CommentRepository $commentRepository, UserRepository $userRepository, View $view, Session $session)
-    {
+    public function __construct(
+        CommentRepository $commentRepository,
+        UserRepository $userRepository,
+        View $view,
+        Session $session,
+        ServiceProvider $serviceProvider
+    ) {
         $this->commentRepository = $commentRepository;
         $this->userRepository = $userRepository;
         $this->view = $view;
         $this->session = $session;
+        $this->serviceProvider = $serviceProvider;
     }
 
-    public function displayAllComments(?array $params = []): Response
+    public function displayAllComments(?array $params = [], ?ParametersBag $request = null): Response
     {
-        $auth = new Authentification();
-
+        $auth = $this->serviceProvider->getAuthentificationService();
+        // check if admin
         if ($auth->isAdminAuth($this->session)) {
-            if ($params === null || ($params && $params["page"] === null)) {
-                $offset = 0;
-            } else {
-                $validity = new Validity();
-                $params = $validity->validityVariables($params);
-                $offset = (int)$params["page"] * 3;
+            // set pagination
+            $offset = $this->serviceProvider->getPaginationService()->setOffset($params);
+
+            // set order
+            $order = (!empty($request) && $request->get("order") !== null) ? htmlspecialchars($request->get("order")) : "desc";
+            $order = $this->serviceProvider->getValidityService()->isInArray(["asc", "desc"], $order);
+
+            // to determine if it's the last page
+            if ($order) {
+                $comments = $this->commentRepository->findAll(4, $offset, ['order' => $order["order"]]);
+                $end = false;
+                if ($comments) {
+                    if (!array_key_exists(3, $comments)) {
+                        $end = true;
+                    }
+                    $comments = array_slice($comments, 0, 3);
+                }
+
+                //set security token
+                $tokencsrf = $this->serviceProvider->getTokenService()->setToken($this->session);
+
+                return new Response($this->view->render([
+                    'template' => 'listComments',
+                    'data' => [
+                        'comments' => $comments,
+                        'page' => $params === null ? 0 : (int)$params["page"],
+                        'filter' => $order,
+                        "end" => $end,
+                        "tokencsrf" => $tokencsrf
+                    ],
+                    'env' => 'backoffice'
+                ]));
             }
-
-            $comments = $this->commentRepository->findAll(3, $offset);
-
-            return new Response($this->view->render([
-                'template' => 'listComments',
-                'data' => [
-                    'comments' => $comments,
-                    'page' => $params === null ? 0 : (int)$params["page"]
-                ],
-                'env' => 'backoffice'
-            ]));
         }
-        return new Response("", 304, ["location" =>  "/login"]);
+        $auth->isNotAuth($this->session);
+        $error = new Errors(403);
+        return $error->handleErrors();
     }
 
     public function validateOneComment(array $params, ?ParametersBag $request): Response
     {
-        $auth = new Authentification();
+        $auth = $this->serviceProvider->getAuthentificationService();
+        // check if admin
         if ($auth->isAdminAuth($this->session)) {
-            $param = $request->all();
+            $this->session->addFlashes("danger", "Une erreur est survenue");
+            if ($request !== null) {
+                $param = $request->all();
 
-            // TO DO CHECK IF NULL 
-            $params["text"] = $param["text"];
-            $validity = new Validity();
-            $params = $validity->validityVariables($params);
+                if (isset($param["text"])) {
+                    // check validity security token
+                    $validToken = $this->serviceProvider->getTokenService()->validateToken($param, $this->session);
 
-            $comment = new Comment(["id" => (int)$params["id"], "text" => $params["text"]]);
+                    if ($validToken) {
+                        $params["text"] = $param["text"];
+                        $validity = $this->serviceProvider->getValidityService();
+                        $params = $validity->validityVariables($params);
 
-            $this->session->addFlashes('danger', "Une erreur est survenue");
-            if ($this->commentRepository->validate($comment)) {
-                $user = $this->userRepository->findOneThroughComment(["id" => (int)$params["id"]]);
-                if ($user) {
-                    $message = new Mailer("Commentaire validé");
-                    $this->session->addFlashes('warning', "la confirmation n'a pas pu être envoyée par mail");
-                    if (
-                        $message->sendMessage(
-                            "frontoffice/mail/publishedComment.html.twig",
-                            $user->getEmail(),
-                            ["comment" => $comment->getText(), "pseudo" => $user->getPseudo()]
-                        )
-                    ) {
-                        $this->session->addFlashes('success', "le commentaire est validé");
+                        $comment = new Comment(["id" => (int)$params["id"], "text" => $params["text"]]);
+                        $text = $comment->getText();
+
+                        if ($this->commentRepository->update($comment)) {
+                            $this->serviceProvider->getInformUserService()
+                                ->contactUserComment(
+                                    $this->session,
+                                    $this->userRepository,
+                                    $params,
+                                    "Commentaire validé",
+                                    "frontoffice/mail/publishedComment.html.twig",
+                                    $text,
+                                    "Le commentaire est validé et la confirmation envoyée"
+                                );
+                        }
                     }
                 }
             }
             return new Response("", 304, ["location" =>  "/admin/comments"]);
         }
-        return new Response("", 304, ["location" =>  "/login"]);
+        $auth->isNotAuth($this->session);
+        $error = new Errors(403);
+        return $error->handleErrors();
     }
 
     public function deleteOneComment(array $params, ?ParametersBag $request): Response
     {
-        $auth = new Authentification();
-
+        $auth = $this->serviceProvider->getAuthentificationService();
+        // check if admin
         if ($auth->isAdminAuth($this->session)) {
-            $param = $request->all();
-
-            // TO do check if null
-            $params["text"] = $param["text"];
-            $validity = new Validity();
-            $params = $validity->validityVariables($params);
-
-            $comment = new Comment(["id" => (int)$params["id"], "text" => $params["text"]]);
-
             $this->session->addFlashes('danger', "Une erreur est survenue");
-            if ($this->commentRepository->delete($comment)) {
-                $user = $this->userRepository->findOneThroughComment(["id" => (int)$params["id"]]);
-                if ($user) {
-                    $message = new Mailer("commentaire supprimé");
-                    $this->session->addFlashes('warning', "la confirmation n'a pas pu être envoyée par mail");
-                    if (
-                        $message->sendMessage(
-                            "frontoffice/mail/deletedComment.html.twig",
-                            $user->getEmail(),
-                            ["comment" => $comment->getText(), "pseudo" => $user->getPseudo()]
-                        )
-                    ) {
-                        $this->session->addFlashes('success', "le commentaire à bien été supprimé");
+            if ($request !== null) {
+                $param = $request->all();
+
+                if (isset($param["text"])) {
+                    // check validity security token
+                    $validToken = $this->serviceProvider->getTokenService()->validateToken($param, $this->session);
+
+                    if ($validToken) {
+                        $params["text"] = $param["text"];
+                        $validity = $this->serviceProvider->getValidityService();
+                        $params = $validity->validityVariables($params);
+
+                        $comment = new Comment(["id" => (int)$params["id"], "text" => $params["text"]]);
+                        $text = $comment->getText();
+
+                        if ($this->commentRepository->delete($comment)) {
+                            $this->serviceProvider->getInformUserService()
+                                ->contactUserComment(
+                                    $this->session,
+                                    $this->userRepository,
+                                    $params,
+                                    "Commentaire supprimé",
+                                    "frontoffice/mail/deletedComment.html.twig",
+                                    $text,
+                                    "Le commentaire à bien été supprimé et la confirmation envoyée"
+                                );
+                        }
                     }
                 }
             }
             return new Response("", 304, ["location" =>  "/admin/comments"]);
         }
-        return new Response("", 304, ["location" =>  "/login"]);
+        $auth->isNotAuth($this->session);
+        $error = new Errors(403);
+        return $error->handleErrors();
     }
 }

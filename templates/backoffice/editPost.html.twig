@@ -1,35 +1,53 @@
 {% extends "/backoffice/baseBackOff.html.twig" %}
 
-{% block title %}Modification d'un post{% endblock %}
+{% set header = 'Création d\'un nouveau post' %}
+{% if post %}
+{% set header = 'Modification d\'un post' %}
+{% endif %}
+
+{% block title %} {{header}} {% endblock %}
 
 {% block content %}
 
 <div class="container">
+  <div class="mb-3">
+    <a href="/admin/posts">Retourner à la liste des posts</a>
+  </div>
 
-  <form action="{{url}}" method="POST" enctype="multipart/form-data">
+  <h2>{{header}}</h2>
+  <p class="text-warning bg-dark">Attention! une fois créé, le post sera automatiquement publié.<br>
+    A part l'image qui est optionnelle, tous les champs sont obligatoires </p>
+    
+  <form action="{{url}}" method="POST" enctype="multipart/form-data" id="postForm">
+    <input type="hidden" value="{{tokencsrf}}" name="tokencsrf"></input>
     <div class="form-group">
       <label for="title">Titre du post</label>
       <input type="text" class="form-control" id="title" name="title" value="{{post.title | default('')}}" />
     </div>
-    <div class="form-group">
-      <label for="standFirst">Chapo</label>
-      <input type="text" class="form-control" id="standFirst" name="standFirst"
-        value="{{post.stand_first | default('')}}">
+    <div class="form-group my-3">
+      <label for="stand_first">Chapo</label>
+      <input type="text" class="form-control" id="stand_first" name="stand_first"
+        value="{{post.stand_first | default('')}}" />
     </div>
-
-
+    <div id="usersToSearch" data-users="{{ usersToSearch|json_encode }}"></div>
+    <div class="form-group mb-3">
+      <label for="stand_first" name="usersToComplete">Auteur</label>
+      <input id="usersToComplete" class="ui-autocomplete-input" autocomplete="off" name="usersToComplete" />
+    </div>
     <div class="form-group">
       <label for="image">Charger une image</label>
       <input type="file" class="form-control-file" name="file_attached" id="image">
     </div>
     <div class="form-group">
       <label for="text">Contenu</label>
-      <textarea class="form-control" id="text" name="text" rows="15">
-            {{post.text | default('')}}
-          </textarea>
+      <textarea class="form-control" id="text" name="text" rows="15">{{post.text | default('')}}</textarea>
     </div>
-    <div class="text-center">
-      <button type="submit" class="btn btn-primary btn-block mb-4 orangeButton">Modifier</button>
+    {% set button = 'Créer' %}
+    {% if post %}
+    {% set button = 'Modifier' %}
+    {% endif %}
+    <div class="text-center mt-4">
+      <button type="submit" class="btn btn-dark btn-block mb-4">{{button}}</button>
     </div>
   </form>
 </div>

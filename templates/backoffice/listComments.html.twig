@@ -4,9 +4,19 @@
 
 {% block content %}
 <div class="container">
+  {% set index = filter['order'] %}
+  {% set index2 = filter['counterOrder'] %}
 
   <h2 class="text-center">liste des commentaires</h2>
-
+  <p>Les commentaires sont actuellement classés du plus récent au plus ancien:</p>
+  <form method="post" action="/admin/comments" class="mb-4">
+    <select class="form-select" name="order">
+        <option value="{{index}}">{{filter[index]}}</option>
+        <option value="{{index2}}">{{filter[index2]}}</option>
+      </select>
+    <button class="btn btn-dark text-white mt-4" type="submit">Rechercher</button>
+</form>
+<hr>
   {% if comments %}
   {% for comment in comments %}
 
@@ -14,22 +24,29 @@
     <ul class="list-group">
       <li class="list-group-item list-group-item-info fs-5">
         <span class=" d-inline-block px-md-2 col-sm-9 col-lg-12">
-          <p class="mb-1 text-muted">Commentaire crée le {{comment.created_date}} - par {{comment.pseudo }} - dernière
+          <p class="mb-1 text-muted">Commentaire crée le {{comment.created_date | date("d/m/Y")}} - par {{comment.pseudo }}
+            {% if comment.created_date is same as(comment.last_update) %}
+            {% else %}
+            - dernière
             mise à jour le:
-            {{comment.last_update}}</p>
+            {{comment.last_update | date("d/m/Y H:i")}}
+          {% endif%}
+          </p>
           <p>{{comment.text}}</p>
         </span>
         <span class="d-inline-block col-md-7">
           {% if comment.status is same as("created") %}
           <form method="POST" action="/comment-{{comment.id}}/validate">
-            <input hidden type="text" id="password" class="form-control" name="text" class="form-control validate"
+            <input type="hidden" value="{{tokencsrf}}" name="tokencsrf"></input>
+            <input hidden type="text" id="text" class="form-control" name="text" class="form-control validate"
             value="{{comment.text}}"/>
             <button class="btn btn-dark text-white me-2" type="submit">valider</button>
           </form>
          
           {% endif %}
           <form method="POST" action="/comment-{{comment.id}}/delete" class="mt-2">
-            <input hidden type="text" id="password" class="form-control" name="text" class="form-control validate"
+            <input type="hidden" value="{{tokencsrf}}" name="tokencsrf"></input>
+            <input hidden type="text" id="textsupp" class="form-control" name="text" class="form-control validate"
             value="{{comment.text}}"/>
             <button class="btn btn-secondary text-white" type="submit" >supprimer</button>
           </form>
@@ -44,12 +61,18 @@
     <ul class="pagination pagination-circle justify-content-center">
       {% if (page > 0) %}
       <li class="page-item">
-        <a class="page-link" href="/admin/comments/{{ page-1}}">Précédent</a>
+        <form method="post" action="/admin/comments/{{ page-1}}">
+          <input hidden value="{{index}}" name="order" />
+          <button class="btn btn-dark text-white mt-4" type="submit">Précédent</button>
+        </form>
       </li>
       {%endif%}
-      {% if comments|length == 3 %}
+      {% if comments|length == 3 and end is same as(false) %}
       <li class="page-item">
-        <a class="page-link" href="/admin/comments/{{page+1}}">Suivant</a>
+        <form method="post" action="/admin/comments/{{page+1}}">
+          <input hidden value="{{index}}" name="order" />
+          <button class="btn btn-dark text-white mt-4" type="submit">Suivant</button>
+        </form>
       </li>
       {% endif %}
     </ul>

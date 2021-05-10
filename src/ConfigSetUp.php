@@ -5,7 +5,7 @@ namespace App;
 class ConfigSetUp
 {
     private array $settingsConfig;
-    private ?object $instance;
+    private ?ConfigSetUp $instance;
 
     public function __construct()
     {

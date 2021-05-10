@@ -89,7 +89,16 @@ final class UserRepository implements EntityRepositoryInterface
 
     public function findBy(array $criteria, array $orderBy = null, int $limit = null, int $offset = null): ?array
     {
-        return null;
+        $query = 'select 
+        id, pseudo, role, email,  created_date, last_update, pseudo from user where role IN("'.$criteria['role1'].'", "'.$criteria['role2'].'")';
+
+        $req = $this->pdo->prepare($query);
+        $req->setFetchMode(\PDO::FETCH_CLASS, User::class, [$criteria]);
+      
+        $req->execute();
+        $data = $req->fetchAll();
+
+        return $data === false ? null : $data;
     }
 
     public function findAll(int $limit = null, int $offset = null, array $orderBy = null): ?array

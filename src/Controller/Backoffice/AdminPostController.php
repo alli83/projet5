@@ -84,7 +84,7 @@ class AdminPostController implements ControllerInterface
 
             $post = $this->postRepository->findOneBy(["id" => (int)$params["id"]]);
             $users = $this->userRepository->findBy(["role1" => "admin", "role2" => "superAdmin"]);
-            // load all admin and users => useful for select input in frontend
+            // load all admin andsuperAdmin => useful for select input in frontend
             if ($users && $post) {
                 $pseudos = [];
                 foreach ($users as $user) {
@@ -166,10 +166,10 @@ class AdminPostController implements ControllerInterface
         $auth = $this->serviceProvider->getAuthentificationService();
         //  check if admin
         if ($auth->isAdminAuth($this->session)) {
-            $users = $this->userRepository->findAll();
+            $users = $this->userRepository->findBy(["role1" => "admin", "role2" => "superAdmin"]);
 
             if ($users) {
-                // load all admin and user member
+                // load all admin and superAdmin
                 $pseudos = [];
                 foreach ($users as $user) {
                     $pseudos[] = $user->getPseudo() . ", " . $user->getEmail();

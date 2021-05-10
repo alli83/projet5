@@ -79,12 +79,11 @@ return array(
 );
 ```
 *   Place your cv in src/doc folder 
-*   When you are ready, at the root of your project, run :
+*   When you are ready, at the root of your project,  to launch the project, run :
 ```bash
 php -S localhost:8000 -t public
 ```
- to launch the project
-
+* You can manage "admin" and "user" permissions directly from the admin dashboard but first, you need to create a superAdmin user => go to signup : create an account and then in your db change the permission (role) to 'superAdmin'. 
 ## Code quality
 
 you can run : 

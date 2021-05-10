@@ -83,7 +83,7 @@ class AdminPostController implements ControllerInterface
             $params = $validity->validityVariables($params);
 
             $post = $this->postRepository->findOneBy(["id" => (int)$params["id"]]);
-            $users = $this->userRepository->findAll();
+            $users = $this->userRepository->findBy(["role1" => "admin", "role2" => "superAdmin"]);
             // load all admin and users => useful for select input in frontend
             if ($users && $post) {
                 $pseudos = [];

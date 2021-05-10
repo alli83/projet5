@@ -164,17 +164,15 @@ final class UserController implements ControllerInterface
 
                         $this->session->addFlashes('danger', 'Une erreur est survenue');
                         if ($user) {
-                        
                             $message = $this->serviceProvider->getMailService();
                             $message = $message->sendMessage(
                                 "création de compte",
                                 "frontoffice/mail/validateRegistration.html.twig",
                                 $email,
                                 ["pseudo" => $user->getPseudo()]
-                            )?
-                            $this->session->addFlashes('success', 'Votre inscription a bien été prise en compte. Vous pouvez désormais vous connecter') : 
+                            ) ?
+                            $this->session->addFlashes('success', 'Votre inscription a bien été prise en compte. Vous pouvez désormais vous connecter') :
                             $this->session->addFlashes('danger', 'L\'email n\'a pas pu être envoyé');
-
                         }
                         return new Response("", 304, ["location" =>  "/login"]);
                     }

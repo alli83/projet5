@@ -48,7 +48,7 @@ class InformUserService
     {
         $message = new MailerService();
 
-        $session->addFlashes('warning', "Nous sommes désolé mais votre message n\'a pas pu être envoyé");
+        $session->addFlashes('warning', "Nous sommes désolé mais votre message n'a pas pu être envoyé");
         if ($message->sendMessageContact($header, $template, $request)) {
             $session->addFlashes('success', $conf);
         }

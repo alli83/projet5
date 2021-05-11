@@ -11,19 +11,19 @@
   <p>Les membres sont actuellement classés du plus récent au plus ancien:</p>
   <form method="post" action="/admin/members" class="mb-4">
     <select class="form-select" name="order">
-        <option value="{{index}}">{{filter[index]}}</option>
-        <option value="{{index2}}">{{filter[index2]}}</option>
-      </select>
+      <option value="{{index}}">{{filter[index]}}</option>
+      <option value="{{index2}}">{{filter[index2]}}</option>
+    </select>
     <button class="btn btn-dark text-white mt-4" type="submit">Rechercher</button>
-</form>
-<hr>
+  </form>
+  <hr>
   {% if members %}
   {% for member in members %}
   <div class="container mt-5">
     <ul class="list-group">
       <li class="list-group-item list-group-item-primary fs-5">
         <span class=" d-inline-block px-md-2 col-sm-9 col-lg-12">{{member.pseudo}}
-          <p class="mb-1 text-muted">Role: {{member.role }} - Crée le {{member.created_date | date("d/m/Y")}} 
+          <p class="mb-1 text-muted">Role: {{member.role }} - Crée le {{member.created_date | date("d/m/Y")}}
             {% if member.created_date is same as(member.last_update) %}
             {% else %}
             - dernière mise à jour le:
@@ -65,11 +65,11 @@
     <ul class="pagination pagination-circle justify-content-center">
       {% if (page > 0) %}
       <li class="page-item me-3">
-      <form method="post" action="/admin/members/{{ page-1 }}">
-        <input hidden value="{{index}}" name="order" />
-        <button class="btn btn-dark text-white mt-4" type="submit">Précédent</button>
-      </form>
-    </li>
+        <form method="post" action="/admin/members/{{ page-1 }}">
+          <input hidden value="{{index}}" name="order" />
+          <button class="btn btn-dark text-white mt-4" type="submit">Précédent</button>
+        </form>
+      </li>
       {%endif%}
       {% if members|length == 3 and end is same as(false) %}
       <li class="page-item">

@@ -8,14 +8,14 @@
   {% set index2 = filter['counterOrder'] %}
 
   <h2 class="text-center fs-2">Liste des posts</h2>
-    <a class="btn btn-success text-white my-4 d-block" href="/post/create" role="button">Ajouter un nouveau post</a>
-    <p>Les posts sont actuellement classés du plus récent au plus ancien:</p>
-    <form method="post" action="/admin/posts" class="mb-4">
-      <select class="form-select" name="order">
-          <option value="{{index}}">{{filter[index]}}</option>
-          <option value="{{index2}}">{{filter[index2]}}</option>
-        </select>
-      <button class="btn btn-dark text-white mt-4" type="submit">Rechercher</button>
+  <a class="btn btn-success text-white my-4 d-block" href="/post/create" role="button">Ajouter un nouveau post</a>
+  <p>Les posts sont actuellement classés du plus récent au plus ancien:</p>
+  <form method="post" action="/admin/posts" class="mb-4">
+    <select class="form-select" name="order">
+      <option value="{{index}}">{{filter[index]}}</option>
+      <option value="{{index2}}">{{filter[index2]}}</option>
+    </select>
+    <button class="btn btn-dark text-white mt-4" type="submit">Rechercher</button>
   </form>
   <hr>
   {% if posts %}
@@ -24,7 +24,7 @@
     <ul class="list-group">
       <li class="list-group-item list-group-item-warning fs-5">
         <span class=" d-inline-block px-md-2 col-sm-9 col-lg-12 mb-4">{{post.title}}
-          <p class="mb-1 text-muted">Crée le {{post.creation_date | date("d/m/Y")}} 
+          <p class="mb-1 text-muted">Crée le {{post.creation_date | date("d/m/Y")}}
             {% if post.creation_date is same as(post.last_update) %}
             {% else %}
             - dernière mise à jour le: {{post.last_update | date("d/m/Y H:i")}}
@@ -46,7 +46,7 @@
   <nav class="my-4">
     <ul class="pagination pagination-circle justify-content-center">
       {% if (page > 0) %}
-      <li class="page-item">
+      <li class="page-item me-3">
         <form method="post" action="/admin/posts/{{ page-1}}">
           <input hidden value="{{index}}" name="order" />
           <button class="btn btn-dark text-white mt-4" type="submit">Précédent</button>
@@ -63,10 +63,10 @@
       {% endif %}
     </ul>
   </nav>
-{% else %}
+  {% else %}
   <p class="fs-3 text-center mt-4">Vous n'avez pour l'instant créé aucun poste sur cette page </p>
-  <img class="center mb-4" src="https://cdn.pixabay.com/photo/2017/07/28/23/18/coming-soon-2550190_1280.jpg" alt="deco picture no post at the moment" width="900"
-        height="380">
-{% endif %}
-</div> 
+  <img class="center mb-4" src="https://cdn.pixabay.com/photo/2017/07/28/23/18/coming-soon-2550190_1280.jpg"
+    alt="deco picture no post at the moment" width="900" height="380">
+  {% endif %}
+</div>
 {% endblock %}

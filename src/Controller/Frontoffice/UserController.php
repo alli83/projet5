@@ -35,10 +35,9 @@ final class UserController implements ControllerInterface
         }
         if ($request !== null) {
             $auth = $this->serviceProvider->getAuthService();
-
-            $this->session->addFlashes('danger', 'Mauvais identifiants');
+            $this->session->addFlashes("danger", "Mauvais identifiants");
             if ($auth->isValidLoginForm($this->session, $request->all(), $this->userRepository)) {
-                $this->session->addFlashes('success', 'Vous êtes désormais connecté');
+                $this->session->addFlashes("success", "Vous êtes désormais connecté");
                 return new Response("", 302, ["location" =>  "/posts"]);
             }
         }
@@ -116,7 +115,7 @@ final class UserController implements ControllerInterface
             ]));
         }
 
-        $this->session->addFlashes("danger", "une erreur est survenue");
+        $this->session->addFlashes("danger", "Une erreur est survenue");
 
         $user = $this->userRepository->findOneBy(["id" => (int)$param["id"]]);
 
@@ -171,7 +170,7 @@ final class UserController implements ControllerInterface
             ]]));
         }
 
-        $this->session->addFlashes('danger', 'Une erreur est survenue');
+        $this->session->addFlashes("danger", "Une erreur est survenue");
         $params = $request->all();
 
         if (empty($params['emailSignup']) || empty($params['password']) || empty($params['pseudoSignup'])) {
@@ -194,17 +193,17 @@ final class UserController implements ControllerInterface
         $params['emailSignup'] = $email;
         $auth = $this->serviceProvider->getAuthService();
 
-        $this->session->addFlashes('warning', 'Ce pseudo est déjà pris');
+        $this->session->addFlashes("warning", "Ce pseudo est déjà pris");
         if ($auth->register($this->session, $params, $this->userRepository)) {
             $user = $this->userRepository->findOneBy(['email' => $email]);
 
-            $this->session->addFlashes('danger', 'Une erreur est survenue');
+            $this->session->addFlashes("danger", "Une erreur est survenue");
 
             if (!$user) {
                 return new Response("", 304, ["location" =>  "/login"]);
             }
 
-            $this->session->addFlashes('warning', 'L\'email n\'a pas pu être envoyé');
+            $this->session->addFlashes("warning", "L'email n'a pas pu être envoyé");
             $message = $this->serviceProvider->getMailService()->sendMessage(
                 "création de compte",
                 "frontoffice/mail/validateRegistration.html.twig",
@@ -212,7 +211,7 @@ final class UserController implements ControllerInterface
                 ["pseudo" => $user->getPseudo()]
             );
             if ($message) {
-                $this->session->addFlashes('success', 'Votre inscription a bien été prise en compte. Vous pouvez désormais vous connecter');
+                $this->session->addFlashes("success", "Votre inscription a bien été prise en compte. Vous pouvez désormais vous connecter");
             }
             return new Response("", 302, ["location" =>  "/login"]);
         }

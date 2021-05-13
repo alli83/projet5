@@ -4,13 +4,15 @@
 
 {% block content %}
 <div class="container">
+    {% set index = filter['order'] %}
+    {% set index2 = filter['counterOrder'] %}
 
     <div class="text-center">
         <h4 class="mb-5"><strong>Les Posts</strong></h4>
         <form method="post" action="/posts" class="mb-4">
             <select class="form-select" name="order">
-                <option value="desc">Du plus récent au plus ancien</option>
-                <option value="asc">Du plus ancien au plus récent</option>
+                <option value="{{index}}">{{filter[index]}}</option>
+                <option value="{{index2}}">{{filter[index2]}}</option>
             </select>
             <button class="btn btn-dark text-white mt-4" type="submit">Rechercher</button>
         </form>
@@ -19,7 +21,6 @@
 
         <div class="row">
             {% for post in posts %}
-
             <div class="col-lg-4 col-sm-11 mb-4">
                 <div class="card">
                     {% if post.file_attached is empty %}
@@ -48,13 +49,18 @@
         <nav class="my-4" aria-label="...">
             <ul class="pagination pagination-circle justify-content-center">
                 {% if (page > 0) %}
-                <li class="page-item">
-                    <a class="page-link" href="/posts/{{page-1}}">Précédent</a>
+                <li class="page-item"><form method="post" action="/posts/{{page-1}}">
+                    <input hidden value="{{index}}" name="order" />
+                    <button class="btn btn-dark text-white mt-4" type="submit">Précédent</button>
+                  </form>
                 </li>
                 {% endif %}
-                {% if posts|length == 3 %}
+                {% if posts|length == 3 and end is same as(false) %}
                 <li class="page-item">
-                    <a class="page-link" href="/posts/{{ page+1}}">Suivant</a>
+                    <form method="post" action="/posts/{{ page+1}}">
+                        <input hidden value="{{index}}" name="order" />
+                        <button class="btn btn-dark text-white mt-4" type="submit">Suivant</button>
+                      </form>
                 </li>
                 {% endif %}
             </ul>

@@ -48,7 +48,7 @@ final class PostController implements ControllerInterface
                 ],
             ));
         }
-        $this->session->addFlashes('danger', 'Une erreur est survenue');
+        $this->session->addFlashes("danger", "Une erreur est survenue");
         return new Response("", 302, ["location" =>  "/posts"]);
     }
 
@@ -72,7 +72,6 @@ final class PostController implements ControllerInterface
         }
         $posts = $this->postRepository->findAll(4, $offset, ['order' => $order["order"]]);
         $end = false;
-
         if ($posts) {
             if (!array_key_exists(3, $posts)) {
                 $end = true;
@@ -84,9 +83,9 @@ final class PostController implements ControllerInterface
             'template' => 'posts',
             'data' => [
                 'posts' => $posts,
-                'page' => $params === null ? 0 : (int)$params["page"]
-            ],
-            "end" => $end
-        ]));
+                'page' => $params === null ? 0 : (int)$params["page"],
+                'filter' => $order,
+                "end" => $end
+            ]]));
     }
 }

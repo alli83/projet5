@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Service\ErrorsHandlers;
 
 use App\Service\Http\Response;
-use App\Service\Http\Session\Session;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 

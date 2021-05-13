@@ -147,7 +147,7 @@ final class AdminCommentController implements ControllerInterface
             return $error->handleErrors();
         }
 
-        $this->session->addFlashes('danger', "Une erreur est survenue");
+        $this->session->addFlashes("danger", "Une erreur est survenue");
         if ($request === null) {
             return new Response("", 302, ["location" =>  "/admin/comments"]);
         }

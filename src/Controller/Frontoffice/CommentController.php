@@ -39,7 +39,7 @@ final class CommentController implements ControllerInterface
             return $error->handleErrors();
         }
 
-        $this->session->addFlashes('danger', 'Une erreur est survenue');
+        $this->session->addFlashes("danger", "Une erreur est survenue");
 
         if (empty($request) || empty($request->get("textComment")) || empty($request->get("post")) || empty($userRepository)) {
             return new Response("", 302, ["location" =>  "/posts"]);
@@ -61,7 +61,7 @@ final class CommentController implements ControllerInterface
         $object = new Comment($param);
 
         if ($this->commentRepository->create($object)) {
-            $this->session->addFlashes('success', 'Merci pour votre commentaire!  Dès qu\'il sera validé par notre équipe, il sera publié');
+            $this->session->addFlashes("success", "Merci pour votre commentaire!  Dès qu'il sera validé par notre équipe, il sera publié");
         }
         return new Response("", 302, ["location" =>  "/post-${post}"]);
     }

@@ -106,7 +106,7 @@ final class AdminMemberController implements ControllerInterface
 
         foreach ($param as $key => $el) {
             if ($el === "") {
-                $this->session->addFlashes('danger', 'vous devez sélectionner un role');
+                $this->session->addFlashes("danger", "Vous devez sélectionner un role");
                 return new Response("", 302, ["location" =>  "/admin/members"]);
             }
             $params[$key] = $el;
@@ -137,7 +137,7 @@ final class AdminMemberController implements ControllerInterface
                     $user->getEmail(),
                     "Modification de vos droits",
                     "frontoffice/mail/updateMember.html.twig",
-                    "les droits de l'utilisateur ont bien été modifiés et la confirmation envoyée par mail"
+                    "Les droits de l'utilisateur ont bien été modifiés et la confirmation envoyée par mail"
                 );
         }
         return new Response("", 302, ["location" =>  "/admin/members"]);

@@ -14,9 +14,10 @@ return array(
         "sender" => "nom de l'expediteur"
     ),
    'cookie' => array(
-        "lifetime" => int,
-        "path" => '/'
+        "lifetime" => 'timeyouwant',
+        "path" => '/',
         "secure" => 'bool',
         "httponly" => 'bool',
         "samesite" => 'yourchoice'
+   )
 );

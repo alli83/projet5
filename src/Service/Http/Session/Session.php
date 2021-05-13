@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Service\Http\Session;
 
 use App\ConfigSetUp;
-use PHP_CodeSniffer\Config;
 
 final class Session
 {

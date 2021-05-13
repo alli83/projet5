@@ -106,7 +106,7 @@ final class AdminPostController implements ControllerInterface
         $users = $this->userRepository->findBy(["role1" => "admin", "role2" => "superAdmin"]);
 
         if (empty($users) || empty($post)) {
-            $this->session->addFlashes('danger', "Une erreur est survenue");
+            $this->session->addFlashes("danger", "Une erreur est survenue");
             return new Response("", 302, ["location" =>  "/admin/posts"]);
         }
         $pseudos = [];
@@ -181,7 +181,7 @@ final class AdminPostController implements ControllerInterface
         $post->setUserId($user->getId());
 
         if ($this->postRepository->update($post)) {
-            $this->session->addFlashes("success", "le post a bien été modifié et mis à jour");
+            $this->session->addFlashes("success", "Le post a bien été modifié et mis à jour");
         }
         return new Response("", 302, ["location" =>  "/admin/posts"]);
     }
@@ -251,7 +251,7 @@ final class AdminPostController implements ControllerInterface
         $param = $request->all();
 
         if (empty($param["stand_first"]) || empty($param["title"]) || empty($param["text"])) {
-            $this->session->addFlashes('warning', "Merci de compléter les champs");
+            $this->session->addFlashes("warning", "Merci de compléter les champs");
             return new Response("", 302, ["location" =>  "/admin/posts"]);
         }
 
@@ -280,7 +280,7 @@ final class AdminPostController implements ControllerInterface
         $post = new Post($params);
 
         if ($this->postRepository->create($post)) {
-            $this->session->addFlashes("success", "le post a bien été modifié et mis à jour");
+            $this->session->addFlashes("success", "Le post a bien été modifié et mis à jour");
         }
         return new Response("", 302, ["location" =>  "/admin/posts"]);
     }
@@ -294,7 +294,7 @@ final class AdminPostController implements ControllerInterface
             return $error->handleErrors();
         }
 
-        $this->session->addFlashes('danger', "Une erreur est survenue");
+        $this->session->addFlashes("danger", "Une erreur est survenue");
 
         if ($request === null) {
             return new Response("", 302, ["location" =>  "/admin/posts"]);
@@ -313,7 +313,7 @@ final class AdminPostController implements ControllerInterface
         $post = new Post(["id" => (int)$params["id"]]);
 
         if ($this->postRepository->delete($post)) {
-            $this->session->addFlashes('success', "Le post à bien été supprimé");
+            $this->session->addFlashes("success", "Le post à bien été supprimé");
         }
         return new Response("", 302, ["location" =>  "/admin/posts"]);
     }

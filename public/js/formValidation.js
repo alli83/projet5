@@ -196,7 +196,7 @@ $(document).ready( () => {
         messages: {
             textComment: {
                 required: "Merci d'écrire votre commentaire avant de l'envoyer",
-                maxlength: "Votre commentaire est trop long",
+                maxlength: "Votre commentaire est trop long (600 caractères maximum)",
                 minlength: "Un minimum de 2 caractère est requis",
                 regexText: "Peut comporter des chiffres et des lettre et: é\'\"èçàâêîôûäëïöüù:_.(), -?!&,",
             },

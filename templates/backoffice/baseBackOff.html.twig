@@ -67,6 +67,12 @@
     <script type="text/javascript" src="/js/formValidation.js"></script>
 
     <footer class="themeAdmin">
+        {% if session.pseudo %}
+        <p class="text-center fs-3 fw-lighter whiteText">
+            <strong> Bonjour {{ session.pseudo }}
+            </strong>
+        </p>
+        {% endif %}
         <ul class="nav justify-content-center">
             <li>
                 <a class="nav-link whiteText" aria-current="page" href="/logout">Se déconnecter</a>

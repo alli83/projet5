@@ -4,12 +4,17 @@ declare(strict_types=1);
 
 namespace App\Service\Http\Session;
 
+use App\ConfigSetUp;
+
 final class Session
 {
     private SessionParametersBag $sessionParamBag;
+    private ?array $instance  = [];
 
     function __construct()
     {
+        $this->instance = (new ConfigSetUp())->getSettingsCookies();
+        session_set_cookie_params($this->instance);
         session_start();
         $this->sessionParamBag = new SessionParametersBag($_SESSION);
     }

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Service\ErrorsHandlers;
 
 use App\Service\Http\Response;
-use App\Service\Http\Session\Session;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
@@ -49,16 +48,6 @@ final class Errors
                         []
                     ),
                     500,
-                    ['Content-Type' => 'text/html; charset=utf-8']
-                );
-            case 23000:
-                (new Session())->addFlashes("warning", "Ce pseudo est déjà pris");
-                return new Response(
-                    $this->twig->render(
-                        "frontoffice/signup.html.twig",
-                        []
-                    ),
-                    403,
                     ['Content-Type' => 'text/html; charset=utf-8']
                 );
             default:

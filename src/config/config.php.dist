@@ -12,5 +12,12 @@ return array(
         "smtp_port" => 1025,
         "from" => "test@test.fr",
         "sender" => "nom de l'expediteur"
-    )
+    ),
+   'cookie' => array(
+        "lifetime" => 'timeyouwant',
+        "path" => '/',
+        "secure" => 'bool',
+        "httponly" => 'bool',
+        "samesite" => 'yourchoice'
+   )
 );

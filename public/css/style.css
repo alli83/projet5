@@ -52,3 +52,9 @@ form .error {
   text-decoration: none;
   color: darkred;
 }
+
+.titleForm {
+  text-decoration: underline;
+  color: rgb(25, 7, 92);
+  font-weight: bold;
+}

@@ -23,20 +23,21 @@
   <div class="container mt-5">
     <ul class="list-group">
       <li class="list-group-item list-group-item-warning fs-5">
-        <span class=" d-inline-block px-md-2 col-sm-9 col-lg-12 mb-4">{{post.title}}
-          <p class="mb-1 text-muted">Crée le {{post.creation_date | date("d/m/Y")}}
-            {% if post.creation_date is same as(post.last_update) %}
-            {% else %}
-            - dernière mise à jour le: {{post.last_update | date("d/m/Y H:i")}}
-            {% endif %}
-            - par {{post.pseudo}}
-          </p>
-        </span>
-        <span class="d-inline-block col-md-7">
-          <a class="btn btn-dark text-white me-2" href="/post-{{post.id}}" role="button">voir</a>
-          <a class="btn btn-warning text-dark me-2" href="/post-{{post.id}}/edit" role="button">modifier</a>
-          <a class="btn btn-secondary text-white" role="button" href="/post-{{post.id}}/delete">supprimer</a>
-        </span>
+        {{post.title}}
+        <p class="mb-1 text-muted">Crée le {{post.creation_date | date("d/m/Y")}}
+          {% if post.creation_date is not same as(post.last_update) %}
+          - dernière mise à jour le: {{post.last_update | date("d/m/Y H:i")}}
+          {% endif %}
+          - par {{post.pseudo}}
+        </p>
+
+        <a class="btn btn-dark text-white me-2" href="/post-{{post.id}}" role="button">voir</a>
+        <a class="btn btn-warning text-dark me-2" href="/post-{{post.id}}/edit" role="button">modifier</a>
+        <form method="POST" action="/post-{{post.id}}/delete" class="mt-3">
+          <input type="hidden" value="{{tokencsrf}}" name="tokencsrf" />
+          <button class="btn btn-secondary text-white" type="submit">supprimer</button>
+        </form>
+
       </li>
     </ul>
   </div>
@@ -66,7 +67,7 @@
   {% else %}
   <p class="fs-3 text-center mt-4">Vous n'avez pour l'instant créé aucun poste sur cette page </p>
   <img class="center mb-4" src="https://cdn.pixabay.com/photo/2017/07/28/23/18/coming-soon-2550190_1280.jpg"
-    alt="deco picture no post at the moment" width="900" height="380">
+    alt="deco picture no post at the moment" width="70%">
   {% endif %}
 </div>
 {% endblock %}

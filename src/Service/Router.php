@@ -89,41 +89,34 @@ final class Router
                 $goodRoad->setParams($varsnames, $varsvalues);
                 $get = $goodRoad->getParams();
 
-                $number = 1;
-
-                if ($accessory) {
-                    $accessoryClass = $this->container->setRepositoryClass(($accessory));
-                    $number = 2;
-                } elseif ($this->request->getMethod() === "POST") {
-                    $number = 4;
-                    if ($this->request->files()->has("file_attached")) {
-                        $number = 7;
-                    }
-                }
-            } elseif ($this->request->getMethod() === "POST") {
-                $number = 3;
-                if ($accessory) {
-                    $accessoryClass = $this->container->setRepositoryClass(($accessory));
-
-                    $number = 5;
-                } elseif ($this->request->files()->has("file_attached")) {
-                    $number = 6;
-                }
+                $number += 1;
             }
+            if ($accessory) {
+                $accessoryClass = $this->container->setRepositoryClass(($accessory));
+
+                $number += 2;
+            }
+            if ($this->request->getMethod() === "POST") {
+                $number += 4;
+            }
+            if ($this->request->files()->has("file_attached")) {
+                $number += 8;
+            }
+
             switch ($number) {
                 case 1:
                     return $goodCont->$method($get, null);
-                case 2:
-                    return $goodCont->$method($get, $accessoryClass, null);
                 case 3:
-                    return $goodCont->$method($this->request->request());
+                    return $goodCont->$method($get, $accessoryClass, null);
                 case 4:
-                    return $goodCont->$method($get, $this->request->request());
+                    return $goodCont->$method($this->request->request());
                 case 5:
-                    return $goodCont->$method($accessoryClass, $this->request->request());
+                    return $goodCont->$method($get, $this->request->request());
                 case 6:
+                    return $goodCont->$method($accessoryClass, $this->request->request());
+                case 12:
                     return $goodCont->$method($this->request->request(), $this->request->files());
-                case 7:
+                case 13:
                     return $goodCont->$method($get, $this->request->request(), $this->request->files());
                 default:
                     return ($goodCont->$method(null));

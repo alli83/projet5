@@ -11,7 +11,7 @@ class InformUserService
 {
     public function contactUserComment(Session $session, UserRepository $repo, array $params, string $header, string $template, string $data, string $conf): void
     {
-        $session->addFlashes('warning', "La confirmation n'a pas pu être envoyée par mail");
+        $session->addFlashes("warning", "La confirmation n'a pas pu être envoyée par mail");
         $user = $repo->findOneThroughComment(["id" => (int)$params["id"]]);
         if ($user) {
             $message = new MailerService();
@@ -23,7 +23,7 @@ class InformUserService
                     ["comment" => $data, "pseudo" => $user->getPseudo()]
                 )
             ) {
-                $session->addFlashes('success', $conf);
+                $session->addFlashes("success", $conf);
             }
         }
     }
@@ -31,7 +31,7 @@ class InformUserService
     public function contactUserMember(Session $session, array $datas, string $email, string $header, string $template, string $conf): void
     {
         $message = new MailerService();
-        $session->addFlashes('warning', "La confirmation n'a pas pu être envoyée par mail");
+        $session->addFlashes("warning", "La confirmation n'a pas pu être envoyée par mail");
         if (
             $message->sendMessage(
                 $header,
@@ -40,7 +40,7 @@ class InformUserService
                 $datas
             )
         ) {
-            $session->addFlashes('success', $conf);
+            $session->addFlashes("success", $conf);
         }
     }
 
@@ -48,9 +48,9 @@ class InformUserService
     {
         $message = new MailerService();
 
-        $session->addFlashes('warning', "Nous sommes désolé mais votre message n'a pas pu être envoyé");
+        $session->addFlashes("warning", "Nous sommes désolé mais votre message n'a pas pu être envoyé");
         if ($message->sendMessageContact($header, $template, $request)) {
-            $session->addFlashes('success', $conf);
+            $session->addFlashes("success", $conf);
         }
     }
 }

@@ -28,21 +28,21 @@ class Route
 
     public function match(string $url): bool
     {
-        if (preg_match('#^' . $this->url . '$#', $url, $matches)) {
-            $this->setVarsValues([]);
-            $vars = $this->hasVarsName();
-            if ($vars) {
-                $varsvalues = [];
-                foreach ($matches as $key => $match) {
-                    if ($key !== 0) {
-                        $varsvalues[$key - 1] = htmlspecialchars($match);
-                    }
-                }
-                $this->setVarsValues($varsvalues);
-            }
-            return true;
+        if (!preg_match('#^' . $this->url . '$#', $url, $matches)) {
+            return false;
         }
-        return false;
+        $this->setVarsValues([]);
+        $vars = $this->hasVarsName();
+        if ($vars) {
+            $varsvalues = [];
+            foreach ($matches as $key => $match) {
+                if ($key !== 0) {
+                    $varsvalues[$key - 1] = htmlspecialchars($match);
+                }
+            }
+            $this->setVarsValues($varsvalues);
+        }
+        return true;
     }
 
     public function getUrl(): string

@@ -161,7 +161,6 @@ final class UserRepository implements EntityRepositoryInterface
     /**
      * @param User $user
      */
-
     public function delete(object $user): bool
     {
         $id = $user->getId();

@@ -32,7 +32,8 @@ final class PostRepository implements EntityRepositoryInterface
 
     public function findOneBy(array $criteria, array $orderBy = null): ?Post
     {
-        $query = 'SELECT post.id, post.title, post.stand_first, post.text, post.creation_date, post.last_update, post.file_attached, user.pseudo 
+        $query = 'SELECT post.id, post.title, post.stand_first, post.text, post.creation_date, post.last_update, 
+        post.file_attached, user.pseudo, user.email 
         FROM post INNER JOIN user ON post.userId = user.id 
         WHERE 1 ';
 

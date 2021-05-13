@@ -32,7 +32,7 @@ final class CommentRepository implements EntityRepositoryInterface
 
     public function findOneBy(array $criteria, array $orderBy = null): ?Comment
     {
-        $query = 'SELECT  user.pseudo, user.email FROM comment INNER JOIN user ON comment.userId = user.id 
+        $query = 'SELECT user.pseudo, user.email FROM comment INNER JOIN user ON comment.userId = user.id 
         WHERE 1 ';
 
         $valuesToBind = [];

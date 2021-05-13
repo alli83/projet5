@@ -27,28 +27,54 @@ final class HomeController implements ControllerInterface
 
     public function getHomePage(): Response
     {
-        return new Response($this->view->render(['template' => 'accueil']));
+        // set security token
+        $tokencsrf = $this->serviceProvider->getTokenService()->setToken($this->session);
+
+        return new Response($this->view->render([
+            'template' => 'accueil',
+            'data' => [
+                "tokencsrf" => $tokencsrf
+            ]
+        ]));
     }
 
     public function contactDev(?ParametersBag $request): Response
     {
-        if ($request !== null) {
-            $request = $request->all();
+        $this->session->addFlashes("danger", "Une erreur est survenue");
 
-            $validityTools = $this->serviceProvider->getValidityService();
-            $this->session->addFlashes("warning", "Merci d'entrer un email valide");
-            if ($validityTools->validateEmail($request["emailContact"]) !== null) {
-                $request = $validityTools->validityVariables($request);
+        if ($request === null) {
+            return new Response("", 302, ["location" =>  "/"]);
+        }
+        $request = $request->all();
+        if (
+            empty($request["nameContact"]) || empty($request["lastNameContact"])
+            || empty($request["emailContact"]) || empty($request["messageContact"])
+        ) {
+            $this->session->addFlashes("warning", "Veuillez renseigner les champs");
+            return new Response("", 302, ["location" =>  "/"]);
+        }
 
-                $this->serviceProvider->getInformUserService()
+        // check validity security token
+        $validToken = $this->serviceProvider->getTokenService()->validateToken($request, $this->session);
+        if (!$validToken) {
+            return new Response("", 302, ["location" =>  "/"]);
+        }
+
+        $validityTools = $this->serviceProvider->getValidityService();
+
+        $this->session->addFlashes("warning", "Merci d'entrer un email valide");
+        if ($validityTools->validateEmail($request["emailContact"]) !== null) {
+            $request = $validityTools->validityVariables($request);
+
+            $this->session->addFlashes("danger", "Une erreur est survenue");
+            $this->serviceProvider->getInformUserService()
                 ->contactUserAdmin(
                     $this->session,
                     $request,
                     "un nouveau message",
                     "frontoffice/mail/contactAdmin.html.twig",
-                    "Votre message a bien été envoyé"
+                    "Votre message a bien été envoyé!"
                 );
-            }
         }
         return new Response("", 302, ["location" =>  "/"]);
     }
@@ -56,7 +82,9 @@ final class HomeController implements ControllerInterface
     public function getCv(array $fileName): Response
     {
         $fileToDownload = $this->serviceProvider->getFileService();
-        $result = $fileToDownload->downloadFile(htmlspecialchars($fileName["file"]));
+        $fileName = $this->serviceProvider->getValidityService()->validityVariables($fileName);
+
+        $result = $fileToDownload->downloadFile($fileName["file"]);
 
         if ($result === false) {
             $error = new Errors(404);

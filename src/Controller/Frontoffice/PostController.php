@@ -9,6 +9,7 @@ use App\View\View;
 use App\Service\Http\Response;
 use App\Model\Repository\PostRepository;
 use App\Model\Repository\CommentRepository;
+use App\Service\ErrorsHandlers\Errors;
 use App\Service\Http\ParametersBag;
 use App\Service\Http\Session\Session;
 use App\Service\Utils\ServiceProvider;
@@ -34,7 +35,6 @@ final class PostController implements ControllerInterface
         $params = $validityTools->validityVariables($params);
 
         $post = $this->postRepository->findOneBy(['id' => (int)$params['id']]);
-
         $comments = $commentRepository->findBy(['idPost' => (int)$params['id']], ['order' => "asc"]);
 
         if ($post !== null) {
@@ -48,7 +48,6 @@ final class PostController implements ControllerInterface
                 ],
             ));
         }
-        // or 404 error ?
         $this->session->addFlashes('danger', 'Une erreur est survenue');
         return new Response("", 302, ["location" =>  "/posts"]);
     }
@@ -59,29 +58,35 @@ final class PostController implements ControllerInterface
         $offset = $this->serviceProvider->getPaginationService()->setOffset($params);
 
         // set order and check if it's the last page
-        $order = ($request !== null && $request->get("order") !== null)  ? htmlspecialchars($request->get("order")) : "desc";
-        $order = $this->serviceProvider->getValidityService()->isInArray(["asc", "desc"], $order);
-
-        if ($order) {
-            $posts = $this->postRepository->findAll(4, $offset, ['order' => $order["order"]]);
-            $end = false;
-
-            if ($posts) {
-                if (!array_key_exists(3, $posts)) {
-                    $end = true;
-                }
-                $posts = array_slice($posts, 0, 3);
-            }
-
-            return new Response($this->view->render([
-                'template' => 'posts',
-                'data' => [
-                    'posts' => $posts,
-                    'page' => $params === null ? 0 : (int)$params["page"]
-                ],
-                "end" => $end
-            ]));
+        $orderToSet = "desc";
+        if (!empty($request) && $request->get("order") !== null) {
+            $request = $request->all();
+            $request = $this->serviceProvider->getValidityService()->validityVariables($request);
+            $orderToSet = $request["order"];
         }
-        return new Response("", 304, ["location" =>  "/posts"]);
+        $order = $this->serviceProvider->getValidityService()->isInArray(["asc", "desc"], $orderToSet);
+
+        if (!$order) {
+            $error = new Errors(404);
+            return $error->handleErrors();
+        }
+        $posts = $this->postRepository->findAll(4, $offset, ['order' => $order["order"]]);
+        $end = false;
+
+        if ($posts) {
+            if (!array_key_exists(3, $posts)) {
+                $end = true;
+            }
+            $posts = array_slice($posts, 0, 3);
+        }
+
+        return new Response($this->view->render([
+            'template' => 'posts',
+            'data' => [
+                'posts' => $posts,
+                'page' => $params === null ? 0 : (int)$params["page"]
+            ],
+            "end" => $end
+        ]));
     }
 }

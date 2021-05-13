@@ -19,13 +19,15 @@ class TokenService
 
     public function validateToken(array $datas, Session $session): bool
     {
-        if (isset($datas["tokencsrf"]) && $session->get("tokencsrf") !== null && $session->get("tokenTime") !== null) {
-            if ($datas["tokencsrf"] === $session->get("tokencsrf")) {
-                $oldTokenTime = time() - (15 * 60);
-                if ($session->get("tokenTime") >= $oldTokenTime) {
-                    return true;
-                }
-            }
+        if (empty($datas["tokencsrf"]) || empty($session->get("tokencsrf")) || empty($session->get("tokenTime"))) {
+            return false;
+        }
+        if ($datas["tokencsrf"] !== $session->get("tokencsrf")) {
+            return false;
+        }
+        $oldTokenTime = time() - (15 * 60);
+        if ($session->get("tokenTime") >= $oldTokenTime) {
+            return true;
         }
         return false;
     }

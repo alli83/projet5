@@ -13,7 +13,7 @@ use App\Service\Http\Response;
 use App\Service\Http\Session\Session;
 use App\Service\Utils\ServiceProvider;
 
-class AdminMemberController implements ControllerInterface
+final class AdminMemberController implements ControllerInterface
 {
     private UserRepository $userRepository;
     private View $view;
@@ -31,128 +31,169 @@ class AdminMemberController implements ControllerInterface
     public function displayAllMembers(?array $params = [], ?ParametersBag $request = null): Response
     {
         $auth = $this->serviceProvider->getAuthentificationService();
+
         //  check if admin
-        if ($auth->isAdminAuth($this->session)) {
-            // set pagination
-            $offset = $this->serviceProvider->getPaginationService()->setOffset($params);
-
-            $order = ($request !== null && $request->get("order") !== null)  ? htmlspecialchars($request->get("order")) : "desc";
-            $order = $this->serviceProvider->getValidityService()->isInArray(["asc", "desc"], $order);
-            // set order and check if it's the last last page (useful for pagination on frontend)
-            if ($order) {
-                $users = $this->userRepository->findAll(4, $offset, ['order' => $order["order"]]);
-                $end = false;
-                if ($users) {
-                    if (!array_key_exists(3, $users)) {
-                        $end = true;
-                    }
-                    $users = array_slice($users, 0, 3);
-                }
-                // set security token
-                $tokencsrf = $this->serviceProvider->getTokenService()->setToken($this->session);
-
-                return new Response($this->view->render([
-                    'template' => 'listUsers',
-                    'data' => [
-                        'members' => $users,
-                        'page' => $params === null ? 0 : (int)$params["page"],
-                        'filter' => $order,
-                        "end" => $end,
-                        "tokencsrf" => $tokencsrf
-                    ],
-                    'env' => 'backoffice'
-                ]));
-            }
+        if (!$auth->isAdminAuth($this->session)) {
+            $error = new Errors(403);
+            return $error->handleErrors();
         }
-        $auth->isNotAuth($this->session);
-        $error = new Errors(403);
-        return $error->handleErrors();
+        // set pagination
+        $offset = $this->serviceProvider->getPaginationService()->setOffset($params);
+
+        // set order
+        $orderToSet = "desc";
+        if (!empty($request) && $request->get("order") !== null) {
+            $request = $request->all();
+            $request = $this->serviceProvider->getValidityService()->validityVariables($request);
+            $orderToSet = $request["order"];
+        }
+        $order = $this->serviceProvider->getValidityService()->isInArray(["asc", "desc"], $orderToSet);
+
+        if (!$order) {
+            $error = new Errors(404);
+            return $error->handleErrors();
+        }
+
+        // set order and check if it's the last last page (useful for pagination on frontend)
+        $users = $this->userRepository->findAll(4, $offset, ['order' => $order["order"]]);
+        $end = false;
+        if ($users) {
+            if (!array_key_exists(3, $users)) {
+                $end = true;
+            }
+            $users = array_slice($users, 0, 3);
+        }
+
+        // set security token
+        $tokencsrf = $this->serviceProvider->getTokenService()->setToken($this->session);
+
+        return new Response($this->view->render([
+            'template' => 'listUsers',
+            'data' => [
+                'members' => $users,
+                'page' => $params === null ? 0 : (int)$params["page"],
+                'filter' => $order,
+                "end" => $end,
+                "tokencsrf" => $tokencsrf
+            ],
+            'env' => 'backoffice'
+        ]));
     }
 
     public function editOneMember(array $params, ?ParametersBag $request): Response
     {
         $auth = $this->serviceProvider->getAuthentificationService();
+
         // check if admin
-        if ($auth->isAdminAuth($this->session)) {
-            if ($request !== null) {
-                $param = $request->all();
-                // check token validity
-                $validToken = $this->serviceProvider->getTokenService()->validateToken($param, $this->session);
-                $this->session->addFlashes('danger', "Une erreur est survenue");
-                if ($validToken) {
-                    foreach ($param as $key => $el) {
-                        if ($el === "") {
-                            $this->session->addFlashes('danger', 'vous devez sélectionner un role');
-                            return new Response("", 304, ["location" =>  "/admin/members"]);
-                        }
-                        $params[$key] = $el;
-                    }
-
-                    $validity = $this->serviceProvider->getValidityService();
-                    $params = $validity->validityVariables($params);
-
-                    $id = (int)$params["id"];
-
-                    $user = $this->userRepository->findOneBy(["id" => $id]);
-                    $this->session->addFlashes("warning", "Aucun utilisateur trouvé");
-                    if ($user) {
-                        $user->setRole($params["role"]);
-
-                        $this->session->addFlashes("danger", "Une erreur s'est produite");
-                        if ($this->userRepository->update($user)) {
-                            $role = $user->getRole() === "admin" ? "administrateur" : "utilisateur";
-                            $datas = ["pseudo" => $user->getPseudo(), "role" => $role];
-                            $this->serviceProvider->getInformUserService()
-                                ->contactUserMember(
-                                    $this->session,
-                                    $datas,
-                                    $user->getEmail(),
-                                    "Modification de vos droits",
-                                    "frontoffice/mail/updateMember.html.twig",
-                                    "les droits de l'utilisateur ont bien été modifiés et la confirmation envoyée"
-                                );
-                        }
-                    }
-                }
-            }
-            return new Response("", 304, ["location" =>  "/admin/members"]);
+        if (!$auth->isAdminAuth($this->session)) {
+            $error = new Errors(403);
+            return $error->handleErrors();
         }
-        $auth->isNotAuth($this->session);
-        $error = new Errors(403);
-        return $error->handleErrors();
+
+        $this->session->addFlashes("danger", "Une erreur est survenue");
+
+        if ($request === null) {
+            return new Response("", 302, ["location" =>  "/admin/members"]);
+        }
+
+        $param = $request->all();
+
+        // check token validity
+        $validToken = $this->serviceProvider->getTokenService()->validateToken($param, $this->session);
+        if (!$validToken) {
+            return new Response("", 302, ["location" =>  "/admin/members"]);
+        }
+
+        foreach ($param as $key => $el) {
+            if ($el === "") {
+                $this->session->addFlashes('danger', 'vous devez sélectionner un role');
+                return new Response("", 302, ["location" =>  "/admin/members"]);
+            }
+            $params[$key] = $el;
+        }
+
+        $validity = $this->serviceProvider->getValidityService();
+        $params = $validity->validityVariables($params);
+
+        $id = (int)$params["id"];
+
+        $user = $this->userRepository->findOneBy(["id" => $id]);
+
+        if (!$user) {
+            $this->session->addFlashes("warning", "Aucun utilisateur trouvé");
+            return new Response("", 302, ["location" =>  "/admin/members"]);
+        }
+
+        $user->setRole($params["role"]);
+
+        if ($this->userRepository->update($user)) {
+            $role = $user->getRole() === "admin" ? "administrateur" : "utilisateur";
+            $datas = ["pseudo" => $user->getPseudo(), "role" => $role];
+
+            $this->serviceProvider->getInformUserService()
+                ->contactUserMember(
+                    $this->session,
+                    $datas,
+                    $user->getEmail(),
+                    "Modification de vos droits",
+                    "frontoffice/mail/updateMember.html.twig",
+                    "les droits de l'utilisateur ont bien été modifiés et la confirmation envoyée par mail"
+                );
+        }
+        return new Response("", 302, ["location" =>  "/admin/members"]);
     }
 
-    public function deleteOneMember(array $params): Response
+    public function deleteOneMember(array $params, ?ParametersBag $request): Response
     {
         $auth = $this->serviceProvider->getAuthentificationService();
+
         // check if admin
-        if ($auth->isAdminAuth($this->session)) {
-            $validity = $this->serviceProvider->getValidityService();
-            $params = $validity->validityVariables($params);
-
-            $id = (int)$params["id"];
-
-            $user = $this->userRepository->findOneBy(["id" => $id]);
-            $this->session->addFlashes("warning", "Aucun utilisateur trouvé");
-            if ($user) {
-                $this->session->addFlashes('danger', "Une erreur est survenue");
-                if ($this->userRepository->delete($user)) {
-                    $datas = ["pseudo" => $user->getPseudo()];
-                    $this->serviceProvider->getInformUserService()
-                        ->contactUserMember(
-                            $this->session,
-                            $datas,
-                            $user->getEmail(),
-                            "Suppression de votre compte",
-                            "frontoffice/mail/deletedAccount.html.twig",
-                            "Le compte de l'utilisateur a été supprimé et la confirmation envoyée"
-                        );
-                }
-            }
-            return new Response("", 304, ["location" =>  "/admin/members"]);
+        if (!$auth->isAdminAuth($this->session)) {
+            $error = new Errors(403);
+            return $error->handleErrors();
         }
-        $auth->isNotAuth($this->session);
-        $error = new Errors(403);
-        return $error->handleErrors();
+
+        $this->session->addFlashes("danger", "Une erreur est survenue");
+
+        if ($request === null) {
+            return new Response("", 302, ["location" =>  "/admin/members"]);
+        }
+        $param = $request->all();
+
+        // check validity security token
+        $validToken = $this->serviceProvider->getTokenService()->validateToken($param, $this->session);
+        if (!$validToken) {
+            return new Response("", 302, ["location" =>  "/admin/members"]);
+        }
+
+        $validity = $this->serviceProvider->getValidityService();
+        $params = $validity->validityVariables($params);
+
+        $id = (int)$params["id"];
+        $user = $this->userRepository->findOneBy(["id" => $id]);
+
+        if (!$user) {
+            $this->session->addFlashes("warning", "Aucun utilisateur trouvé");
+            return new Response("", 302, ["location" =>  "/admin/members"]);
+        }
+        // delete superAdmin: forbidden
+        if ($user->getRole() === "superAdmin") {
+            $this->session->addFlashes("danger", "Cette opération est interdite");
+            return new Response("", 302, ["location" =>  "/admin/members"]);
+        }
+
+        if ($this->userRepository->delete($user)) {
+            $datas = ["pseudo" => $user->getPseudo()];
+            $this->serviceProvider->getInformUserService()
+                ->contactUserMember(
+                    $this->session,
+                    $datas,
+                    $user->getEmail(),
+                    "Suppression de votre compte",
+                    "frontoffice/mail/deletedAccount.html.twig",
+                    "Le compte de l'utilisateur a été supprimé et la confirmation envoyée par mail"
+                );
+        }
+        return new Response("", 302, ["location" =>  "/admin/members"]);
     }
 }

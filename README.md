@@ -61,7 +61,7 @@ $whoops = new \Whoops\Run();
  $this->twig = new Environment($loader, [
             'debug' => true]);
 ```
-*   For email configuration and database configuration: you need to create config.php file (src/config) based on config.php.dist with your own datas(password, database, name etc). config.php is loaded by configSetUp which is loaded by Database.php et MailerService.php.
+*   For email, database and cookie configuration: you need to create config.php file (src/config) based on config.php.dist with your own datas(password, database, name etc). config.php is loaded by configSetUp which is loaded by Database.php et MailerService.php and Session.php
 ```bash
 return array(
     'database' => array(
@@ -75,6 +75,13 @@ return array(
         "smtp_port" => 1025,
         "from" => "test@test.fr",
         "sender" => "nom de l'expediteur"
+    ),
+    'cookie' => array(
+        "lifetime" => int,
+        "path" => '/'
+        "secure" => 'bool',
+        "httponly" => 'bool',
+        "samesite" => 'yourchoice'
     )
 );
 ```

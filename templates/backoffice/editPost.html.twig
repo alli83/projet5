@@ -11,34 +11,40 @@
 
 <div class="container">
   <div class="mb-3">
-    <a href="/admin/posts">Retourner à la liste des posts</a>
+    <a href="/admin/posts" class="linkStandard">Retourner à la liste des posts</a>
   </div>
 
-  <h2>{{header}}</h2>
-  <p class="text-warning bg-dark">Attention! une fois créé, le post sera automatiquement publié.<br>
+  <h2 class="mb-4">{{header}}</h2>
+  <p class="text-danger bg-light mb-4">Attention! une fois créé, le post sera automatiquement publié.<br>
     A part l'image qui est optionnelle, tous les champs sont obligatoires </p>
 
   <form action="{{url}}" method="POST" enctype="multipart/form-data" id="postForm">
-    <input type="hidden" value="{{tokencsrf}}" name="tokencsrf"></input>
-    <div class="form-group">
+    <input type="hidden" value="{{tokencsrf}}" name="tokencsrf" />
+    <div class="form-group text-light bg-dark h5 mb-4">
       <label for="title">Titre du post</label>
       <input type="text" class="form-control" id="title" name="title" value="{{post.title | default('')}}" />
     </div>
-    <div class="form-group my-3">
+    <div class="form-group my-3 text-light bg-dark h5 mb-4">
       <label for="stand_first">Chapo</label>
       <input type="text" class="form-control" id="stand_first" name="stand_first"
         value="{{post.stand_first | default('')}}" />
     </div>
     <div id="usersToSearch" data-users="{{ usersToSearch|json_encode }}"></div>
-    <div class="form-group mb-3">
-      <label for="stand_first" name="usersToComplete">Auteur</label>
+    <div class="form-group mb-4">
+      <p class="text-light bg-dark h5">Chercher l'auteur par son pseudo:</p>
+      <label for="usersToComplete">Auteur</label>
+      {% if post%}
+      <input id="usersToComplete" class="ui-autocomplete-input" autocomplete="off" name="usersToComplete"
+        value="{{post.pseudo}}, {{post.email}}" />
+      {% else %}
       <input id="usersToComplete" class="ui-autocomplete-input" autocomplete="off" name="usersToComplete" />
+      {% endif%}
     </div>
-    <div class="form-group">
-      <label for="image">Charger une image</label>
+    <div class="form-group mb-4">
+      <label for="image" class="text-light bg-dark h5">Charger une image</label>
       <input type="file" class="form-control-file" name="file_attached" id="image">
     </div>
-    <div class="form-group">
+    <div class="form-group text-light bg-dark h5 mb-4">
       <label for="text">Contenu</label>
       <textarea class="form-control" id="text" name="text" rows="15">{{post.text | default('')}}</textarea>
     </div>

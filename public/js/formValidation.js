@@ -17,12 +17,16 @@ $(document).ready( () => {
     $.validator.addMethod("regexText", (value) => {  
         return /^[\\r\\n\wé'"èçàâêîôûäëïöüù:_.(), -?!&,]{1,}$/m.test(value);
     });
+    $.validator.addMethod("regexEmail", (value) => {  
+        return /^[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+$/m.test(value);
+    });
     $("#loginForm").validate({
 
         rules: {
             emailLogin: {
                 required: true,
                 email: true,
+                regexEmail: true,
                 normalizer: (value) => {
                     return $.trim(value);
                 }
@@ -37,7 +41,8 @@ $(document).ready( () => {
         messages: {
             emailLogin: {
                 required: "Vous devez renseigner votre email",
-                email: "Le format de votre email est incorrect"
+                email: "Le format de votre email est incorrect",
+                regexEmail: "Vous devez renseigner un email valide"
             },
             passwordLogin: {
                 required: "Vous devez renseigner votre mot de passe",
@@ -62,6 +67,7 @@ $(document).ready( () => {
             emailSignup: {
                 required: true,
                 email: true,
+                regexEmail: true,
                 normalizer: (value) => {
                     return $.trim(value);
                 }
@@ -90,7 +96,8 @@ $(document).ready( () => {
             },
             emailSignup: {
                 required: "Vous devez renseigner votre email",
-                email: "Le format de votre email est incorrect"
+                email: "Le format de votre email est incorrect",
+                regexEmail: "Vous devez renseigner un email valide"
             },
             password: {
                 required: "Vous devez renseigner un mot de passe",
@@ -129,12 +136,15 @@ $(document).ready( () => {
             emailContact: {
                 required: true,
                 email: true,
+                regexEmail: true,
                 normalizer: (value) => {
                     return $.trim(value);
                 }
             },
             messageContact: {
                 required: true,
+                regexText:true,
+                maxlength:1000,
                 normalizer: (value) => {
                     return $.trim(value);
                 }
@@ -146,18 +156,21 @@ $(document).ready( () => {
         messages: {
             nameContact: {
                 required: "Vous devez renseigner votre prénom",
-                regexPseudo: "Votre prénom doit être composé entre 1 et 20 caractères",
+                regexPseudo: "Votre prénom doit être composé entre 1 et 20 caractères (chiffres ou lettres)",
             },
             lastNameContact: {
                 required: "Vous devez renseigner votre nom",
-                regexPseudo: "Votre nom doit être composé entre 1 et 20 caractères",
+                regexPseudo: "Votre nom doit être composé entre 1 et 20 caractères (chiffres ou lettres)",
             },
             emailContact: {
                 required: "Vous devez renseigner un email",
                 email: "L'email est invalide",
+                regexEmail: "Vous devez renseigner un email valide"
             },
             messageContact: {
-                required: "Veuillez compléter ce champs"
+                required: "Veuillez compléter ce champs",
+                maxlength:"Votre message dépasse les 1000 caractères",
+                regexText:"Le message ne peux contenir que des caractères (chiffres ou lettres)"
             },
             check: {
                 required: "Vous devez accepter les conditions"
@@ -198,6 +211,7 @@ $(document).ready( () => {
             emailReset: {
                 required: true,
                 email: true,
+                regexEmail: true,
                 normalizer: (value) => {
                     return $.trim(value);
                 }
@@ -207,6 +221,7 @@ $(document).ready( () => {
             emailReset: {
                 required: "Vous devez renseigner un email",
                 email: "L'email est invalide",
+                regexEmail: "Vous devez renseigner un email valide"
             },
         },
         submitHandler: (form) => {

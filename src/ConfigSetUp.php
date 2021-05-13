@@ -27,4 +27,12 @@ class ConfigSetUp
         }
         return $this->settingsConfig["emailTransport"];
     }
+
+    public function getSettingsCookies(): array
+    {
+        if (empty($this->settingsConfig)) {
+            $this->instance = new ConfigSetUp();
+        }
+        return $this->settingsConfig["cookie"];
+    }
 }

@@ -11,7 +11,7 @@
       pour créer votre compte</p>
     <div class="col col-lg-4">
       <form method="POST" action="/login" id="loginForm">
-        <input type="hidden" value="{{tokencsrf}}" name="tokencsrf"></input>
+        <input type="hidden" value="{{tokencsrf}}" name="tokencsrf" />
         <div class="mb-4">
           <label class="form-label" for="emailLogin">Votre email</label>
           <input type="email" id="emailLogin" name="emailLogin" class="form-control" value="{{email | default('')}}">
@@ -38,7 +38,7 @@
             </div>
             <div class="modal-body">
               <form method="POST" action="/login/reset" id="newPass">
-                <input type="hidden" value="{{tokencsrf}}" name="tokencsrf"></input>
+                <input type="hidden" value="{{tokencsrf}}" name="tokencsrf" />
                 <div class="mb-4">
                   <label class="form-label" for="emailReset">Votre email</label>
                   <input type="email" id="emailReset" name="emailReset" class="form-control">

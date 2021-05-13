@@ -26,7 +26,8 @@
                     <div></div>
                     {% else %}
                     <div class="bg-image hover-overlay ripple" data-mdb-ripple-color="light">
-                        <img src="data:image/jpeg;base64,{{post.file_attached}}" class="img-fluid" width="30%" />
+                        <img src="data:image/jpeg;base64,{{post.file_attached}}" alt="decopicture" class="img-fluid"
+                            width="30%" />
                     </div>
                     {% endif %}
                     <div class="card-body">
@@ -61,7 +62,7 @@
         {% else %}
         <h3 class="mb-4">Il y a actuellement aucun poste</h3>
         <img class=" center mb-4" src="https://cdn.pixabay.com/photo/2017/07/28/23/18/coming-soon-2550190_1280.jpg"
-            alt="deco picture no post at the moment" width="900" height="380">
+            alt="deco picture no post at the moment" width="70%">
         {% endif %}
     </div>
 </div>

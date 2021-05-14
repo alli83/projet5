@@ -34,12 +34,12 @@ class FileService
 
         if (file_exists($base . "/src/doc/" . $fileToSearch)) {
             header('Content-Description: File Transfer');
-            header('Content-Type: application/octet-stream');
+            // header('Content-Type: application/octet-stream');
             header('Content-Disposition: attachment; filename=' . $fileToSearch);
             header('Expires: 0');
             header('Cache-Control: must-revalidate');
             header('Pragma: public');
-            header('Content-Length: ' . filesize($base . "/src/utils/" . $fileToSearch));
+            header('Content-Length: ' . filesize($base . "/src/doc/" . $fileToSearch));
             $result = readfile($base . "/src/doc/" . $fileToSearch);
 
             if ($result !== false) {

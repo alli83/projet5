@@ -34,7 +34,7 @@ class FileService
 
         if (file_exists($base . "/src/doc/" . $fileToSearch)) {
             header('Content-Description: File Transfer');
-            // header('Content-Type: application/octet-stream');
+            header('Content-Type: application/octet-stream');
             header('Content-Disposition: attachment; filename=' . $fileToSearch);
             header('Expires: 0');
             header('Cache-Control: must-revalidate');

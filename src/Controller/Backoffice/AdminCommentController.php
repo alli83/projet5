@@ -50,13 +50,7 @@ final class AdminCommentController implements ControllerInterface
         $offset = $this->serviceProvider->getPaginationService()->setOffset($params);
 
         // set order
-        $orderToSet = "desc";
-        if (!empty($request) && $request->get("order") !== null) {
-            $request = $request->all();
-            $request = $this->serviceProvider->getValidityService()->validityVariables($request);
-            $orderToSet = $request["order"];
-        }
-        $order = $this->serviceProvider->getValidityService()->isInArray(["asc", "desc"], $orderToSet);
+        $order = $this->serviceProvider->getSetOrderService()->setOrder($request, $this->serviceProvider);
 
         if (!$order) {
             $error = new Errors(404);

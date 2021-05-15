@@ -51,4 +51,8 @@ class ServiceProvider
     {
         return new CheckSignupService();
     }
+    public function getSetOrderService(): SetOrderService
+    {
+        return new SetOrderService();
+    }
 }

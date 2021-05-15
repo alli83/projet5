@@ -57,14 +57,8 @@ final class PostController implements ControllerInterface
         // set pagination
         $offset = $this->serviceProvider->getPaginationService()->setOffset($params);
 
-        // set order and check if it's the last page
-        $orderToSet = "desc";
-        if (!empty($request) && $request->get("order") !== null) {
-            $request = $request->all();
-            $request = $this->serviceProvider->getValidityService()->validityVariables($request);
-            $orderToSet = $request["order"];
-        }
-        $order = $this->serviceProvider->getValidityService()->isInArray(["asc", "desc"], $orderToSet);
+        // set order
+        $order = $this->serviceProvider->getSetOrderService()->setOrder($request, $this->serviceProvider);
 
         if (!$order) {
             $error = new Errors(404);

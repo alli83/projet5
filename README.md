@@ -80,7 +80,7 @@ return array(
         "path" => '/',
         "secure" => 'bool',
         "httponly" => 'bool',
-        "samesite" => 'yourchoice'
+        "samesite" => 'lax'
     )
 );
 ```

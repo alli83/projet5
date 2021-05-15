@@ -51,13 +51,7 @@ final class AdminPostController implements ControllerInterface
         $offset = $this->serviceProvider->getPaginationService()->setOffset($params);
 
         // set order
-        $orderToSet = "desc";
-        if (!empty($request) && $request->get("order") !== null) {
-            $request = $request->all();
-            $request = $this->serviceProvider->getValidityService()->validityVariables($request);
-            $orderToSet = $request["order"];
-        }
-        $order = $this->serviceProvider->getValidityService()->isInArray(["asc", "desc"], $orderToSet);
+        $order = $this->serviceProvider->getSetOrderService()->setOrder($request, $this->serviceProvider);
 
         if (!$order) {
             $error = new Errors(404);
@@ -139,42 +133,25 @@ final class AdminPostController implements ControllerInterface
         }
         $this->session->addFlashes("danger", "Une erreur est survenue");
 
-        if ($request === null) {
+        $params = $this->serviceProvider->getCreatePostService()
+        ->paramsPost($params, $file, $request, $this->serviceProvider, $this->session);
+
+        if ($params === null) {
             return new Response("", 302, ["location" =>  "/admin/posts"]);
         }
-
-        $fileAttached = isset($file) ? $file->get("file_attached") : null;
-
-        if (isset($fileAttached) && !empty($fileAttached["tmp_name"] || !empty($fileAttached["tmp_name"]))) {
-            $validityFile = $this->serviceProvider->getValidateFileService();
-            $val = $validityFile->checkFileValidity($fileAttached, $this->session);
-            if ($val === null) {
-                return new Response("", 302, ["location" =>  "/admin/posts"]);
-            }
-            $params["file_attached"] = $val;
-        }
-
-        $param = $request->all();
-        foreach ($param as $key => $el) {
-            $params[$key] = $el;
-        }
-        // check validity security token
-        $validToken = $this->serviceProvider->getTokenService()->validateToken($param, $this->session);
-
-        if (!$validToken) {
-            return new Response("", 302, ["location" =>  "/admin/posts"]);
-        }
-
-        $validity = $this->serviceProvider->getValidityService();
-        $params = $validity->validityVariables($params);
 
         $post = new Post($params);
 
-        $email = trim(explode(",", $params["usersToComplete"])[1]);
-
+        $part = explode(",", $params["usersToComplete"]);
+        if (!array_key_exists(1, $part)) {
+            $this->session->addFlashes("danger", "L'administrateur associé est introuvable");
+            return new Response("", 302, ["location" =>  "/admin/posts"]);
+        }
+        $email = trim($part[1]);
         $user = $this->userRepository->findOneBy(["email" => $email]);
 
         if (!$user) {
+            $this->session->addFlashes("danger", "L'administrateur associé est introuvable");
             return new Response("", 302, ["location" =>  "/admin/posts"]);
         }
 
@@ -233,51 +210,30 @@ final class AdminPostController implements ControllerInterface
 
         $this->session->addFlashes("danger", "Une erreur est survenue");
 
-        if ($request === null) {
+        $params = $this->serviceProvider->getCreatePostService()
+        ->paramsPost($params, $file, $request, $this->serviceProvider, $this->session);
+
+        if ($params === null) {
             return new Response("", 302, ["location" =>  "/admin/posts"]);
         }
 
-        $fileAttached = isset($file) ? $file->get("file_attached") : null;
+        $post = new Post($params);
 
-        if (isset($fileAttached) && !empty($fileAttached["tmp_name"] || !empty($fileAttached["tmp_name"]))) {
-            $validityFile = $this->serviceProvider->getValidateFileService();
-            $val = $validityFile->checkFileValidity($fileAttached, $this->session);
-            if ($val === null) {
-                return new Response("", 302, ["location" =>  "/admin/posts"]);
-            }
-            $params["file_attached"] = $val;
-        }
-
-        $param = $request->all();
-
-        if (empty($param["stand_first"]) || empty($param["title"]) || empty($param["text"])) {
-            $this->session->addFlashes("warning", "Merci de compléter les champs");
+        $part = explode(",", $params["usersToComplete"]);
+        if (!array_key_exists(1, $part)) {
+            $this->session->addFlashes("danger", "L'administrateur associé est introuvable");
             return new Response("", 302, ["location" =>  "/admin/posts"]);
         }
-
-        foreach ($param as $key => $el) {
-            $params[$key] = $el;
-        }
-
-        // check validity security token
-        $validToken = $this->serviceProvider->getTokenService()->validateToken($param, $this->session);
-        if (!$validToken) {
-            return new Response("", 302, ["location" =>  "/admin/posts"]);
-        }
-
-        $validity = $this->serviceProvider->getValidityService();
-        $params = $validity->validityVariables($params);
-
-        $email = trim(explode(",", $params["usersToComplete"])[1]);
+        $email = trim($part[1]);
 
         $user = $this->userRepository->findOneBy(["email" => $email]);
 
         if (!$user) {
+            $this->session->addFlashes("danger", "L'administrateur associé est introuvable");
             return new Response("", 302, ["location" =>  "/admin/posts"]);
         }
 
-        $params["userId"] = $user->getId();
-        $post = new Post($params);
+        $post->setUserId($user->getId());
 
         if ($this->postRepository->create($post)) {
             $this->session->addFlashes("success", "Le post a bien été modifié et mis à jour");

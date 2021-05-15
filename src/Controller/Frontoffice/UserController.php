@@ -171,20 +171,15 @@ final class UserController implements ControllerInterface
         }
 
         $this->session->addFlashes("danger", "Une erreur est survenue");
-        $params = $request->all();
 
-        if (empty($params['emailSignup']) || empty($params['password']) || empty($params['pseudoSignup'])) {
-            return new Response("", 302, ["location" =>  "/signup"]);
-        }
-        // check validity security token
-        $validToken = $this->serviceProvider->getTokenService()->validateToken($params, $this->session);
-        if (!$validToken) {
+        $params = $this->serviceProvider->getCheckSignupService()
+        ->paramsSignUp($request, $this->session, $this->serviceProvider);
+
+        if ($params === null) {
             return new Response("", 302, ["location" =>  "/signup"]);
         }
 
-        $validity = $this->serviceProvider->getValidityService();
-        $params = $validity->validityVariables($params);
-        $email = $validity->validateEmail($params['emailSignup']);
+        $email = $this->serviceProvider->getValidityService()->validateEmail($params['emailSignup']);
 
         if (!$email) {
             $this->session->addFlashes("warning", "Le format de votre email est invalide");

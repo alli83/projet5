@@ -17,6 +17,9 @@ $(document).ready( () => {
     $.validator.addMethod("regexText", (value) => {  
         return /^[\\r\\n\wé'"èçàâêîôûäëïöüù:_.(), -?!&,]{1,}$/m.test(value);
     });
+    $.validator.addMethod("regexAuthor", (value) => {  
+        return /^[ \w,.@]{1,}$/m.test(value);
+    });
     $.validator.addMethod("regexEmail", (value) => {  
         return /^[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+$/m.test(value);
     });
@@ -263,7 +266,7 @@ $(document).ready( () => {
         }
     });
 
-        var users = $('#usersToSearch').data('users');
+        var users = $("#usersToSearch").data("users");
         $("#usersToComplete").autocomplete({
             source: users
           });
@@ -288,6 +291,8 @@ $(document).ready( () => {
                 },
                 usersToComplete: {
                     required: true,
+                    regexAuthor:true,
+                    maxlength: 500,
                 },
                 text: {
                     required: true,
@@ -311,6 +316,8 @@ $(document).ready( () => {
                 },
                 usersToComplete: {
                     required: "Vous devez renseigner un auteur",
+                    regexAuthor: "Merci de sélectionner parmi la liste. Ce champs peut comporter lettres, chiffres et @",
+                    maxlength: "La limite est à 500 caractères"
                 },
                 text: {
                     required: "Vous devez renseigner un contenu",

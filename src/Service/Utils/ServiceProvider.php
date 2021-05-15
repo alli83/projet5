@@ -43,4 +43,16 @@ class ServiceProvider
     {
         return new AuthentificationService();
     }
+    public function getCreatePostService(): CreatePostService
+    {
+        return new CreatePostService();
+    }
+    public function getCheckSignupService(): CheckSignupService
+    {
+        return new CheckSignupService();
+    }
+    public function getSetOrderService(): SetOrderService
+    {
+        return new SetOrderService();
+    }
 }

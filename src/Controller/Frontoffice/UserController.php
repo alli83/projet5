@@ -174,11 +174,11 @@ final class UserController implements ControllerInterface
 
         $params = $this->serviceProvider->getCheckSignupService()
         ->paramsSignUp($request, $this->session, $this->serviceProvider);
-       
+
         if ($params === null) {
             return new Response("", 302, ["location" =>  "/signup"]);
         }
-        
+
         $email = $this->serviceProvider->getValidityService()->validateEmail($params['emailSignup']);
 
         if (!$email) {

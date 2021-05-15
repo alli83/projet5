@@ -16,6 +16,7 @@ class CreatePostService
         ServiceProvider $serviceProvider,
         Session $session
     ): ?array {
+
         if ($request === null) {
             return null;
         }

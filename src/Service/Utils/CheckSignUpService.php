@@ -7,13 +7,18 @@ namespace App\Service\Utils;
 use App\Service\Http\ParametersBag;
 use App\Service\Http\Session\Session;
 
-class CheckSignUpService
+class CheckSignupService
 {
     public function paramsSignUp(
         ?ParametersBag $request,
         Session $session,
         ServiceProvider $serviceProvider
     ): ?array {
+
+        if ($request === null) {
+            return null;
+        }
+
         $params = $request->all();
 
         if (empty($params['emailSignup']) || empty($params['password']) || empty($params['pseudoSignup'])) {

@@ -85,7 +85,6 @@ return array(
 );
 ```
 *   profil picture in public/images folder (profile.jpeg)
-
 *   When you are ready, at the root of your project,  to launch the project, run :
 ```bash
 php -S localhost:8000 -t public

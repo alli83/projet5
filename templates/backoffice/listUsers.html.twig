@@ -30,7 +30,8 @@
           {% endif %}
         </p>
 
-        {% if member.role is not same as('superAdmin') %}
+        {% if session.role is same as('superAdmin') %}
+        {%if member.role is not same as('superAdmin') %}
         <form action="/member-{{member.id}}/edit" method="post">
           <div class="row mt-2">
             <div class="col-md-7">
@@ -47,12 +48,11 @@
             </div>
           </div>
         </form>
-        {% endif %}
-        {% if member.role is not same as('superAdmin')%}
         <form method="POST" action="/member-{{member.id}}/delete" class="mt-2">
           <input type="hidden" value="{{tokencsrf}}" name="tokencsrf" />
           <button class="btn btn-secondary text-white" type="submit">supprimer</button>
         </form>
+        {% endif %}
         {% endif %}
       </li>
     </ul>

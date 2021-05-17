@@ -51,7 +51,7 @@
 
     <main class="mt-5">
         {% for type, message in flashes %}
-        <h2 id="flash" class="alert alert-{{type}} w-30"> {{ message }} </h2>
+        <h2 id="flash" class="text-center alert alert-{{type}} w-30"> {{ message }} </h2>
         {% endfor %}
 
         {% block content %} {% endblock %}

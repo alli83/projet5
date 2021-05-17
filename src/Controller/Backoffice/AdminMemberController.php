@@ -79,7 +79,7 @@ final class AdminMemberController implements ControllerInterface
         $auth = $this->serviceProvider->getAuthentificationService();
 
         // check if admin
-        if (!$auth->isAdminAuth($this->session)) {
+        if (!$auth->isSuperAdminAuth($this->session)) {
             $error = new Errors(403);
             return $error->handleErrors();
         }
@@ -142,7 +142,7 @@ final class AdminMemberController implements ControllerInterface
         $auth = $this->serviceProvider->getAuthentificationService();
 
         // check if admin
-        if (!$auth->isAdminAuth($this->session)) {
+        if (!$auth->isSuperAdminAuth($this->session)) {
             $error = new Errors(403);
             return $error->handleErrors();
         }

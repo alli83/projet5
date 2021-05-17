@@ -18,6 +18,11 @@ class AuthentificationService
         return ($session->get("role") === "admin" || $session->get("role") === "superAdmin");
     }
 
+    public function isSuperAdminAuth(Session $session): bool
+    {
+        return $session->get("role") === "superAdmin";
+    }
+
     public function isNotAuth(Session $session): void
     {
         $session->remove('role');

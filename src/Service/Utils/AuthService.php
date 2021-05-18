@@ -61,7 +61,7 @@ class AuthService
         if ($userRepo->findOneBy(["email" => $email])) {
             $session->addFlashes(
                 "warning",
-                "Un compte a déjà été crée avec cette adresse email"
+                "Un compte a déjà été créé avec cette adresse email"
             );
             return false;
         }
@@ -75,7 +75,7 @@ class AuthService
         if (!preg_match('/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@%^&*-]).{8,}$/', $datas['password'])) {
             $session->addFlashes(
                 "warning",
-                "Votre mot de passe doit comporter 8 caractères, au moins un chiffre et un caractère spécial #?!@%^&*-"
+                "Votre mot de passe doit comporter 10 caractères, au moins un chiffre et un caractère spécial #?!@%^&*-"
             );
             return false;
         }

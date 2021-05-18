@@ -99,7 +99,6 @@ class Container
         return new HomeController(
             $this->getView(),
             $this->getSession(),
-            $this->serviceProvider->getAuthentificationService(),
             $this->serviceProvider->getValidityService(),
             $this->serviceProvider->getTokenService(),
             $this->serviceProvider->getInformUserService(),

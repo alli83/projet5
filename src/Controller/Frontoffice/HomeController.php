@@ -9,7 +9,6 @@ use App\Service\Http\ParametersBag;
 use App\Service\Http\Response;
 use App\View\View;
 use App\Service\Http\Session\Session;
-use App\Service\Utils\AuthentificationService;
 use App\Service\Utils\FileService;
 use App\Service\Utils\InformUserService;
 use App\Service\Utils\TokenService;
@@ -19,7 +18,6 @@ final class HomeController implements ControllerInterface
 {
     private View $view;
     private Session $session;
-    private AuthentificationService $authentificationService;
     private ValidityService $validityService;
     private TokenService $tokenService;
     private InformUserService $informUserService;
@@ -28,7 +26,6 @@ final class HomeController implements ControllerInterface
     public function __construct(
         View $view,
         Session $session,
-        AuthentificationService $authentificationService,
         ValidityService $validityService,
         TokenService $tokenService,
         InformUserService $informUserService,
@@ -36,7 +33,6 @@ final class HomeController implements ControllerInterface
     ) {
         $this->view = $view;
         $this->session = $session;
-        $this->authentificationService = $authentificationService;
         $this->validityService = $validityService;
         $this->tokenService = $tokenService;
         $this->informUserService = $informUserService;
@@ -108,5 +104,10 @@ final class HomeController implements ControllerInterface
             return new Response("", 302, ["location" =>  "/error/404"]);
         }
         return new Response($this->view->render(['template' => 'accueil', 'data' => []]));
+    }
+
+    public function getMentions(): Response
+    {
+        return new Response($this->view->render(['template' => 'mentions', 'data' => []]));
     }
 }

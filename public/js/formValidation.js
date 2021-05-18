@@ -61,7 +61,7 @@ $(document).ready( () => {
         rules: {
             pseudoSignup: {
                 required: true,
-                minlength: 3,
+                minlength: 1,
                 regexPseudo: true,
                 normalizer: (value) => {
                     return $.trim(value);
@@ -94,7 +94,7 @@ $(document).ready( () => {
         messages: {
             pseudoSignup: {
                 required: "Vous devez renseigner votre pseudo",
-                minlength: "Votre pseudo doit comporter au minimum 3 caractères",
+                minlength: "Votre pseudo doit comporter au minimum 1 caractère",
                 regexPseudo:" Votre pseudo peut être composé de lettres ou de chiffres (20 maximum) "
             },
             emailSignup: {

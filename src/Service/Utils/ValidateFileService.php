@@ -8,13 +8,13 @@ use App\Service\Http\Session\Session;
 
 final class ValidateFileService
 {
-    public function checkFileValidity(array $fileAttached, Session $session): ?string
+    public function checkFileValidity(array $fileAttached, Session $session, FileService $fileService): ?string
     {
         if ($fileAttached["size"] > 150000) {
             $session->addFlashes("danger", "fichier trop lourd");
             return null;
         }
-            $file = new FileService();
+            $file = $fileService;
             $targetFile = $file->registerFile($fileAttached["tmp_name"], $fileAttached["name"]);
 
         if ($targetFile === null) {

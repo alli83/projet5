@@ -7,45 +7,64 @@ namespace  App\Controller\Backoffice;
 use App\Controller\ControllerInterface\ControllerInterface;
 use App\View\View;
 use App\Model\Repository\UserRepository;
-use App\Service\ErrorsHandlers\Errors;
 use App\Service\Http\ParametersBag;
 use App\Service\Http\Response;
 use App\Service\Http\Session\Session;
-use App\Service\Utils\ServiceProvider;
+use App\Service\Utils\AuthentificationService;
+use App\Service\Utils\InformUserService;
+use App\Service\Utils\PaginationService;
+use App\Service\Utils\SetOrderService;
+use App\Service\Utils\TokenService;
+use App\Service\Utils\ValidityService;
 
 final class AdminMemberController implements ControllerInterface
 {
     private UserRepository $userRepository;
     private View $view;
     private Session $session;
-    private ServiceProvider $serviceProvider;
+    private AuthentificationService $authentificationService;
+    private PaginationService $paginationService;
+    private SetOrderService $setOrderService;
+    private TokenService $tokenService;
+    private ValidityService $validityService;
+    private InformUserService $informUserService;
 
-    public function __construct(UserRepository $userRepository, View $view, Session $session, ServiceProvider $serviceProvider)
-    {
+    public function __construct(
+        UserRepository $userRepository,
+        View $view,
+        Session $session,
+        AuthentificationService $authentificationService,
+        PaginationService $paginationService,
+        SetOrderService $setOrderService,
+        TokenService $tokenService,
+        ValidityService $validityService,
+        InformUserService $informUserService
+    ) {
         $this->userRepository = $userRepository;
         $this->view = $view;
         $this->session = $session;
-        $this->serviceProvider = $serviceProvider;
+        $this->authentificationService = $authentificationService;
+        $this->paginationService = $paginationService;
+        $this->setOrderService = $setOrderService;
+        $this->tokenService = $tokenService;
+        $this->validityService = $validityService;
+        $this->informUserService = $informUserService;
     }
 
     public function displayAllMembers(?array $params = [], ?ParametersBag $request = null): Response
     {
-        $auth = $this->serviceProvider->getAuthentificationService();
-
         //  check if admin
-        if (!$auth->isAdminAuth($this->session)) {
-            $error = new Errors(403);
-            return $error->handleErrors();
+        if (!$this->authentificationService->isAdminAuth($this->session)) {
+            return new Response("", 302, ["location" =>  "/error/403"]);
         }
         // set pagination
-        $offset = $this->serviceProvider->getPaginationService()->setOffset($params);
+        $offset = $this->paginationService->setOffset($params, $this->validityService);
 
         // set order
-        $order = $this->serviceProvider->getSetOrderService()->setOrder($request, $this->serviceProvider);
+        $order = $this->setOrderService->setOrder($request, $this->validityService);
 
         if (!$order) {
-            $error = new Errors(404);
-            return $error->handleErrors();
+            return new Response("", 302, ["location" =>  "/error/404"]);
         }
 
         // set order and check if it's the last last page (useful for pagination on frontend)
@@ -59,7 +78,7 @@ final class AdminMemberController implements ControllerInterface
         }
 
         // set security token
-        $tokencsrf = $this->serviceProvider->getTokenService()->setToken($this->session);
+        $tokencsrf = $this->tokenService->setToken($this->session);
 
         return new Response($this->view->render([
             'template' => 'listUsers',
@@ -76,12 +95,9 @@ final class AdminMemberController implements ControllerInterface
 
     public function editOneMember(array $params, ?ParametersBag $request): Response
     {
-        $auth = $this->serviceProvider->getAuthentificationService();
-
         // check if admin
-        if (!$auth->isSuperAdminAuth($this->session)) {
-            $error = new Errors(403);
-            return $error->handleErrors();
+        if (!$this->authentificationService->isSuperAdminAuth($this->session)) {
+            return new Response("", 302, ["location" =>  "/error/403"]);
         }
 
         $this->session->addFlashes("danger", "Une erreur est survenue");
@@ -93,7 +109,7 @@ final class AdminMemberController implements ControllerInterface
         $param = $request->all();
 
         // check token validity
-        $validToken = $this->serviceProvider->getTokenService()->validateToken($param, $this->session);
+        $validToken = $this->tokenService->validateToken($param, $this->session);
         if (!$validToken) {
             return new Response("", 302, ["location" =>  "/admin/members"]);
         }
@@ -106,8 +122,7 @@ final class AdminMemberController implements ControllerInterface
             $params[$key] = $el;
         }
 
-        $validity = $this->serviceProvider->getValidityService();
-        $params = $validity->validityVariables($params);
+        $params = $this->validityService->validityVariables($params);
 
         $id = (int)$params["id"];
 
@@ -124,7 +139,7 @@ final class AdminMemberController implements ControllerInterface
             $role = $user->getRole() === "admin" ? "administrateur" : "utilisateur";
             $datas = ["pseudo" => $user->getPseudo(), "role" => $role];
 
-            $this->serviceProvider->getInformUserService()
+            $this->informUserService
                 ->contactUserMember(
                     $this->session,
                     $datas,
@@ -139,12 +154,9 @@ final class AdminMemberController implements ControllerInterface
 
     public function deleteOneMember(array $params, ?ParametersBag $request): Response
     {
-        $auth = $this->serviceProvider->getAuthentificationService();
-
         // check if admin
-        if (!$auth->isSuperAdminAuth($this->session)) {
-            $error = new Errors(403);
-            return $error->handleErrors();
+        if (!$this->authentificationService->isSuperAdminAuth($this->session)) {
+            return new Response("", 302, ["location" =>  "/error/403"]);
         }
 
         $this->session->addFlashes("danger", "Une erreur est survenue");
@@ -155,13 +167,12 @@ final class AdminMemberController implements ControllerInterface
         $param = $request->all();
 
         // check validity security token
-        $validToken = $this->serviceProvider->getTokenService()->validateToken($param, $this->session);
+        $validToken = $this->tokenService->validateToken($param, $this->session);
         if (!$validToken) {
             return new Response("", 302, ["location" =>  "/admin/members"]);
         }
 
-        $validity = $this->serviceProvider->getValidityService();
-        $params = $validity->validityVariables($params);
+        $params = $this->validityService->validityVariables($params);
 
         $id = (int)$params["id"];
         $user = $this->userRepository->findOneBy(["id" => $id]);
@@ -178,7 +189,7 @@ final class AdminMemberController implements ControllerInterface
 
         if ($this->userRepository->delete($user)) {
             $datas = ["pseudo" => $user->getPseudo()];
-            $this->serviceProvider->getInformUserService()
+            $this->informUserService
                 ->contactUserMember(
                     $this->session,
                     $datas,

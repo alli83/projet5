@@ -8,15 +8,15 @@ use App\Service\Http\ParametersBag;
 
 class SetOrderService
 {
-    public function setOrder(?ParametersBag $request, ServiceProvider $serviceProvider): ?array
+    public function setOrder(?ParametersBag $request, ValidityService $validityService): ?array
     {
         $orderToSet = "desc";
         if (!empty($request) && $request->get("order") !== null) {
             $request = $request->all();
-            $request = $serviceProvider->getValidityService()->validityVariables($request);
+            $request = $validityService->validityVariables($request);
             $orderToSet = $request["order"];
         }
-        $order = $serviceProvider->getValidityService()->isInArray(["asc", "desc"], $orderToSet);
+        $order = $validityService->isInArray(["asc", "desc"], $orderToSet);
         return $order;
     }
 }

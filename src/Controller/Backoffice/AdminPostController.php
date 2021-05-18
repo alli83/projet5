@@ -9,11 +9,17 @@ use App\Model\Entity\Post;
 use App\View\View;
 use App\Model\Repository\PostRepository;
 use App\Model\Repository\UserRepository;
-use App\Service\ErrorsHandlers\Errors;
 use App\Service\Http\ParametersBag;
 use App\Service\Http\Response;
 use App\Service\Http\Session\Session;
-use App\Service\Utils\ServiceProvider;
+use App\Service\Utils\AuthentificationService;
+use App\Service\Utils\CreatePostService;
+use App\Service\Utils\FileService;
+use App\Service\Utils\PaginationService;
+use App\Service\Utils\SetOrderService;
+use App\Service\Utils\TokenService;
+use App\Service\Utils\ValidateFileService;
+use App\Service\Utils\ValidityService;
 
 final class AdminPostController implements ControllerInterface
 {
@@ -22,40 +28,58 @@ final class AdminPostController implements ControllerInterface
     private UserRepository $userRepository;
     private View $view;
     private Session $session;
-    private ServiceProvider $serviceProvider;
+    private CreatePostService $createPostService;
+    private AuthentificationService $authentificationService;
+    private PaginationService $paginationService;
+    private SetOrderService $setOrderService;
+    private TokenService $tokenService;
+    private ValidityService $validityService;
+    private ValidateFileService $validateFileService;
+    private FileService $fileService;
 
     public function __construct(
         PostRepository $postRepository,
         UserRepository $userRepository,
         View $view,
         Session $session,
-        ServiceProvider $serviceProvider
+        CreatePostService $createPostService,
+        AuthentificationService $authentificationService,
+        PaginationService $paginationService,
+        SetOrderService $setOrderService,
+        TokenService $tokenService,
+        ValidityService $validityService,
+        ValidateFileService $validateFileService,
+        FileService $fileService
     ) {
         $this->postRepository = $postRepository;
         $this->userRepository = $userRepository;
         $this->view = $view;
         $this->session = $session;
-        $this->serviceProvider = $serviceProvider;
+        $this->createPostService = $createPostService;
+        $this->authentificationService = $authentificationService;
+        $this->paginationService = $paginationService;
+        $this->setOrderService = $setOrderService;
+        $this->tokenService = $tokenService;
+        $this->validityService = $validityService;
+        $this->validateFileService = $validateFileService;
+        $this->fileService = $fileService;
     }
 
     public function displayAllPosts(?array $params = [], ?ParametersBag $request = null): Response
     {
-        $auth = $this->serviceProvider->getAuthentificationService();
         // check if admin
-        if (!$auth->isAdminAuth($this->session)) {
-            $error = new Errors(403);
-            return $error->handleErrors();
+        if (!$this->authentificationService->isAdminAuth($this->session)) {
+            return new Response("", 302, ["location" =>  "/error/403"]);
         }
 
         // set pagination
-        $offset = $this->serviceProvider->getPaginationService()->setOffset($params);
+        $offset = $this->paginationService->setOffset($params, $this->validityService);
 
         // set order
-        $order = $this->serviceProvider->getSetOrderService()->setOrder($request, $this->serviceProvider);
+        $order = $this->setOrderService->setOrder($request, $this->validityService);
 
         if (!$order) {
-            $error = new Errors(404);
-            return $error->handleErrors();
+            return new Response("", 302, ["location" =>  "/error/404"]);
         }
 
         $posts = $this->postRepository->findAll(4, $offset, ['order' => $order["order"]]);
@@ -68,7 +92,7 @@ final class AdminPostController implements ControllerInterface
         }
 
         //set security token
-        $tokencsrf = $this->serviceProvider->getTokenService()->setToken($this->session);
+        $tokencsrf = $this->tokenService->setToken($this->session);
 
         return new Response($this->view->render([
             'template' => 'listPosts',
@@ -85,15 +109,12 @@ final class AdminPostController implements ControllerInterface
 
     public function editOnePost(array $params): Response
     {
-        $auth = $this->serviceProvider->getAuthentificationService();
         // check if admin
-        if (!$auth->isAdminAuth($this->session)) {
-            $error = new Errors(403);
-            return $error->handleErrors();
+        if (!$this->authentificationService->isAdminAuth($this->session)) {
+            return new Response("", 302, ["location" =>  "/error/403"]);
         }
 
-        $validity = $this->serviceProvider->getValidityService();
-        $params = $validity->validityVariables($params);
+        $params = $this->validityService->validityVariables($params);
 
         $post = $this->postRepository->findOneBy(["id" => (int)$params["id"]]);
         // load all admin andsuperAdmin => useful for select input in frontend
@@ -108,7 +129,7 @@ final class AdminPostController implements ControllerInterface
             $pseudos[] = $user->getPseudo() . ", " . $user->getEmail();
         }
         // set security token
-        $tokencsrf = $this->serviceProvider->getTokenService()->setToken($this->session);
+        $tokencsrf = $this->tokenService->setToken($this->session);
 
         return new Response($this->view->render([
             'template' => 'editPost',
@@ -124,17 +145,23 @@ final class AdminPostController implements ControllerInterface
 
     public function editOnePostSave(array $params, ?ParametersBag $request = null, ?ParametersBag $file = null): Response
     {
-        $auth = $this->serviceProvider->getAuthentificationService();
-
         // check if admin
-        if (!$auth->isAdminAuth($this->session)) {
-            $error = new Errors(403);
-            return $error->handleErrors();
+        if (!$this->authentificationService->isAdminAuth($this->session)) {
+            return new Response("", 302, ["location" =>  "/error/403"]);
         }
         $this->session->addFlashes("danger", "Une erreur est survenue");
 
-        $params = $this->serviceProvider->getCreatePostService()
-        ->paramsPost($params, $file, $request, $this->serviceProvider, $this->session);
+        $params = $this->createPostService
+            ->paramsPost(
+                $params,
+                $file,
+                $request,
+                $this->validateFileService,
+                $this->fileService,
+                $this->tokenService,
+                $this->validityService,
+                $this->session
+            );
 
         if ($params === null) {
             return new Response("", 302, ["location" =>  "/admin/posts"]);
@@ -165,11 +192,9 @@ final class AdminPostController implements ControllerInterface
 
     public function createNewPost(): Response
     {
-        $auth = $this->serviceProvider->getAuthentificationService();
         //  check if admin
-        if (!$auth->isAdminAuth($this->session)) {
-            $error = new Errors(403);
-            return $error->handleErrors();
+        if (!$this->authentificationService->isAdminAuth($this->session)) {
+            return new Response("", 302, ["location" =>  "/error/403"]);
         }
         // load all admin and superAdmin
         $users = $this->userRepository->findBy(["role1" => "admin", "role2" => "superAdmin"]);
@@ -184,7 +209,7 @@ final class AdminPostController implements ControllerInterface
             $pseudos[] = $user->getPseudo() . ", " . $user->getEmail();
         }
         // set security token
-        $tokencsrf = $this->serviceProvider->getTokenService()->setToken($this->session);
+        $tokencsrf = $this->tokenService->setToken($this->session);
 
         return new Response($this->view->render([
             'template' => 'editPost',
@@ -200,18 +225,26 @@ final class AdminPostController implements ControllerInterface
     public function createNewPostSave(?ParametersBag $request = null, ?ParametersBag $file = null): Response
     {
         $params = [];
-        $auth = $this->serviceProvider->getAuthentificationService();
+        $auth = $this->authentificationService;
 
         // check if admin
         if (!$auth->isAdminAuth($this->session)) {
-            $error = new Errors(403);
-            return $error->handleErrors();
+            return new Response("", 302, ["location" =>  "/error/403"]);
         }
 
         $this->session->addFlashes("danger", "Une erreur est survenue");
 
-        $params = $this->serviceProvider->getCreatePostService()
-        ->paramsPost($params, $file, $request, $this->serviceProvider, $this->session);
+        $params = $this->createPostService
+            ->paramsPost(
+                $params,
+                $file,
+                $request,
+                $this->validateFileService,
+                $this->fileService,
+                $this->tokenService,
+                $this->validityService,
+                $this->session
+            );
 
         if ($params === null) {
             return new Response("", 302, ["location" =>  "/admin/posts"]);
@@ -243,11 +276,9 @@ final class AdminPostController implements ControllerInterface
 
     public function deleteOnePost(array $params, ?ParametersBag $request): Response
     {
-        $auth = $this->serviceProvider->getAuthentificationService();
         //  check if admin
-        if (!$auth->isAdminAuth($this->session)) {
-            $error = new Errors(403);
-            return $error->handleErrors();
+        if (!$this->authentificationService->isAdminAuth($this->session)) {
+            return new Response("", 302, ["location" =>  "/error/403"]);
         }
 
         $this->session->addFlashes("danger", "Une erreur est survenue");
@@ -258,12 +289,12 @@ final class AdminPostController implements ControllerInterface
         $param = $request->all();
 
         // check validity security token
-        $validToken = $this->serviceProvider->getTokenService()->validateToken($param, $this->session);
+        $validToken = $this->tokenService->validateToken($param, $this->session);
         if (!$validToken) {
             return new Response("", 302, ["location" =>  "/admin/posts"]);
         }
 
-        $validity = $this->serviceProvider->getValidityService();
+        $validity = $this->validityService;
         $params = $validity->validityVariables($params);
 
         $post = new Post(["id" => (int)$params["id"]]);

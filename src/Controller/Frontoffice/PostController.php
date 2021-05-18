@@ -9,29 +9,40 @@ use App\View\View;
 use App\Service\Http\Response;
 use App\Model\Repository\PostRepository;
 use App\Model\Repository\CommentRepository;
-use App\Service\ErrorsHandlers\Errors;
 use App\Service\Http\ParametersBag;
 use App\Service\Http\Session\Session;
-use App\Service\Utils\ServiceProvider;
+use App\Service\Utils\PaginationService;
+use App\Service\Utils\SetOrderService;
+use App\Service\Utils\ValidityService;
 
 final class PostController implements ControllerInterface
 {
     private PostRepository $postRepository;
     private View $view;
     private Session $session;
-    private ServiceProvider $serviceProvider;
+    private ValidityService $validityService;
+    private PaginationService $paginationService;
+    private SetOrderService $setOrderService;
 
-    public function __construct(PostRepository $postRepository, View $view, Session $session, ServiceProvider $serviceProvider)
-    {
+    public function __construct(
+        PostRepository $postRepository,
+        View $view,
+        Session $session,
+        ValidityService $validityService,
+        PaginationService $paginationService,
+        SetOrderService $setOrderService
+    ) {
         $this->postRepository = $postRepository;
         $this->view = $view;
         $this->session = $session;
-        $this->serviceProvider = $serviceProvider;
+        $this->validityService = $validityService;
+        $this->paginationService = $paginationService;
+        $this->setOrderService = $setOrderService;
     }
 
     public function displayOneAction(array $params, CommentRepository $commentRepository): Response
     {
-        $validityTools =  $this->serviceProvider->getValidityService();
+        $validityTools =  $this->validityService;
         $params = $validityTools->validityVariables($params);
 
         $post = $this->postRepository->findOneBy(['id' => (int)$params['id']]);
@@ -55,14 +66,13 @@ final class PostController implements ControllerInterface
     public function displayAllAction(?array $params = [], ?ParametersBag $request = null): Response
     {
         // set pagination
-        $offset = $this->serviceProvider->getPaginationService()->setOffset($params);
+        $offset = $this->paginationService->setOffset($params, $this->validityService);
 
         // set order
-        $order = $this->serviceProvider->getSetOrderService()->setOrder($request, $this->serviceProvider);
+        $order = $this->setOrderService->setOrder($request, $this->validityService);
 
         if (!$order) {
-            $error = new Errors(404);
-            return $error->handleErrors();
+            return new Response("", 302, ["location" =>  "/error/404"]);
         }
         $posts = $this->postRepository->findAll(4, $offset, ['order' => $order["order"]]);
         $end = false;
@@ -80,6 +90,7 @@ final class PostController implements ControllerInterface
                 'page' => $params === null ? 0 : (int)$params["page"],
                 'filter' => $order,
                 "end" => $end
-            ]]));
+            ]
+        ]));
     }
 }

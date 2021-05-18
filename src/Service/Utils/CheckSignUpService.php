@@ -12,7 +12,8 @@ class CheckSignupService
     public function paramsSignUp(
         ?ParametersBag $request,
         Session $session,
-        ServiceProvider $serviceProvider
+        TokenService $tokenService,
+        ValidityService $validityService
     ): ?array {
 
         if ($request === null) {
@@ -25,13 +26,12 @@ class CheckSignupService
             return null;
         }
         // check validity security token
-        $validToken = $serviceProvider->getTokenService()->validateToken($params, $session);
+        $validToken = $tokenService->validateToken($params, $session);
         if (!$validToken) {
             return null;
         }
 
-        $validity = $serviceProvider->getValidityService();
-        $params = $validity->validityVariables($params);
+        $params = $validityService->validityVariables($params);
         return $params;
     }
 }

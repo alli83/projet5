@@ -9,7 +9,8 @@
         {% if post.file_attached is empty %}
         {% else %}
         <div class="col-md-12 mb-3">
-            <img src="data:image/jpeg;base64,{{post.file_attached}}" alt="deco picture" class="img-fluid imagePost" width="30%" />
+            <img src="data:image/jpeg;base64,{{post.file_attached}}" alt="deco picture" class="img-fluid imagePost"
+                width="30%" />
         </div>
         {% endif %}
         <div class="mb-3">
@@ -33,6 +34,14 @@
         <div class="mb-3">
             <section>
                 <h3>Commentaires</h3>
+                {% if not session.pseudo %}
+                <div class="bg-warning">
+                    <p>Seuls les membres inscrits peuvent laisser des commentaires</p>
+                    <p>Vous souhaitez vous aussi commenter ce post ? Cliquez sur ce <a href="/signup"
+                            class="linkStandard">lien</a> afin de vous inscrire.
+                    </p>
+                </div>
+                {% endif%}
                 {% if session.pseudo %}
                 <div class="col col-lg-4">
                     <form action="/validate" method="post" id="formComment">

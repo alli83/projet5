@@ -10,21 +10,45 @@ use App\Service\Http\Response;
 use App\Service\Http\Session\Session;
 use App\Model\Repository\UserRepository;
 use App\Service\Http\ParametersBag;
-use App\Service\Utils\ServiceProvider;
+use App\Service\Utils\AuthService;
+use App\Service\Utils\CheckSignupService;
+use App\Service\Utils\InformUserService;
+use App\Service\Utils\MailerService;
+use App\Service\Utils\TokenService;
+use App\Service\Utils\ValidityService;
 
 final class UserController implements ControllerInterface
 {
     private UserRepository $userRepository;
     private View $view;
     private Session $session;
-    private ServiceProvider $serviceProvider;
+    private AuthService $authService;
+    private InformUserService $informUserService;
+    private CheckSignupService $checkSignupService;
+    private MailerService $mailService;
+    private TokenService $tokenService;
+    private ValidityService $validityService;
 
-    public function __construct(UserRepository $userRepository, View $view, Session $session, ServiceProvider $serviceProvider)
-    {
+    public function __construct(
+        UserRepository $userRepository,
+        View $view,
+        Session $session,
+        AuthService $authService,
+        InformUserService $informUserService,
+        CheckSignupService $checkSignupService,
+        MailerService $mailService,
+        TokenService $tokenService,
+        ValidityService $validityService
+    ) {
         $this->userRepository = $userRepository;
         $this->view = $view;
         $this->session = $session;
-        $this->serviceProvider = $serviceProvider;
+        $this->authService = $authService;
+        $this->informUserService = $informUserService;
+        $this->checkSignupService = $checkSignupService;
+        $this->mailService = $mailService;
+        $this->tokenService = $tokenService;
+        $this->validityService = $validityService;
     }
 
     public function loginAction(?ParametersBag $request): Response
@@ -34,15 +58,22 @@ final class UserController implements ControllerInterface
             return new Response("", 302, ["location" =>  "/posts"]);
         }
         if ($request !== null) {
-            $auth = $this->serviceProvider->getAuthService();
             $this->session->addFlashes("danger", "Mauvais identifiants");
-            if ($auth->isValidLoginForm($this->session, $request->all(), $this->userRepository)) {
+            if (
+                $this->authService->isValidLoginForm(
+                    $this->session,
+                    $request->all(),
+                    $this->userRepository,
+                    $this->tokenService,
+                    $this->validityService
+                )
+            ) {
                 $this->session->addFlashes("success", "Vous êtes désormais connecté");
                 return new Response("", 302, ["location" =>  "/posts"]);
             }
         }
         // set security token
-        $tokencsrf = $this->serviceProvider->getTokenService()->setToken($this->session);
+        $tokencsrf = $this->tokenService->setToken($this->session);
         return new Response($this->view->render(['template' => 'login', 'data' => ["tokencsrf" => $tokencsrf]]));
     }
 
@@ -56,7 +87,7 @@ final class UserController implements ControllerInterface
         $params = $request->all();
 
         // check validity security token (compared with the one on login page)
-        $validToken = $this->serviceProvider->getTokenService()->validateToken($params, $this->session);
+        $validToken = $this->tokenService->validateToken($params, $this->session);
 
         if (!$validToken) {
             return new Response("", 302, ["location" =>  "/login"]);
@@ -66,9 +97,8 @@ final class UserController implements ControllerInterface
             return new Response("", 302, ["location" =>  "/login"]);
         }
 
-        $validity = $this->serviceProvider->getValidityService();
         // check email validity
-        $email = $validity->validateEmail($params['emailReset']);
+        $email = $this->validityService->validateEmail($params['emailReset']);
 
         if (!$email) {
             $this->session->addFlashes("warning", "Le format de votre email est invalide");
@@ -81,13 +111,13 @@ final class UserController implements ControllerInterface
             return new Response("", 302, ["location" =>  "/login"]);
         }
         // set security token
-        $tokencsrf = $this->serviceProvider->getTokenService()->setToken($this->session);
+        $tokencsrf = $this->tokenService->setToken($this->session);
         $user->setToken($tokencsrf);
 
         if ($this->userRepository->update($user)) {
             //set token in url
             $datas = ["pseudo" => $user->getPseudo(), "id" => $user->getId(), "token" => $tokencsrf];
-            $this->serviceProvider->getInformUserService()
+            $this->informUserService
                 ->contactUserMember(
                     $this->session,
                     $datas,
@@ -102,7 +132,7 @@ final class UserController implements ControllerInterface
 
     public function confirmResetAction(array $param, ?ParametersBag $request): Response
     {
-        $validity = $this->serviceProvider->getValidityService();
+        $validity = $this->validityService;
         $param = $validity->validityVariables($param);
 
         if ($request === null) {
@@ -121,8 +151,11 @@ final class UserController implements ControllerInterface
 
         // check validity security token
         if (!$user || $user->getToken() !== $param["token"]) {
-            $this->session->addFlashes("danger", "Une erreur est survenue. Si vous souhaitez toujours réinitialiser votre mot de passe,
-            merci de générer à nouveau un lien en cliquant sur ' J'ai oublié mon mot de passe' ");
+            $this->session->addFlashes(
+                "danger",
+                "Une erreur est survenue. Si vous souhaitez toujours réinitialiser votre mot de passe,
+            merci de générer à nouveau un lien en cliquant sur ' J'ai oublié mon mot de passe' "
+            );
 
             return new Response("", 302, ["location" =>  "/login"]);
         }
@@ -139,8 +172,11 @@ final class UserController implements ControllerInterface
         }
         $user->setPassword($password);
 
-        $this->session->addFlashes("danger", "Une erreur est survenue. Si vous souhaitez toujours réinitialiser votre mot de passe,
-        merci de générer à nouveau un lien en cliquant sur ' J'ai oublié mon mot de passe' ");
+        $this->session->addFlashes(
+            "danger",
+            "Une erreur est survenue. Si vous souhaitez toujours réinitialiser votre mot de passe,
+        merci de générer à nouveau un lien en cliquant sur ' J'ai oublié mon mot de passe' "
+        );
         if ($this->userRepository->update($user)) {
             $this->session->addFlashes("success", "Votre mot de passe a bien été réinitialisé. 
                             Vous pouvez désormais vous connecter avec votre nouveau mot de passe");
@@ -164,7 +200,7 @@ final class UserController implements ControllerInterface
             return new Response("", 302, ["location" =>  "/posts"]);
         }
         if ($request === null) {
-            $tokencsrf = $this->serviceProvider->getTokenService()->setToken($this->session);
+            $tokencsrf = $this->tokenService->setToken($this->session);
             return new Response($this->view->render(['template' => 'signup', 'data' => [
                 "tokencsrf" => $tokencsrf
             ]]));
@@ -172,24 +208,28 @@ final class UserController implements ControllerInterface
 
         $this->session->addFlashes("danger", "Une erreur est survenue");
 
-        $params = $this->serviceProvider->getCheckSignupService()
-        ->paramsSignUp($request, $this->session, $this->serviceProvider);
+        $params = $this->checkSignupService
+            ->paramsSignUp(
+                $request,
+                $this->session,
+                $this->tokenService,
+                $this->validityService
+            );
 
         if ($params === null) {
             return new Response("", 302, ["location" =>  "/signup"]);
         }
 
-        $email = $this->serviceProvider->getValidityService()->validateEmail($params['emailSignup']);
+        $email = $this->validityService->validateEmail($params['emailSignup']);
 
         if (!$email) {
             $this->session->addFlashes("warning", "Le format de votre email est invalide");
             return new Response("", 302, ["location" =>  "/signup"]);
         }
         $params['emailSignup'] = $email;
-        $auth = $this->serviceProvider->getAuthService();
 
         $this->session->addFlashes("warning", "Ce pseudo est déjà pris");
-        if ($auth->register($this->session, $params, $this->userRepository)) {
+        if ($this->authService->register($this->session, $params, $this->userRepository)) {
             $user = $this->userRepository->findOneBy(['email' => $email]);
 
             $this->session->addFlashes("danger", "Une erreur est survenue");
@@ -199,14 +239,17 @@ final class UserController implements ControllerInterface
             }
 
             $this->session->addFlashes("warning", "L'email n'a pas pu être envoyé");
-            $message = $this->serviceProvider->getMailService()->sendMessage(
+            $message = $this->mailService->sendMessage(
                 "création de compte",
                 "frontoffice/mail/validateRegistration.html.twig",
                 $email,
                 ["pseudo" => $user->getPseudo()]
             );
             if ($message) {
-                $this->session->addFlashes("success", "Votre inscription a bien été prise en compte. Vous pouvez désormais vous connecter");
+                $this->session->addFlashes(
+                    "success",
+                    "Votre inscription a bien été prise en compte. Vous pouvez désormais vous connecter"
+                );
             }
             return new Response("", 302, ["location" =>  "/login"]);
         }

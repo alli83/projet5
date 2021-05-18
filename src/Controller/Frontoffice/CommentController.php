@@ -10,33 +10,39 @@ use App\View\View;
 use App\Service\Http\Response;
 use App\Model\Repository\CommentRepository;
 use App\Model\Repository\UserRepository;
-use App\Service\ErrorsHandlers\Errors;
 use App\Service\Http\ParametersBag;
 use App\Service\Http\Session\Session;
-use App\Service\Utils\ServiceProvider;
+use App\Service\Utils\AuthentificationService;
+use App\Service\Utils\ValidityService;
 
 final class CommentController implements ControllerInterface
 {
     private CommentRepository $commentRepository;
     private View $view;
     private Session $session;
-    private ServiceProvider $serviceProvider;
+    private AuthentificationService $authentificationService;
+    private ValidityService $validityService;
 
-    public function __construct(CommentRepository $commentRepository, View $view, Session $session, ServiceProvider $serviceProvider)
-    {
+
+    public function __construct(
+        CommentRepository $commentRepository,
+        View $view,
+        Session $session,
+        AuthentificationService $authentificationService,
+        ValidityService $validityService
+    ) {
         $this->commentRepository = $commentRepository;
         $this->view = $view;
         $this->session = $session;
-        $this->serviceProvider = $serviceProvider;
+        $this->authentificationService = $authentificationService;
+        $this->validityService = $validityService;
     }
 
     public function createComment(?UserRepository $userRepository = null, ?ParametersBag $request = null): Response
     {
-        $auth = $this->serviceProvider->getAuthentificationService();
         // check if auth
-        if (!$auth->isAuth($this->session)) {
-            $error = new Errors(403);
-            return $error->handleErrors();
+        if (!$this->authentificationService->isAuth($this->session)) {
+            return new Response("", 302, ["location" =>  "/error/403"]);
         }
 
         $this->session->addFlashes("danger", "Une erreur est survenue");
@@ -56,7 +62,7 @@ final class CommentController implements ControllerInterface
         $values = [$request->get("textComment"), $post, $user->getId()];
         $param = array_combine($params, $values);
 
-        $validityTools = $this->serviceProvider->getValidityService();
+        $validityTools = $this->validityService;
         $param = $validityTools->validityVariables($param);
         $object = new Comment($param);
 

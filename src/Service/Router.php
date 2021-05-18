@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace  App\Service;
 
-use App\Service\ErrorsHandlers\Errors;
 use App\Service\Http\Request;
 use App\Service\Http\Response;
 use Exception;
@@ -68,8 +67,7 @@ final class Router
             $goodRoad = $this->getRoute($this->request->server()->get("REQUEST_URI"));
 
             if ($goodRoad === null) {
-                $error = new Errors(404);
-                return $error->handleErrors();
+                return new Response("", 302, ["location" =>  "/error/404"]);
             }
 
             $module = $goodRoad->getModule();
@@ -122,8 +120,8 @@ final class Router
                     return ($goodCont->$method(null));
             }
         } catch (Exception $e) {
-            $error = new Errors((int)($e->getCode()));
-            return $error->handleErrors();
+            $code = (int)($e->getCode());
+            return new Response("", 302, ["location" =>  "/error/${code}"]);
         }
     }
 

@@ -9,6 +9,7 @@ use App\Controller\Backoffice\AdminMemberController;
 use App\Controller\Backoffice\AdminPostController;
 use App\Controller\ControllerInterface\ControllerInterface;
 use App\Controller\Frontoffice\CommentController;
+use App\Controller\Frontoffice\ErrorController;
 use App\Controller\Frontoffice\HomeController;
 use App\Controller\Frontoffice\PostController;
 use App\Controller\Frontoffice\UserController;
@@ -24,6 +25,8 @@ class Container
 {
 
     private Session $session;
+    private Database $database;
+    private View $view;
     private ServiceProvider $serviceProvider;
 
     public function __construct(ServiceProvider $serviceProvider)
@@ -48,6 +51,8 @@ class Container
                 return $this->getAdminCommentController();
             case "adminmember":
                 return $this->getAdminMemberController();
+            case "error":
+                return $this->getErrorController();
             default:
                 return $this->getHomeController();
         }
@@ -67,7 +72,10 @@ class Container
 
     public function getDatabase(): Database
     {
-        return new Database();
+        if (empty($this->database)) {
+            $this->database = new Database();
+        }
+        return $this->database;
     }
     public function getSession(): Session
     {
@@ -78,35 +86,110 @@ class Container
     }
     public function getView(): View
     {
-        return new View($this->getSession());
+        if (empty($this->view)) {
+            $this->view = new View($this->getSession());
+        }
+        return $this->view;
     }
+
+
+
     public function getHomeController(): ControllerInterface
     {
-        return new HomeController($this->getView(), $this->getSession(), $this->serviceProvider);
+        return new HomeController(
+            $this->getView(),
+            $this->getSession(),
+            $this->serviceProvider->getAuthentificationService(),
+            $this->serviceProvider->getValidityService(),
+            $this->serviceProvider->getTokenService(),
+            $this->serviceProvider->getInformUserService(),
+            $this->serviceProvider->getFileService()
+        );
     }
     public function getPostController(): ControllerInterface
     {
-        return new PostController($this->getPostRepository(), $this->getView(), $this->getSession(), $this->serviceProvider);
+        return new PostController(
+            $this->getPostRepository(),
+            $this->getView(),
+            $this->getSession(),
+            $this->serviceProvider->getValidityService(),
+            $this->serviceProvider->getPaginationService(),
+            $this->serviceProvider->getSetOrderService()
+        );
     }
     public function getUserController(): ControllerInterface
     {
-        return new UserController($this->getUserRepository(), $this->getView(), $this->getSession(), $this->serviceProvider);
+        return new UserController(
+            $this->getUserRepository(),
+            $this->getView(),
+            $this->getSession(),
+            $this->serviceProvider->getAuthService(),
+            $this->serviceProvider->getInformUserService(),
+            $this->serviceProvider->getCheckSignupService(),
+            $this->serviceProvider->getMailService(),
+            $this->serviceProvider->getTokenService(),
+            $this->serviceProvider->getValidityService()
+        );
     }
     public function getCommentController(): ControllerInterface
     {
-        return new CommentController($this->getCommentRepository(), $this->getView(), $this->getSession(), $this->serviceProvider);
+        return new CommentController(
+            $this->getCommentRepository(),
+            $this->getView(),
+            $this->getSession(),
+            $this->serviceProvider->getAuthentificationService(),
+            $this->serviceProvider->getValidityService(),
+        );
     }
     public function getAdminPostController(): ControllerInterface
     {
-        return new AdminPostController($this->getPostRepository(), $this->getUserRepository(), $this->getView(), $this->getSession(), $this->serviceProvider);
+        return new AdminPostController(
+            $this->getPostRepository(),
+            $this->getUserRepository(),
+            $this->getView(),
+            $this->getSession(),
+            $this->serviceProvider->getCreatePostService(),
+            $this->serviceProvider->getAuthentificationService(),
+            $this->serviceProvider->getPaginationService(),
+            $this->serviceProvider->getSetOrderService(),
+            $this->serviceProvider->getTokenService(),
+            $this->serviceProvider->getValidityService(),
+            $this->serviceProvider->getValidateFileService(),
+            $this->serviceProvider->getFileService()
+        );
     }
     public function getAdminCommentController(): ControllerInterface
     {
-        return new AdminCommentController($this->getCommentRepository(), $this->getUserRepository(), $this->getView(), $this->getSession(), $this->serviceProvider);
+        return new AdminCommentController(
+            $this->getCommentRepository(),
+            $this->getUserRepository(),
+            $this->getView(),
+            $this->getSession(),
+            $this->serviceProvider->getAuthentificationService(),
+            $this->serviceProvider->getPaginationService(),
+            $this->serviceProvider->getSetOrderService(),
+            $this->serviceProvider->getTokenService(),
+            $this->serviceProvider->getValidityService(),
+            $this->serviceProvider->getInformUserService()
+        );
     }
     public function getAdminMemberController(): ControllerInterface
     {
-        return new AdminMemberController($this->getUserRepository(), $this->getView(), $this->getSession(), $this->serviceProvider);
+        return new AdminMemberController(
+            $this->getUserRepository(),
+            $this->getView(),
+            $this->getSession(),
+            $this->serviceProvider->getAuthentificationService(),
+            $this->serviceProvider->getPaginationService(),
+            $this->serviceProvider->getSetOrderService(),
+            $this->serviceProvider->getTokenService(),
+            $this->serviceProvider->getValidityService(),
+            $this->serviceProvider->getInformUserService()
+        );
+    }
+    public function getErrorController(): ControllerInterface
+    {
+        return new ErrorController($this->getView());
     }
     public function getPostRepository(): PostRepository
     {

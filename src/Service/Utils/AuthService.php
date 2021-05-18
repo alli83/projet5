@@ -10,19 +10,24 @@ use App\Service\Http\Session\Session;
 
 class AuthService
 {
-    public function isValidLoginForm(Session $session, array $datas, UserRepository $userRepo): bool
-    {
+    public function isValidLoginForm(
+        Session $session,
+        array $datas,
+        UserRepository $userRepo,
+        TokenService $tokenService,
+        ValidityService $validityService
+    ): bool {
         if (empty($datas) || empty($datas["emailLogin"]) || empty($datas["passwordLogin"])) {
             return false;
         }
-        $validToken = (new TokenService())->validateToken($datas, $session);
+        $validToken = $tokenService->validateToken($datas, $session);
 
         if (!$validToken) {
             $session->addFlashes("danger", "une erreur est survenue");
             return false;
         }
 
-        $datas = (new ValidityService())->validityVariables($datas);
+        $datas = $validityService->validityVariables($datas);
         $email = $datas['emailLogin'];
         $password = $datas['passwordLogin'];
 

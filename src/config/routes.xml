@@ -32,4 +32,7 @@
      <route url="/admin/members/([0-9]*)" module= "adminmember"  action="displayAllMembers" varnames="page"/>
     <route url="/member-([0-9]*)/edit" module= "adminmember" action="editOneMember" varnames="id"/>
     <route url="/member-([0-9]*)/delete" module= "adminmember"  action="deleteOneMember" varnames="id"/>
+
+    <!-- ERRORS -->
+     <route url="/error/([0-9]*)" module= "error"  action="handleErrors" varnames="error"/>
 </routes>

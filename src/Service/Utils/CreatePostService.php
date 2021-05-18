@@ -13,7 +13,10 @@ class CreatePostService
         array $params,
         ?ParametersBag $file,
         ?ParametersBag $request,
-        ServiceProvider $serviceProvider,
+        ValidateFileService $validateFileService,
+        FileService $fileService,
+        TokenService $tokenService,
+        ValidityService $validityService,
         Session $session
     ): ?array {
 
@@ -24,8 +27,7 @@ class CreatePostService
         $fileAttached = isset($file) ? $file->get("file_attached") : null;
 
         if (isset($fileAttached) && !empty($fileAttached["tmp_name"] || !empty($fileAttached["tmp_name"]))) {
-            $validityFile = $serviceProvider->getValidateFileService();
-            $val = $validityFile->checkFileValidity($fileAttached, $session);
+            $val = $validateFileService->checkFileValidity($fileAttached, $session, $fileService);
             if ($val === null) {
                 return null;
             }
@@ -42,13 +44,12 @@ class CreatePostService
         foreach ($param as $key => $el) {
             $params[$key] = $el;
         }
-        $validToken = $serviceProvider->getTokenService()->validateToken($param, $session);
+        $validToken = $tokenService->validateToken($param, $session);
         if (!$validToken) {
             return null;
         }
 
-        $validity = $serviceProvider->getValidityService();
-        $params = $validity->validityVariables($params);
+        $params = $validityService->validityVariables($params);
 
         return $params;
     }

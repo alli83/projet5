@@ -27,7 +27,7 @@ In order to create the vendor folder run:
 ```bash
 composer install
 ```
-In order to include your own classes from src directory under the namespace App (for example), in composer.json add:
+In order to include your own classes from src directory under the namespace App (for example), in composer.json make sure you have:
 ```bash
     "autoload": {
         "psr-4": {
@@ -35,11 +35,7 @@ In order to include your own classes from src directory under the namespace App 
         }
     }
 ```
-*   Via composer, install Whoops, PHP_CodeSniffer, PhpStan packages with composer with flag --dev
-*   Via composer, install twig.
-*   Via composer install SwiftMailer
 *   In dev mode, to intercept emails, you can use maildev 
-
 ```bash
 npm install -g maildev
 ```

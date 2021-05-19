@@ -31,7 +31,7 @@
           {{comment.last_update | date("d/m/Y H:i")}}
           {% endif%}
         </p>
-        <p>{{comment.text}}</p>
+        <p>{{comment.text|raw}}</p>
 
         {% if comment.status is same as("created") %}
         <form method="POST" action="/comment-{{comment.id}}/validate">

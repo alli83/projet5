@@ -72,10 +72,10 @@ class AuthService
             );
             return false;
         }
-        if (!preg_match('/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@%^&*-]).{8,}$/', $datas['password'])) {
+        if (!preg_match('/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@%^*-]).{8,}$/', $datas['password'])) {
             $session->addFlashes(
                 "warning",
-                "Votre mot de passe doit comporter 10 caractères, au moins un chiffre et un caractère spécial #?!@%^&*-"
+                "Votre mot de passe doit comporter 10 caractères, au moins un chiffre et un caractère spécial #?!@%^*-"
             );
             return false;
         }

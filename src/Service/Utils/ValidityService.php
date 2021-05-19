@@ -36,7 +36,7 @@ class ValidityService
 
     public function validatePassword(string $param, string $param2): ?string
     {
-        if (preg_match('/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@%^&*-]).{8,}$/', $param) && ($param === $param2)) {
+        if (preg_match('/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@%^*-]).{8,}$/', $param) && ($param === $param2)) {
             $password = password_hash($param, PASSWORD_DEFAULT);
             if ($password === false) {
                 return null;

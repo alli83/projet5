@@ -6,7 +6,7 @@ $(document).ready( () => {
     }, 10000);
 
     $.validator.addMethod("regexPass", (value) => {
-        return /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@%^&*-]).{10,}$/.test(value);
+        return /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@%^*-]).{10,}$/.test(value);
     });
     $.validator.addMethod("regexPseudo", (value) => {  
         return /^\w{1,20}$/.test(value);
@@ -48,7 +48,7 @@ $(document).ready( () => {
                 regexEmail: "Vous devez renseigner un email valide"
             },
             passwordLogin: {
-                required: "Vous devez renseigner votre mot de passe",
+                required: "Vous devez renseigner votre mot de passe"
             }
         },
         submitHandler: (form) => {
@@ -105,7 +105,7 @@ $(document).ready( () => {
             password: {
                 required: "Vous devez renseigner un mot de passe",
                 minlength: "Le mot de passe doit comporter au moins 10 caractères",
-                regexPass: "Votre mot de passe doit comporter au moins 10 caractères, une majuscule, un chiffre et un caractère spécial #?!@%^&*-"
+                regexPass: "Votre mot de passe doit comporter au moins 10 caractères, une majuscule, un chiffre et un caractère spécial #?!@%^*-"
             },
             passwordConfirm: {
                 required: "Vous devez confirmer votre mot de passe",
@@ -159,11 +159,11 @@ $(document).ready( () => {
         messages: {
             nameContact: {
                 required: "Vous devez renseigner votre prénom",
-                regexPseudo: "Votre prénom doit être composé entre 1 et 20 caractères (chiffres ou lettres)",
+                regexPseudo: "Votre prénom doit être composé entre 1 et 20 caractères (chiffres ou lettres)"
             },
             lastNameContact: {
                 required: "Vous devez renseigner votre nom",
-                regexPseudo: "Votre nom doit être composé entre 1 et 20 caractères (chiffres ou lettres)",
+                regexPseudo: "Votre nom doit être composé entre 1 et 20 caractères (chiffres ou lettres)"
             },
             emailContact: {
                 required: "Vous devez renseigner un email",
@@ -173,7 +173,7 @@ $(document).ready( () => {
             messageContact: {
                 required: "Veuillez compléter ce champs",
                 maxlength:"Votre message dépasse les 1000 caractères",
-                regexText:"Le message ne peux contenir que des caractères (chiffres ou lettres)"
+                regexText:"Peut comporter des chiffres et des lettres et: é\'\"èçàâêîôûäëïöüù:_.(), -?!&,"
             },
             check: {
                 required: "Vous devez accepter les conditions"
@@ -201,7 +201,7 @@ $(document).ready( () => {
                 required: "Merci d'écrire votre commentaire avant de l'envoyer",
                 maxlength: "Votre commentaire est trop long (600 caractères maximum)",
                 minlength: "Un minimum de 2 caractère est requis",
-                regexText: "Peut comporter des chiffres et des lettre et: é\'\"èçàâêîôûäëïöüù:_.(), -?!&,",
+                regexText: "Peut comporter des chiffres et des lettres et: é\'\"èçàâêîôûäëïöüù:_.(), -?!&,"
             },
         },
         submitHandler: (form) => {
@@ -253,7 +253,7 @@ $(document).ready( () => {
             password2: {
                 required: "Vous devez renseigner un mot de passe",
                 minlength: "Le mot de passe doit comporter au moins 10 caractères",
-                regexPass: "Votre mot de passe doit comporter au moins 10 caractères, une majuscule, un chiffre et un caractère spécial #?!@%^&*-"
+                regexPass: "Votre mot de passe doit comporter au moins 10 caractères, une majuscule, un chiffre et un caractère spécial #?!@%^*-"
             },
             passwordConfirm2: {
                 required: "Vous devez confirmer votre mot de passe",
@@ -306,12 +306,12 @@ $(document).ready( () => {
             messages: {
                 title: {
                     required: "Vous devez renseigner un titre",
-                    regexPostTitle: "Doit comporter des chiffres et des lettre et peut comporter é\'\"èçàâêîôûäëïöüù:_.(), -?!&,",
+                    regexPostTitle: "Doit comporter des chiffres et des lettres et peut comporter é\'\"èçàâêîôûäëïöüù:_.(), -?!&,",
                     maxlength: "La limite est à 255 caractères"
                        },
                 stand_first: {
                     required: "Vous devez renseigner un chapo",
-                    regexText: "Doit comporter des chiffres et des lettre et peut comporter é\'\"èçàâêîôûäëïöüù:_.(), -?!&,",
+                    regexText: "Doit comporter des chiffres et des lettres et peut comporter é\'\"èçàâêîôûäëïöüù:_.(), -?!&,",
                     maxlength: "La limite est à 1500 caractères"
                 },
                 usersToComplete: {
@@ -321,7 +321,7 @@ $(document).ready( () => {
                 },
                 text: {
                     required: "Vous devez renseigner un contenu",
-                    regexText: "Doit comporter des chiffres et des lettre et peut comporter é\'\"èçàâêîôûäëïöüù:_.(), -?!&,",
+                    regexText: "Doit comporter des chiffres et des lettres et peut comporter é\'\"èçàâêîôûäëïöüù:_.(), -?!&,",
                     maxlength: "La limite est à 10000 caractères"
                 },
             },

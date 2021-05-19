@@ -8,8 +8,8 @@ However, it is possible to use librairies downloaded via Composer.
 Main goals: 
 *   Create a home page (cv to download, contact form etc..)
 *   Display posts with image (optionnal).
-*   Create an admin dashboard only accessible for admin users, one where they can manage posts, members and comments)
-*   authorize logged in users to write comments (comments need to be validated by Admin user before being published)
+*   Create an admin dashboard only accessible for admin users, one where they can manage posts, members and comments
+*   Authorize logged in users to write comments (comments need to be validated by Admin user before being published)
 
 ## Requirements
 
@@ -80,12 +80,15 @@ return array(
     )
 );
 ```
-*   profil picture in public/images folder (profile.jpeg)
-*   When you are ready, at the root of your project,  to launch the project, run :
+*   Profil picture in public/images folder (profile.jpeg)
+*   At the root of the project, for the db's structure, you can find a db.sql file => you can import it. 
+*   Don't forget to reset the password: /login => "jai oublié mon mot de passe".
+*   From your superAdmin account, you can manage "admin" and "user" permissions directly from the admin dashboard.
+*   If you decide to create your own database from zero (without any of the examples given in db.sql), don't forget that you need to create first a superAdmin user => go to signup : create an account and then, directly in your db (through phpmyadmin for example) change the permission (role) to 'superAdmin'. 
+*   When you are ready, at the root of your project, to launch it, run :
 ```bash
 php -S localhost:8000 -t public
 ```
-*   You can manage "admin" and "user" permissions directly from the admin dashboard but first, you need to create a superAdmin user => go to signup : create an account and then in your db change the permission (role) to 'superAdmin'. 
 ## Code quality
 
 you can run : 

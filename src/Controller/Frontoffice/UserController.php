@@ -132,8 +132,7 @@ final class UserController implements ControllerInterface
 
     public function confirmResetAction(array $param, ?ParametersBag $request): Response
     {
-        $validity = $this->validityService;
-        $param = $validity->validityVariables($param);
+        $param = $this->validityService->validityVariables($param);
 
         if ($request === null) {
             return new Response($this->view->render([
@@ -160,12 +159,13 @@ final class UserController implements ControllerInterface
             return new Response("", 302, ["location" =>  "/login"]);
         }
         $params = $request->all();
+        $params = $this->validityService->validityVariables($params);
 
         if (empty($params['password2']) || empty($params['passwordConfirm2'])) {
             return new Response("", 302, ["location" =>  "/login"]);
         }
 
-        $password = $validity->validatePassword($params['password2'], $params['passwordConfirm2']);
+        $password = $this->validityService->validatePassword($params['password2'], $params['passwordConfirm2']);
 
         if ($password === null) {
             return new Response("", 302, ["location" =>  "/login"]);

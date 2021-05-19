@@ -44,8 +44,11 @@ class AuthService
         return false;
     }
 
-    public function register(Session $session, array $datas, UserRepository $userRepo): bool
-    {
+    public function register(
+        Session $session,
+        array $datas,
+        UserRepository $userRepo
+    ): bool {
         $password = "";
 
         if (empty($datas['emailSignup']) || empty($datas['pseudoSignup'])) {

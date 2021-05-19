@@ -32,12 +32,12 @@
                     </div>
                     {% endif %}
                     <div class="card-body">
-                        <h5 class="card-title">{{ post.title }}</h5>
+                        <h5 class="card-title">{{ post.title|raw }}</h5>
                         <div class="mb-1 text-muted">
                             <p>Modifié dernièrement le {{ post.last_update | date("d/m/Y") }} par {{post.pseudo}}</p>
                         </div>
                         <p class="card-text">
-                            {{ post.stand_first}}
+                            {{ post.stand_first|raw }}
                         </p>
                         <a href="/post-{{ post.id}}" class="btn btn-dark">Lire le post</a>
                     </div>

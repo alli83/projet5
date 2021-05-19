@@ -23,7 +23,7 @@
   <div class="container mt-5">
     <ul class="list-group">
       <li class="list-group-item list-group-item-warning fs-5">
-        {{post.title}}
+        {{post.title|raw }}
         <p class="mb-1 text-muted">Crée le {{post.creation_date | date("d/m/Y")}}
           {% if post.creation_date is not same as(post.last_update) %}
           - dernière mise à jour le: {{post.last_update | date("d/m/Y H:i")}}

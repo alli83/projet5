@@ -16,12 +16,12 @@
         <div class="mb-3">
             <div class="card">
                 <div class="card-body">
-                    <h2 class="blog-post-title text-center">{{ post.title }}</h2>
-                    <p class="blog-post-meta mb-1 text-muted">Par {{ post.pseudo}}</p>
+                    <h2 class="blog-post-title text-center">{{ post.title|raw  }}</h2>
+                    <p class="blog-post-meta mb-1 text-muted">Par {{ post.pseudo }}</p>
                     <p class="blog-post-meta mb-1 text-muted">Créé le {{ post.creation_date | date("d/m/Y")}}</p>
-                    <p class="blog-post-meta mb-1 text-muted"> {{ post.stand_first }}</p>
+                    <p class="blog-post-meta mb-1 text-muted"> {{ post.stand_first|raw  }}</p>
                     <div class="card-text my-4">
-                        {{ post.text|nl2br }}
+                        {{ post.text|raw|nl2br }}
                     </div>
                     {% if post.creation_date is not same as(post.last_update)%}
                     <p class="blog-post-meta mb-1 text-muted">modifié dernièrement le {{ post.last_update | date("d/m/Y
@@ -72,7 +72,7 @@
                 <p class="mb-1 text-muted">Commentaire de {{ comment.pseudo }} - posté le {{ comment.created_date |
                     date("d/m/Y")}}</p>
                 <br>
-                <p>{{ comment.text }}</p>
+                <p>{{ comment.text|raw  }}</p>
                 <hr>
                 {% endfor %}
                 {% else %}
